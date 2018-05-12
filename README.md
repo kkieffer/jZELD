@@ -90,7 +90,7 @@ additional hotkeys.
 When starting the demo, if a previous instance was saved with Ctrl-S, it can be loaded.  If the user chooses not to load, a default ZCanvas is loaded with a collection
 of demo ZElements.  The default Demo is shown below.
 
-![Demo Screenshot](https://github.com/kkieffer/jCircularGauges/blob/master/demo.jpg "Demo Screenshot")
+![Demo Screenshot](https://github.com/kkieffer/jZELD/blob/master/demo.jpg "Demo Screenshot")
 
 
 ## Getting Started
