@@ -95,7 +95,7 @@ of demo ZElements.  The default Demo is shown below.
 
 ## Getting Started
 
-Build and Run using Maven:  "mvn compile"
+Build and Run using Maven:  "mvn package"
 Navigate to the "target" directory
 
 Run: java -cp classes:test-classes com.github.kkieffer.jzeld.Demo
