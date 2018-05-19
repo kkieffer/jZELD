@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld;
 
 import com.github.kkieffer.jzeld.JAXBAdapter.ColorAdapter;
+import com.github.kkieffer.jzeld.JAXBAdapter.DimensionAdapter;
 import com.github.kkieffer.jzeld.JAXBAdapter.FontAdapter;
 import com.github.kkieffer.jzeld.JAXBAdapter.PointAdapter;
 import com.github.kkieffer.jzeld.draw.DrawClient;
@@ -36,8 +37,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -139,8 +138,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         @XmlElement(name="Origin")
         @XmlJavaTypeAdapter(PointAdapter.class)
         private Point origin;
-
         
+        @XmlElement(name="Bounds")
+        @XmlJavaTypeAdapter(DimensionAdapter.class)
+        private Dimension bounds;
     }
     /*----------------------------------------------------------------------*/
     
@@ -199,9 +200,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param unitType the unit to use for mouse coordinates
      * @param mouseCursorColor color for the mouse cursor lines, use null to remove the cursor
      * @param undoStackCount the amount of history to keep in undo (the higher the count, the more memory used
-     * @param origin the desired coordinate origin of the top left corner, if null, origin = 0,0
+     * @param origin the desired coordinate origin of the top left corner. If null, origin = 0,0
+     * @param bounds the maximum bounds of the canvas (width and height).  If null, unlimited
      */
-    public ZCanvas(Color background, Font mouseCoordFont, Unit unitType, Color mouseCursorColor, int undoStackCount, Point origin) {
+    public ZCanvas(Color background, Font mouseCoordFont, Unit unitType, Color mouseCursorColor, int undoStackCount, Point origin, Dimension bounds) {
         super();
         fields.backgroundColor = background;
         fields.unit = unitType;
@@ -212,6 +214,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             fields.origin = new Point(0,0);
         else
             fields.origin = new Point(origin);
+        
+        if (bounds == null)
+            fields.bounds = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        else
+            fields.bounds = new Dimension(bounds.width, bounds.height);
         
         init();
     }
@@ -316,12 +323,34 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
     }
     
+    //This method is overriden to force the component to draw only to its bounds. 
+    @Override
+    public void reshape(int x, int y, int width, int height) {
+        if (width > fields.bounds.width)
+            width = fields.bounds.width;
+        if (height > fields.bounds.height)
+            height = fields.bounds.height;
+        
+        super.reshape(x, y, width, height);
+    }
+    
+    /**
+     * Returns the origin in values of units
+     * @return 
+     */
     public Point2D getOrigin() {
         return new Point2D.Double(fields.origin.getX()/SCALE, fields.origin.getY()/SCALE);
-    }   
+    }
 
-  
+    /**
+     * Provides the drawing area of the canvas, in units 
+     * @return a Rectangle2D where x,y are the origin and width,height are the bounds
+     */
+    public Rectangle2D getCanvasBounds() {
+        return new Rectangle2D.Double(fields.origin.getX()/SCALE, fields.origin.getY()/SCALE, fields.bounds.width/SCALE, fields.bounds.height/SCALE);
+    }
     
+      
     public double getScale() {
          return SCALE;
     }
@@ -559,7 +588,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param d the dimension to shift
      */
     protected void shiftBy(Dimension d) {
-    
+        
         if (selectedElements.isEmpty() || passThruElement != null)  {
             translate.x += d.width * TRANSLATE_SCALE;
             translate.y += d.height * TRANSLATE_SCALE;
@@ -946,7 +975,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         Graphics2D g2d = (Graphics2D)g;
         
         
-        
+
         g2d.scale(1/pixScale, 1/pixScale);
         g2d.scale(zoom, zoom);
         

@@ -364,6 +364,27 @@ public class ZEditableText extends ZElement {
         
     }
     
+    /**
+     * Checks to see if the text string will fit in the bounds of the element without resizing it
+     * @param text the test string
+     * @param font the font to try, if null, use the currently set font attribute
+     * @param scale the canvas scale
+     * @return true if the text will fit, false otherwise
+     */
+    public boolean checkTextFit(String text, Font font, double scale) {
+                
+        JTextPane testPane = new JTextPane();
+        testPane.setFont(font == null ? attr.font : font);
+        testPane.setText(text);
+
+        Dimension d = testPane.getPreferredSize();  //preferred size is the size that it should be based on the amount of characters
+        Rectangle b = super.getBounds(scale);
+        
+        if (d.width > b.getWidth() || d.height > b.getHeight())
+            return false;
+        else
+            return true;
+    }
 
     @Override
     public Rectangle getBounds(double scale) {

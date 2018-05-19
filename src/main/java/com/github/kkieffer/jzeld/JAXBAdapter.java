@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
@@ -74,7 +75,7 @@ public class JAXBAdapter {
         public Point unmarshal(final String xml) throws Exception {
            String[] parts = xml.split(",");
            if (parts.length != 2)
-               throw new java.text.ParseException("Point must have 2 integers", 0);
+               throw new java.text.ParseException("Object must have 2 integers", 0);
            Point p = new Point();
            p.x = Integer.parseInt(parts[0].trim());
            p.y = Integer.parseInt(parts[1].trim());
@@ -87,6 +88,26 @@ public class JAXBAdapter {
            return object.x + ", " + object.y;
         }
 
+     }
+    
+     /**
+      * This class just duplicates the functionality of PointAdapter since they are both storing two integers
+      */
+     public static class DimensionAdapter extends XmlAdapter<String, Dimension> {
+
+         private final PointAdapter pa = new PointAdapter();
+         
+        @Override
+        public Dimension unmarshal(String v) throws Exception {
+             Point p = pa.unmarshal(v);
+             return new Dimension(p.x, p.y);
+        }
+
+        @Override
+        public String marshal(Dimension v) throws Exception {
+            return pa.marshal(new Point(v.width, v.height));
+        }
+         
      }
     
     

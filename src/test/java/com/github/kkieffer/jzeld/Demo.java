@@ -18,6 +18,7 @@ import com.github.kkieffer.jzeld.element.ZTriangle;
 import com.github.kkieffer.jzeld.element.ZRoundedRectangle;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -132,7 +133,7 @@ public class Demo extends javax.swing.JFrame {
         setTitle("jZELD Demo");
 
         //Create our ZCanvas with a dark grey background, label font, centimeter scale, dark grey cursor lines, 10 undo stack
-        ZCanvas c = new ZCanvas(Color.DARK_GRAY, LABEL_FONT, Unit.CM, Color.DARK_GRAY, 10, new Point(36, 36));
+        ZCanvas c = new ZCanvas(Color.DARK_GRAY, LABEL_FONT, Unit.CM, Color.DARK_GRAY, 10, new Point(36, 36), new Dimension(1400, 800));
         canvasPane.add(c, BorderLayout.CENTER);
         
         ZDefaultContextMenu m = new ZDefaultContextMenu(c);
