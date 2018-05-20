@@ -90,7 +90,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 public class ZCanvas extends JComponent implements Printable, MouseListener, MouseMotionListener, MouseWheelListener  {
 
-
+    public enum Orientation {PORTRAIT, LANDSCAPE, REVERSE_LANDSCAPE}  //The ordinals conform to the PageFormat integer defines
    
     public enum Alignment {Left_Edge, Top_Edge, Right_Edge, Bottom_Edge, Centered_Vertically, Centered_Horizontally;
         
@@ -142,6 +142,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         @XmlElement(name="Bounds")
         @XmlJavaTypeAdapter(DimensionAdapter.class)
         private Dimension bounds;
+        
+        @XmlElement(name="Orientation")        
+        private Orientation orientation;
     }
     /*----------------------------------------------------------------------*/
     
@@ -160,7 +163,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private Point translate;
     
     private final ArrayList<ZElement> selectedElements = new ArrayList<>();
-    private ZElement copyOfSelectedElement;
+    private ZElement[] clipboard;
 
     private UndoStack undoStack;
 
@@ -202,8 +205,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param undoStackCount the amount of history to keep in undo (the higher the count, the more memory used
      * @param origin the desired coordinate origin of the top left corner. If null, origin = 0,0
      * @param bounds the maximum bounds of the canvas (width and height).  If null, unlimited
+     * @param o the page orientation, for printing
      */
-    public ZCanvas(Color background, Font mouseCoordFont, Unit unitType, Color mouseCursorColor, int undoStackCount, Point origin, Dimension bounds) {
+    public ZCanvas(Color background, Font mouseCoordFont, Unit unitType, Color mouseCursorColor, int undoStackCount, Point origin, Dimension bounds, Orientation o) {
         super();
         fields.backgroundColor = background;
         fields.unit = unitType;
@@ -215,11 +219,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         else
             fields.origin = new Point(origin);
         
-        if (bounds == null)
-            fields.bounds = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
-        else
-            fields.bounds = new Dimension(bounds.width, bounds.height);
-        
+        setCanvasBounds(bounds, o);
         init();
     }
     
@@ -293,15 +293,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         am.put("Plus", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (zoom < 4.0)
-                zoom *= 2.0;
+                zoomIn();
             }
         });
         am.put("Minus", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (zoom > 1.0)
-                zoom /= 2.0;
+                zoomOut();
             }
         });
         
@@ -326,10 +324,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     //This method is overriden to force the component to draw only to its bounds. 
     @Override
     public void reshape(int x, int y, int width, int height) {
-        if (width > fields.bounds.width)
-            width = fields.bounds.width;
-        if (height > fields.bounds.height)
-            height = fields.bounds.height;
+        
+        if (fields.bounds != null) {
+            if (width > fields.bounds.width * zoom)
+                width = (int)(fields.bounds.width * zoom);
+            if (height > fields.bounds.height * zoom)
+                height = (int)(fields.bounds.height * zoom);
+        }
         
         super.reshape(x, y, width, height);
     }
@@ -350,6 +351,34 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         return new Rectangle2D.Double(fields.origin.getX()/SCALE, fields.origin.getY()/SCALE, fields.bounds.width/SCALE, fields.bounds.height/SCALE);
     }
     
+    public Orientation getOrientation() {
+        return fields.orientation;
+    }
+    
+    /**
+     * Sets the drawing area of the canvas, in pixels 
+     * @param bounds the drawing area dimension
+     * @param o the orientation, for printing purposes
+     */
+    public final void setCanvasBounds(Dimension bounds, Orientation o) {
+        if (bounds != null) { 
+            fields.bounds = new Dimension(bounds.width + fields.origin.x, bounds.height + fields.origin.y);
+        }
+        fields.orientation = o;
+        
+        updatePreferredSize();
+        repaint();
+    }
+    
+    private void updatePreferredSize() {
+        if (fields.bounds == null)
+            setPreferredSize(null);
+        else {
+            Dimension d = new Dimension((int)(fields.bounds.width * zoom), (int)(fields.bounds.height * zoom));
+            setPreferredSize(d);
+        }
+        revalidate();
+    }
       
     public double getScale() {
          return SCALE;
@@ -393,7 +422,25 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         repaint();
     }
     
+    /**
+     * Zoom in, to 4:1
+     */
+    public void zoomIn() {
+        if (zoom < 4.0)
+            zoom *= 2.0;
+        
+        updatePreferredSize();
+    }
     
+    /**
+     * Zooms out, as far as 1:1 
+     */
+    public void zoomOut() {
+        if (zoom > 1.0)
+            zoom /= 2.0;
+        
+        updatePreferredSize();
+    }
     
    
     private void setLastMethod(String name, Object... params) {
@@ -885,35 +932,77 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     /**
      * Makes a deep copy of the last selected element, if there is one, and stores it for later.  Does nothing if the control is currently with an element.
+     * @return a copy of the copied elements, or null if none was copied
      */
-    public void copy() {
-        if (selectedElements.size() == 1 && passThruElement == null)
-            copyOfSelectedElement = lastSelectedElement.copyOf();
-        lastMethod = null;
-
+    public ZElement[] copy() {
+        if (selectedElements.size() > 0) {
+            
+            clipboard = new ZElement[selectedElements.size()];
+            ZElement[] externalCopy = new ZElement[selectedElements.size()];
+            for (int i=0; i<clipboard.length; i++) {
+                clipboard[i] = selectedElements.get(i).copyOf();
+                externalCopy[i] = selectedElements.get(i).copyOf();
+            }
+            
+            lastMethod = null;
+            return externalCopy;
+        }
+        else
+            return null;
     }
     
     /**
-     * Pastes any stored element copy (and slightly shifts it to distinguish it from its source). Does nothing if no element was copied or control is
-     * currently with an element.
+     * Makes a deep copy of the last selected element, if there is one, and returns it _and_ stores it for later.
+     * @return a copy of the cut elements, or null if none was cut
      */
-    public void paste() {
-        if (copyOfSelectedElement != null && passThruElement == null) {
-            undoStack.saveContext(fields.zElements);
-
-            
-            ZElement toPaste = copyOfSelectedElement;
-            toPaste.move(0.2, 0.2, this.getScaledWidth()/SCALE, this.getScaledHeight()/SCALE);  //move slighty down to distinguish from original
-        
-            copyOfSelectedElement = copyOfSelectedElement.copyOf(); //make another copy of the original
-            addElement(toPaste);
-            selectedElements.clear();;
-            selectedElements.add(toPaste);
-            
-            repaint();            
+    public ZElement[] cut() {
+        ZElement[] copied = copy();
+        if (copied != null) {
+            delete();
+            return copied;
         }
-        lastMethod = null;            
+        else
+            return null;
     }
+    
+    
+    /**
+     * Pastes any stored elements (and slightly shifts it to distinguish it from its source). Does nothing if no element was copied or control is
+     * currently with an element.
+     * @return true if at least one element was pasted, null otherwise
+     */
+    public boolean paste() {
+        if (clipboard != null && passThruElement == null) {
+            selectedElements.clear();
+
+            undoStack.saveContext(fields.zElements);
+            for (ZElement e : clipboard)
+                paste(e);          
+            return true;
+        }
+        else
+            return false;
+             
+    }
+    
+    /**
+     * Pastes an external ZElement and selects it
+     * @param e the element to paste 
+     */
+    public void paste(ZElement e) {
+
+        e.move(0.2, 0.2, this.getScaledWidth()/SCALE, this.getScaledHeight()/SCALE);  //move slighty down to distinguish from original
+        
+        ZElement toPaste = e.copyOf();  //make a copy to paste, for multiple pastes
+        
+        addElement(toPaste);
+        selectedElements.add(toPaste);  //select the pasted element
+        lastMethod = null;            
+
+        repaint();  
+    }
+    
+    
     
     /**
      * Deletes the selected elements. Does nothing if no element is selected or control is
@@ -969,7 +1058,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     @Override
-    public synchronized void paint(Graphics g) {
+    public synchronized void paintComponent(Graphics g) {
 
         super.paintComponent(g);  
         Graphics2D g2d = (Graphics2D)g;
@@ -985,8 +1074,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
          
         g2d.translate(translate.x, translate.y);
         
-        
-        g2d.setBackground(fields.backgroundColor);
+        if (fields.backgroundColor != null) {
+            g2d.setBackground(fields.backgroundColor);
+            g2d.clearRect(0, 0, getScaledWidth(), getScaledHeight());
+        }
         
         //Start from the deepest point in the stack, drawing elements up to the top z layer
         Iterator<ZElement> it = fields.zElements.descendingIterator();  
@@ -1496,6 +1587,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         fields = (ZCanvas.CanvasFields)jaxbUnMarshaller.unmarshal(f);
         
         resetView();
+        selectedElements.clear();
+        updatePreferredSize();
         repaint();
         
     }
@@ -1506,10 +1599,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (pageIndex > 0) 
             return(NO_SUCH_PAGE);
 
+        resetView();
+        selectedElements.clear();
+
         RepaintManager currentManager = RepaintManager.currentManager(this);
         
         Graphics2D g2d = (Graphics2D)g;
-        g2d.translate(pageFormat.getImageableX() - fields.origin.x, pageFormat.getImageableY() - fields.origin.y);
+        g2d.translate(-fields.origin.x, -fields.origin.y);
         currentManager.setDoubleBufferingEnabled(false);
         this.paint(g2d);
         currentManager.setDoubleBufferingEnabled(true);

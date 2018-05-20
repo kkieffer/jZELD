@@ -22,6 +22,7 @@ public class ZDefaultCanvasHotkeys {
         ActionMap am = c.getActionMap();
 
   
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.META_DOWN_MASK), "Cut");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.META_DOWN_MASK), "Copy");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), "Paste");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "Delete");
@@ -30,7 +31,13 @@ public class ZDefaultCanvasHotkeys {
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.META_DOWN_MASK), "Undo");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.META_DOWN_MASK), "Group");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.META_DOWN_MASK), "Ungroup");
-
+ 
+        am.put("Cut", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                c.cut();
+            }
+        });
         am.put("Copy", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
