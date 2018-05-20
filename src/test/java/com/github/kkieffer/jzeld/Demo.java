@@ -2,6 +2,7 @@ package com.github.kkieffer.jzeld;
 
 
 
+import com.github.kkieffer.jzeld.ZCanvas.Orientation;
 import com.github.kkieffer.jzeld.draw.FreeformDraw;
 import com.github.kkieffer.jzeld.draw.StraightLineDraw;
 import com.github.kkieffer.jzeld.element.ZCanvasRuler;
@@ -133,7 +134,7 @@ public class Demo extends javax.swing.JFrame {
         setTitle("jZELD Demo");
 
         //Create our ZCanvas with a dark grey background, label font, centimeter scale, dark grey cursor lines, 10 undo stack
-        ZCanvas c = new ZCanvas(Color.DARK_GRAY, LABEL_FONT, Unit.CM, Color.DARK_GRAY, 10, new Point(36, 36), new Dimension(1400, 800));
+        ZCanvas c = new ZCanvas(Color.WHITE, LABEL_FONT, Unit.CM, Color.DARK_GRAY, 10, new Point(36, 36), new Dimension(1400, 800), Orientation.LANDSCAPE);
         canvasPane.add(c, BorderLayout.CENTER);
         
         ZDefaultContextMenu m = new ZDefaultContextMenu(c);
