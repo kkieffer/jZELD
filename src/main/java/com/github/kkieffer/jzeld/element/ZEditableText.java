@@ -78,10 +78,16 @@ public class ZEditableText extends ZElement {
         }
         
         protected TextAttributes() {}
+        
+        protected TextAttributes(TextAttributes source) {
+            hj = source.hj;
+            font = new Font(source.font.getName(), source.font.getStyle(), source.font.getSize());
+            fontColor = source.fontColor;
+        }
     }
 
     /* ----- JAXB FIELDS ---------*/
-    protected TextAttributes attr;
+    protected TextAttributes textAttributes;
     
     @XmlJavaTypeAdapter(ColorAdapter.class)
     protected Color backgroundColor;
@@ -157,7 +163,7 @@ public class ZEditableText extends ZElement {
 
     protected void afterUnmarshal(Unmarshaller u, Object parent) {
         textPanel = new JPanel();
-        setTextAttributes(attr);
+        setTextAttributes(textAttributes);
         setAttributes(borderThickness, borderColor, null, backgroundColor);
         setup();
     }
@@ -197,7 +203,7 @@ public class ZEditableText extends ZElement {
         textPanel = new JPanel();
         textWidget = new JTextPane();
         
-        setTextAttributes(copy.attr);
+        setTextAttributes(copy.textAttributes);
         modifyText(copy.textWidget.getText());
         setAttributes(copy.borderThickness, copy.borderColor, null, copy.backgroundColor);
 
@@ -302,7 +308,7 @@ public class ZEditableText extends ZElement {
      */
     public final void setTextAttributes(TextAttributes attr) {
                 
-        this.attr = attr;
+        this.textAttributes = attr;
 
         StyledDocument doc = textWidget.getStyledDocument();
         SimpleAttributeSet a = new SimpleAttributeSet();
@@ -315,9 +321,16 @@ public class ZEditableText extends ZElement {
         
         textWidget.setFont(attr.font);
         textWidget.setForeground(attr.fontColor);     
-        
-        
-       
+
+    }
+    
+    
+    /**
+     * Returns a copy of the element's text attributes
+     * @return 
+     */
+    public final TextAttributes getTextAttributes() {
+        return new TextAttributes(this.textAttributes); //copy
     }
     
     
@@ -374,7 +387,7 @@ public class ZEditableText extends ZElement {
     public boolean checkTextFit(String text, Font font, double scale) {
                 
         JTextPane testPane = new JTextPane();
-        testPane.setFont(font == null ? attr.font : font);
+        testPane.setFont(font == null ? textAttributes.font : font);
         testPane.setText(text);
 
         Dimension d = testPane.getPreferredSize();  //preferred size is the size that it should be based on the amount of characters
@@ -403,7 +416,7 @@ public class ZEditableText extends ZElement {
         super.setSize(b.width, b.height, 1, scale); 
         
         //Adjust the font size by the scaling factor to maintain consistency
-        Font f = new Font(attr.font.getFontName(), attr.font.getStyle(), (int)(attr.font.getSize2D()*scale/72.0));
+        Font f = new Font(textAttributes.font.getFontName(), textAttributes.font.getStyle(), (int)(textAttributes.font.getSize2D()*scale/72.0));
         textWidget.setFont(f);
         
         return super.getBounds(scale);

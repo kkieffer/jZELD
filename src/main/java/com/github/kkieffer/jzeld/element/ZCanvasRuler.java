@@ -96,7 +96,7 @@ public final class ZCanvasRuler extends ZRectangle {
                 
                 for (double j=i; j<width; j+=scale/minorTicks) {
                     int jnc = (int)Math.round(j);
-                    g.drawLine(jnc, 0, jnc, height/2);  //draw a vertical bar at j for minor tick
+                    g.drawLine(jnc, 0, jnc, height/4);  //draw a vertical bar at j for minor tick
                 }
                 
                 if (i==0)
@@ -117,7 +117,7 @@ public final class ZCanvasRuler extends ZRectangle {
                 
                  for (double j=i; j<height; j+=scale/minorTicks) {
                         int jnc = (int)Math.round(j);
-                     g.drawLine(0, jnc, width/2, jnc);  //draw a horizontal bar at j for minor tick
+                     g.drawLine(0, jnc, width/4, jnc);  //draw a horizontal bar at j for minor tick
                  }
                  
                 if (i==0)
