@@ -122,13 +122,14 @@ public class ZShape extends ZAbstractShape {
         //Scale the shape by the ratio
         AffineTransform scaleInstance = AffineTransform.getScaleInstance(widthRatio, heightRatio);
         shape = scaleInstance.createTransformedShape(shape);
-
+        hasChanges = true;
     }
     
 
     @Override
     protected void fillShape(Graphics2D g, int unitSize, int width, int height) {
         g.fill(scaledShape);
+        hasChanges = true;
     }
 
    

@@ -74,11 +74,13 @@ public class ZImage extends ZRectangle {
      */
     public void setImage(BufferedImage i) {
         image = i;
+        hasChanges = true;
     }
 
      @Override
     public void setFillColor(Color fillColor) {
         backgroundColor = null;
+        hasChanges = true;
     }
     
     
@@ -91,6 +93,7 @@ public class ZImage extends ZRectangle {
     public void setAttributes(int outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
         super.setAttributes(outlineWidth, outlineColor, dashPattern, fillColor);
         backgroundColor = null;
+        hasChanges = true;
     }
     
     

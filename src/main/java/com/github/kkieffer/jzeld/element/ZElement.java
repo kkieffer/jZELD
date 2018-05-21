@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
@@ -46,6 +47,10 @@ public abstract class ZElement {
     
     @XmlAttribute(name = "class")
     private String className;  //needed to reload subclasses by classname
+    
+    @XmlTransient
+    protected boolean hasChanges = false;  //marks any changes to the Element prior to saving
+  
     
   
     /**
@@ -89,6 +94,23 @@ public abstract class ZElement {
     
     public abstract ZElement copyOf();
    
+    /**
+     * Call this after saving an element to permanent storage. This marks the "hasChanges" flag to false, and hasChanges() will return false
+     * until the next time the element is modified.
+     */
+    public final void wasSaved() {
+        hasChanges = false;
+    }
+    
+    
+    /**
+     * Checks to see if the element has changed since the last call to wasSaved().  Generally changing the position, size, rotation, or
+     * other attributes of a element will indicate changes.  Immediately after construction the element should not have any changes.
+     * @return true if the element has changed, false otherwise
+     */
+    public final boolean hasChanges() {
+        return hasChanges;
+    }
     
     
     /**

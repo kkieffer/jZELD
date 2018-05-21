@@ -46,6 +46,7 @@ public class ZRoundedRectangle extends ZRectangle {
      */
     public void setRadius(double r) {
         radius = r;
+        hasChanges = true;
     }
      
     

@@ -141,7 +141,8 @@ public class ZEditableText extends ZElement {
             public void keyPressed(KeyEvent e) {
                 textWidget.repaint();
                 textWidget.getParent().repaint();
-            }
+                hasChanges = true;
+        }
 
             @Override
             public void keyReleased(KeyEvent e) {
@@ -166,6 +167,7 @@ public class ZEditableText extends ZElement {
         setTextAttributes(textAttributes);
         setAttributes(borderThickness, borderColor, null, backgroundColor);
         setup();
+        hasChanges = false;
     }
     
     /**
@@ -194,6 +196,7 @@ public class ZEditableText extends ZElement {
         setAttributes(borderThickness, borderColor, null, backgroundColor);
 
         setup();
+        hasChanges = false;
 
     }
     
@@ -208,7 +211,8 @@ public class ZEditableText extends ZElement {
         setAttributes(copy.borderThickness, copy.borderColor, null, copy.backgroundColor);
 
         setup();
-        
+        hasChanges = false;
+
     }
     
      @Override
@@ -223,11 +227,13 @@ public class ZEditableText extends ZElement {
         setOutlineWidth(outlineWidth);
         setDashPattern(dashPattern);
         setOutlineColor(outlineColor);  
+        hasChanges = true;
     }
     
     @Override
     public void setOutlineWidth(int width) {
         borderThickness = width; 
+        hasChanges = true;
     }
   
     @Override
@@ -237,6 +243,7 @@ public class ZEditableText extends ZElement {
     @Override
     public void setOutlineColor(Color outlineColor) {
         this.borderColor = outlineColor;
+        hasChanges = true;
     }
     
     @Override
@@ -263,6 +270,8 @@ public class ZEditableText extends ZElement {
         textWidget.setBackground(backgroundColor);
         if (backgroundColor == null)
             textWidget.setBackground(new Color(0,0,0,0)); //transparent
+        
+        hasChanges = true;
         
     }
     
@@ -300,6 +309,7 @@ public class ZEditableText extends ZElement {
      */
     public final void modifyText(String t) {
         textWidget.setText(t);
+        hasChanges = true;
     }
     
     /**
@@ -321,6 +331,8 @@ public class ZEditableText extends ZElement {
         
         textWidget.setFont(attr.font);
         textWidget.setForeground(attr.fontColor);     
+     
+        hasChanges = true;
 
     }
     

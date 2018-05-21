@@ -15,7 +15,7 @@ import com.github.kkieffer.jzeld.element.ZImage;
 import com.github.kkieffer.jzeld.element.ZLine;
 import com.github.kkieffer.jzeld.element.ZOval;
 import com.github.kkieffer.jzeld.element.ZRectangle;
-import com.github.kkieffer.jzeld.element.ZTriangle;
+import com.github.kkieffer.jzeld.element.ZRightTriangle;
 import com.github.kkieffer.jzeld.element.ZRoundedRectangle;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -88,7 +88,7 @@ public class Demo extends javax.swing.JFrame {
         c.addElement(l);
         
         //Right triangle, yellow, big borders
-        ZTriangle t = new ZTriangle(ZTriangle.Type.RIGHT, 1.0, 6.0, 1.0, 1.0, 0.0, true, true, 4, Color.BLACK, null, Color.YELLOW);
+        ZRightTriangle t = new ZRightTriangle(1.0, 6.0, 1.0, 1.0, 0.0, true, true, 4, Color.BLACK, null, Color.YELLOW);
         c.addElement(t);
             
         //Add the test image

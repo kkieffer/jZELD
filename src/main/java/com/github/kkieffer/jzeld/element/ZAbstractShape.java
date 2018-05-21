@@ -36,12 +36,13 @@ public abstract class ZAbstractShape extends ZElement {
     protected ZAbstractShape(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, int borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
         super(x, y, width, height, rotation, canSelect, canResize);
         setAttributes(borderWidth, borderColor, dashPattern, fillColor);
-
+        hasChanges = false;
     }
     
     protected ZAbstractShape(ZAbstractShape src) {
         super(src);
         setAttributes(src.borderThickness, src.borderColor, src.dashPattern, src.backgroundColor);
+        hasChanges = false;
     }
     
     protected ZAbstractShape() {}
@@ -61,27 +62,31 @@ public abstract class ZAbstractShape extends ZElement {
         setOutlineWidth(outlineWidth);
         setDashPattern(dashPattern);
         setOutlineColor(outlineColor);
-          
+        hasChanges = true;
     }
     
     @Override
     public void setOutlineWidth(int width) {
         borderThickness = width;
+        hasChanges = true;
     }
     
     @Override
     public void setDashPattern(Float[] dashPattern) {
         this.dashPattern = dashPattern == null ? null : (Float[])Arrays.copyOf(dashPattern, dashPattern.length);
+        hasChanges = true;
     }
     
     @Override
     public void setOutlineColor(Color outlineColor) {
         this.borderColor = outlineColor;
+        hasChanges = true;
     }
     
     @Override
     public void setFillColor(Color fillColor) {
         backgroundColor = fillColor;
+        hasChanges = true;
     }
     
     @Override

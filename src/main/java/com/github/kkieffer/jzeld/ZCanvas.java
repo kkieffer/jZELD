@@ -345,10 +345,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
     /**
      * Provides the drawing area of the canvas, in units 
-     * @return a Rectangle2D where x,y are the origin and width,height are the bounds
+     * @return a Rectangle2D where x,y are the origin and width,height are the bounds, returns null if unbounded
      */
     public Rectangle2D getCanvasBounds() {
-        return new Rectangle2D.Double(fields.origin.getX()/SCALE, fields.origin.getY()/SCALE, fields.bounds.width/SCALE, fields.bounds.height/SCALE);
+        if (fields.bounds == null)
+            return null;
+        else
+            return new Rectangle2D.Double(fields.origin.getX()/SCALE, fields.origin.getY()/SCALE, fields.bounds.width/SCALE, fields.bounds.height/SCALE);
     }
     
     public Orientation getOrientation() {
