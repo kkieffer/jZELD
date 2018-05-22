@@ -60,13 +60,6 @@ public class Demo extends javax.swing.JFrame {
         ZGrid grid = new ZGrid(1, Color.LIGHT_GRAY, new Float[]{.05f}, Unit.CM, 2);
         c.addElement(grid);
         
-        //Create two rulers, 1/4" thick, with different minor tick spacing, just outside the desired drawing space
-        ZCanvasRuler hRule = new ZCanvasRuler(0.0, -c.getOrigin().getY(), 1, 0.25, true, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, Unit.CM, 4, 2);
-        c.addElement(hRule);        
-        ZCanvasRuler yRule = new ZCanvasRuler(-c.getOrigin().getX(), 0.0, 1, 0.25, false, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, Unit.CM, 2, 2);
-        c.addElement(yRule);
-       
-        
         //Create a red rectangle, large black border, moveable
         ZRectangle r = new ZRectangle(1.0, 1.0, 2.0, 1.0, 25.0, true, true, 3, Color.BLACK, new Float[]{.2f, .2f}, Color.RED);
         c.addElement(r);
@@ -137,6 +130,13 @@ public class Demo extends javax.swing.JFrame {
         ZCanvas c = new ZCanvas(Color.WHITE, LABEL_FONT, Unit.CM, Color.DARK_GRAY, 10, new Point(36, 36), new Dimension(1400, 800), Orientation.LANDSCAPE);
         canvasPane.add(c, BorderLayout.CENTER);
         
+       //Create two rulers, 20 pixels thick, with different minor tick spacing
+        ZCanvasRuler hRule = new ZCanvasRuler(20, true, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, Unit.CM, 4, 2);
+        c.setHorizontalRuler(hRule);
+        ZCanvasRuler vRule = new ZCanvasRuler(20, false, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, Unit.CM, 2, 2);
+        c.setVerticalRuler(vRule);
+       
+
         ZDefaultContextMenu m = new ZDefaultContextMenu(c);
         c.setContextMenu(m);
         

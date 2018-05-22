@@ -9,6 +9,7 @@ import com.github.kkieffer.jzeld.draw.DrawClient;
 import com.github.kkieffer.jzeld.element.ZCanvasRuler.Unit;
 import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZAbstractShape;
+import com.github.kkieffer.jzeld.element.ZCanvasRuler;
 import com.github.kkieffer.jzeld.element.ZGroupedElement;
 import java.awt.BasicStroke;
 import static java.awt.BasicStroke.CAP_SQUARE;
@@ -132,8 +133,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         private Unit unit;
 
         @XmlElement(name="UndoStackCount")        
-        private int undoStackCount = 1;
-        
+        private int undoStackCount = 1;       
         
         @XmlElement(name="Origin")
         @XmlJavaTypeAdapter(PointAdapter.class)
@@ -145,6 +145,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         @XmlElement(name="Orientation")        
         private Orientation orientation;
+        
+        @XmlElement(name="HorizontalRuler")        
+        private ZCanvasRuler horizontalRuler;
+        
+        @XmlElement(name="HorizontalRuler")        
+        private ZCanvasRuler verticalRuler;
+        
+        
     }
     /*----------------------------------------------------------------------*/
     
@@ -227,9 +235,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         init();
     }
     
-     protected void afterUnmarshal(Unmarshaller u, Object parent) {
+    protected void afterUnmarshal(Unmarshaller u, Object parent) {
          init();
-     }
+    }
         
     
     private void init() {
@@ -325,6 +333,27 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
 
     }
+    
+    /**
+     * Set the horizontal ruler
+     * @param r the ruler to use, or null to remove
+     */
+    public void setHorizontalRuler(ZCanvasRuler r) {
+        fields.horizontalRuler = r;
+        canvasModified = true;
+        repaint();
+    }
+    
+     /**
+     * Set the vertical ruler
+     * @param r the ruler to use, or null to remove
+     */
+    public void setVerticalRuler(ZCanvasRuler r) {
+        fields.verticalRuler = r;
+        canvasModified = true;
+        repaint();
+    }
+    
     
     public void registerSelectListener(SelectListener l) {
         if (!selectListeners.contains(l))
@@ -1077,9 +1106,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (selectedElements.contains(o) && highlightSelectedOnly) {  //highlight selected element, just outside its boundaries
                 g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke((int)(1.0f * pixScale), CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
-                g2d.drawRect((int)(-1*pixScale), (int)(-1*pixScale), r.width+(int)(3*pixScale), r.height+(int)(3*pixScale)); 
-                    
-                if (o.isResizable()) {  //draw drag box in the corner
+                int pixelsOut = (int)((o.getOutlineWidth()/2 + 1) * pixScale);
+                g2d.drawRect(-pixelsOut, -pixelsOut, r.width+pixelsOut*2, r.height+pixelsOut*2); 
+                   
+                //draw drag box in the corner
+                if (o.isResizable()) {  
                     g2d.setColor(Color.BLACK);  
                     g2d.fillRect(r.width-DRAG_BOX_SIZE, r.height-DRAG_BOX_SIZE, DRAG_BOX_SIZE, DRAG_BOX_SIZE);
                 }
@@ -1098,11 +1129,24 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         Graphics2D g2d = (Graphics2D)g;
         
         DecimalFormat fmt = new DecimalFormat("0.00");
-   
+           
         if (zoom == 1.0) {
             translate = new Point(fields.origin);
         }
    
+          
+        //Paint any rulers before scaling and translations
+        if (fields.horizontalRuler != null) {
+            g2d.translate(translate.x, 0); 
+            fields.horizontalRuler.paint(g2d, (int)(SCALE*zoom), getScaledWidth(), getScaledHeight());    
+            g2d.translate(-translate.x, 0);         
+        }
+        if (fields.verticalRuler != null) {
+            g2d.translate(0, translate.y); 
+            fields.verticalRuler.paint(g2d, (int)(SCALE*zoom), getScaledWidth(), getScaledHeight());    
+            g2d.translate(0, -translate.y);         
+        }
+
         g2d.translate(translate.x, translate.y);
         g2d.scale(1/pixScale, 1/pixScale);
         g2d.scale(zoom, zoom);
@@ -1121,7 +1165,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZElement s : selectedElements)
             paintElement(g2d, s, true); //apply highlights to selected elements
         
-        //draw crosshairs to left corner of first selected element, and draw mouse coordinates
+        Font mouseFont = new Font(fields.mouseCoordFont.getFontName(), fields.mouseCoordFont.getStyle(), (int)Math.ceil(fields.mouseCoordFont.getSize2D()*pixScale/zoom));
+        FontMetrics fontMetrics = g2d.getFontMetrics(mouseFont);
+        g2d.setFont(mouseFont);
+   
+        //ELEMENT IS BEING DRAGGED - DRAW SELECTED HIGHLIGHT AND POSITION LINES/TEXT
         if (mouseDrag != null && !selectedElements.isEmpty()) {
                         
             ZElement selectedElement = lastSelectedElement;
@@ -1131,65 +1179,54 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             AffineTransform t = AffineTransform.getRotateInstance(Math.toRadians(selectedElement.getRotation()), r.x + r.width/2, r.y + r.height/2);
             Point2D tMouse = t.transform(mouseDrag, null);   
             
+            //Draw crosshair
             if (fields.mouseCursorColor != null) {
                 g2d.setColor(fields.mouseCursorColor);
-                g2d.setStroke(new BasicStroke((int)(1.0f * pixScale), CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
+                g2d.setStroke(new BasicStroke(1.0f * pixScale / (float)zoom, CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
                 g2d.drawLine(-fields.origin.x, (int)(tMouse.getY()), (int)(tMouse.getX()), (int)(tMouse.getY())); //horiz crosshair
                 g2d.drawLine((int)(tMouse.getX()), -fields.origin.y, (int)(tMouse.getX()), (int)(tMouse.getY())); //vert crosshair
             }
             
+            //Draw Position string
             if (fields.mouseCoordFont != null) {
-                g2d.setColor(Color.BLACK);
-                FontMetrics fontMetrics = g2d.getFontMetrics(fields.mouseCoordFont);
-                 //Adjust the font size by the scaling factor to maintain consistency
-                Font f = new Font(fields.mouseCoordFont.getFontName(), fields.mouseCoordFont.getStyle(), (int)(fields.mouseCoordFont.getSize2D()*pixScale));
-     
-                g2d.setFont(f);
-                String mouseCoord = fmt.format(fields.unit.getScale()*tMouse.getX()/SCALE) + ", " + fmt.format(fields.unit.getScale()*tMouse.getY()/SCALE);
-                g2d.drawString(mouseCoord, (int)tMouse.getX() - 10*pixScale - fontMetrics.stringWidth(mouseCoord)*pixScale, (int)(tMouse.getY()) - 10*pixScale);
+                g2d.setColor(Color.BLACK);               
+                String mouseCoord = fmt.format(fields.unit.getScale()*tMouse.getX()/SCALE) + ", " + fmt.format(fields.unit.getScale()*tMouse.getY()/SCALE);                       
+                g2d.drawString(mouseCoord, (int)tMouse.getX() - (int)Math.ceil(fontMetrics.stringWidth(mouseCoord) + 10.0 * pixScale/zoom), (int)(tMouse.getY()) - 10*pixScale/(float)zoom);
             }
 
         }
         
+        //Draw Resize String
         if (selectedElementResizeOn && mouseIn != null && lastSelectedElement != null && fields.mouseCoordFont != null) {
             g2d.setColor(Color.BLACK);
-             //Adjust the font size by the scaling factor to maintain consistency
-            Font f = new Font(fields.mouseCoordFont.getFontName(), fields.mouseCoordFont.getStyle(), (int)(fields.mouseCoordFont.getSize2D()*pixScale));
-
-            g2d.setFont(f);
             Rectangle2D bounds = lastSelectedElement.getBounds2D();
             String mouseCoord = fmt.format(bounds.getWidth()) + ", " + fmt.format(bounds.getHeight());
-            g2d.drawString(mouseCoord, mouseIn.x + 10*pixScale, mouseIn.y + 10*pixScale);
+            g2d.drawString(mouseCoord, mouseIn.x + 10*pixScale/(float)zoom, mouseIn.y + 10*pixScale/(float)zoom);
             
         }
         
         
-        //if nothing selected, and the mouse is in the canvas, draw a crosshair
+        //When nothing selected, draw the mouse
         if (mouseIn != null && selectedElements.isEmpty() && mouseIn.x >= 0 && mouseIn.y >= 0) {  
                         
+            //Draw crosshair
             if (fields.mouseCursorColor != null) {
                 g2d.setColor(fields.mouseCursorColor);
-                g2d.setStroke(new BasicStroke((int)(1.0f * pixScale)));
+                g2d.setStroke(new BasicStroke(1.0f * pixScale / (float)zoom));
                 g2d.drawLine(-fields.origin.x, mouseIn.y, getScaledWidth(), mouseIn.y); //horiz crosshair
                 g2d.drawLine(mouseIn.x, -fields.origin.y, mouseIn.x, getScaledHeight()); //vert crosshair
             }
 
+            //Draw mouse position
             if (fields.mouseCoordFont != null) {
-
                 g2d.setColor(Color.BLACK);
-
-                FontMetrics fontMetrics = g2d.getFontMetrics(fields.mouseCoordFont);
-                 //Adjust the font size by the scaling factor to maintain consistency
-                Font f = new Font(fields.mouseCoordFont.getFontName(), fields.mouseCoordFont.getStyle(), (int)(fields.mouseCoordFont.getSize2D()*pixScale));
-
-                g2d.setFont(f);
                 String mouseCoord = fmt.format(fields.unit.getScale()*mouseIn.x/SCALE) + ", " + fmt.format(fields.unit.getScale()*mouseIn.y/SCALE);
-                g2d.drawString(mouseCoord, mouseIn.x + 10*pixScale, mouseIn.y + fontMetrics.getHeight() + 10*pixScale);
+                g2d.drawString(mouseCoord, mouseIn.x + (int)Math.ceil(10.0 * pixScale/zoom), mouseIn.y + (int)Math.ceil(fontMetrics.getHeight() + 10.0 * pixScale/zoom));
             }
             
         }
             
-        
+        //Paint anything the client is drawing
         if (drawClient != null) {
             drawClient.drawClientPaint(g, mouseIn);
         }
@@ -1564,9 +1601,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void toFile(File f) throws JAXBException {
                
-        Class[] contextClasses = new Class[elementTypes.size() + 3]; 
+        Class[] contextClasses = new Class[elementTypes.size() + 4]; 
         elementTypes.toArray(contextClasses);
-           
+
+        contextClasses[contextClasses.length-4] = ZCanvasRuler.class;        
         contextClasses[contextClasses.length-3] = ZAbstractShape.class;        
         contextClasses[contextClasses.length-2] = ZCanvas.CanvasFields.class;
         contextClasses[contextClasses.length-1] = ZElement.class;
@@ -1626,9 +1664,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         elementTypes.clear();
         elementTypes.addAll(newElementClasses);
                
-        Class[] contextClasses = new Class[elementTypes.size() + 3]; 
+        Class[] contextClasses = new Class[elementTypes.size() + 4]; 
         elementTypes.toArray(contextClasses);
-
+       
+        contextClasses[contextClasses.length-4] = ZCanvasRuler.class;        
         contextClasses[contextClasses.length-3] = ZAbstractShape.class;        
         contextClasses[contextClasses.length-2] = ZCanvas.CanvasFields.class;
         contextClasses[contextClasses.length-1] = ZElement.class;

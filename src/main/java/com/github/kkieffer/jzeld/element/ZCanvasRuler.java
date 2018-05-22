@@ -14,7 +14,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 /**
  * ZCanvasRuler defines a fixed, immovable ruler on the top of the window (horizontal) or the left of the window (vertical)
  * It measures the ZCanvas area in units.  The ruler has all the attributes of a rectangle, and supports major ticks with labels
- * on the unit boundary or multiple thereof, as well as minor ticks.
+ * on the unit boundary or multiple thereof, as well as minor ticks.  The ruler has a fixed width however, in pixels, that does not
+ * scale with the canvas.
  * 
  * @author kkieffer
  */
@@ -41,6 +42,8 @@ public final class ZCanvasRuler extends ZRectangle {
     @XmlJavaTypeAdapter(FontAdapter.class)
     private Font labelFont;
         
+    private int fixedWidth;  //in pixels
+    
     private int majorTickStep;
     private int minorTicks;
     
@@ -48,10 +51,8 @@ public final class ZCanvasRuler extends ZRectangle {
     
     /**
      * Create a horizontal or vertical ruler
-     * @param x the x coordinate, upper left x, in units
-     * @param y the y coordinate, upper left y, in units
-     * @param border border
-     * @param width the width in units of the ruler
+     * @param borderThickness border thickness
+     * @param width the width in pixels
      * @param isHorizontal true for a horizontal ruler, false for vertical
      * @param borderColor color of the ruler border, null for no border
      * @param backgroundColor fill color of the ruler, null for transparent
@@ -60,8 +61,9 @@ public final class ZCanvasRuler extends ZRectangle {
      * @param majorTickStep number of units between major ticks
      * @param minorTicks minor ticks per unit, 0 for none. One minor tick will lie directly on the major tick.
      */
-    public ZCanvasRuler(double x, double y, int border, double width, boolean isHorizontal, Color borderColor, Color backgroundColor, Font labelFont, Unit unit, int majorTickStep, int minorTicks) {
-        super(x, y, isHorizontal ? -1 : width, !isHorizontal ? -1 : width, 0.0, false, false, border, borderColor, null, backgroundColor);
+    public ZCanvasRuler(int width, boolean isHorizontal, int borderThickness, Color borderColor, Color backgroundColor, Font labelFont, Unit unit, int majorTickStep, int minorTicks) {
+        super(0, 0, isHorizontal ? -1 : width, !isHorizontal ? -1 : width, 0.0, false, false, borderThickness, borderColor, null, backgroundColor);
+        fixedWidth = width;
         isHoriz = isHorizontal;
         this.unit = unit;
         this.labelFont = labelFont;
@@ -69,20 +71,17 @@ public final class ZCanvasRuler extends ZRectangle {
         this.minorTicks = minorTicks;
     }
     
-    @Override
-    public ZCanvasRuler copyOf() {
-        return this;  //don't copy
-    }
-
+    
     @Override
     public void paint(Graphics2D g, int unitSize, int width, int height) {
         
+        width =  isHoriz ? width : fixedWidth;  //horizontal ruler uses the canvas width, vertical uses the fixed width
+        height = !isHoriz ? height : fixedWidth;  //horizontal ruler uses the fixedWidth, vertical uses the canvas height
         
         super.paint(g, unitSize, width, height);
         
-        Font f = new Font(labelFont.getFontName(), labelFont.getStyle(), (int)(labelFont.getSize2D()*unitSize/72.0));
-        FontMetrics fontMetrics = g.getFontMetrics(f);
-        g.setFont(f);
+        FontMetrics fontMetrics = g.getFontMetrics(labelFont);
+        g.setFont(labelFont);
 
         double scale = majorTickStep * (double)unitSize / unit.getScale();
        
