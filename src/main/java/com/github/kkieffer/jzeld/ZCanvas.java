@@ -181,6 +181,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private Method lastMethod = null;
     private Object[] lastMethodParams;
 
+    private boolean canvasModified;  //tracks any changes to the Z-plane order of the elements
+
     private long mouseWheelLastMoved = -1;
     private long mouseFirstPressed = -1;
     private long shiftLastPerformed = -1;
@@ -190,6 +192,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private Point2D mouseDrag;
     private Point2D mousePress;
     private ZCanvasContextMenu contextMenu;
+    
+    private final ArrayList<SelectListener> selectListeners = new ArrayList<>();
 
     //For restoration by JAXB
     private ZCanvas() {
@@ -232,7 +236,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
         undoStack = new UndoStack(fields.undoStackCount);
         translate = new Point(fields.origin);
-    
+        canvasModified = false;
+        
         addMouseListener(this);	
         addMouseMotionListener(this);    
         addMouseWheelListener(this);
@@ -321,6 +326,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
     }
     
+    public void registerSelectListener(SelectListener l) {
+        if (!selectListeners.contains(l))
+            selectListeners.add(l);
+    }
+    
+    
     //This method is overriden to force the component to draw only to its bounds. 
     @Override
     public void reshape(int x, int y, int width, int height) {
@@ -369,6 +380,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         fields.orientation = o;
         
+        canvasModified = true;
         updatePreferredSize();
         repaint();
     }
@@ -380,6 +392,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             Dimension d = new Dimension((int)(fields.bounds.width * zoom), (int)(fields.bounds.height * zoom));
             setPreferredSize(d);
         }
+        canvasModified = true;
+
         revalidate();
     }
       
@@ -430,7 +444,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void zoomIn() {
         if (zoom < 4.0)
-            zoom *= 2.0;
+            zoom += .25;
         
         updatePreferredSize();
     }
@@ -440,7 +454,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void zoomOut() {
         if (zoom > 1.0)
-            zoom /= 2.0;
+            zoom -= .25;
         
         updatePreferredSize();
     }
@@ -736,6 +750,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public void setCanvasBackgroundColor(Color c) {
         fields.backgroundColor = c;
         lastMethod = null;
+        canvasModified = true;
+
         repaint();
     }
     
@@ -826,7 +842,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         o.addedTo(this);
 
         lastMethod = null;
-        
+        canvasModified = true;
+      
         if (!elementTypes.contains(o.getClass()))  //Add this class type to our list of types
             elementTypes.add(o.getClass());
     }
@@ -838,6 +855,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public void removeElement(ZElement o) {
         fields.zElements.remove(o);
         o.removedFrom(this);
+    
+        canvasModified = true;
+
         lastMethod = null;
     }
     
@@ -854,6 +874,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             fields.zElements.remove(selectedElement);
             fields.zElements.addLast(selectedElement);   
         }
+        canvasModified = true;
+
         setLastMethod("moveToBack");
         repaint();     
     }
@@ -871,6 +893,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             fields.zElements.remove(selectedElement);
             fields.zElements.addFirst(selectedElement);
         }
+        canvasModified = true;
+
         setLastMethod("moveToFront");
         repaint();
 
@@ -895,6 +919,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             fields.zElements.remove(index);
             fields.zElements.add(index+1, selectedElement);
         }
+        canvasModified = true;
+
         setLastMethod("moveBackward");
         repaint();
         
@@ -919,6 +945,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             fields.zElements.remove(index);
             fields.zElements.add(index-1, selectedElement);
         }
+
+        canvasModified = true;
+
         setLastMethod("moveForward");
         repaint();
     }
@@ -1023,7 +1052,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             fields.zElements.remove(s);
             it.remove();
         }
-        
+          
+        canvasModified = true;
+      
         lastMethod = null;            
         repaint();
      }
@@ -1066,17 +1097,16 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         super.paintComponent(g);  
         Graphics2D g2d = (Graphics2D)g;
         
-        
-
-        g2d.scale(1/pixScale, 1/pixScale);
-        g2d.scale(zoom, zoom);
-        
+        DecimalFormat fmt = new DecimalFormat("0.00");
+   
         if (zoom == 1.0) {
             translate = new Point(fields.origin);
         }
-         
+   
         g2d.translate(translate.x, translate.y);
-        
+        g2d.scale(1/pixScale, 1/pixScale);
+        g2d.scale(zoom, zoom);
+               
         if (fields.backgroundColor != null) {
             g2d.setBackground(fields.backgroundColor);
             g2d.clearRect(0, 0, getScaledWidth(), getScaledHeight());
@@ -1115,7 +1145,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 Font f = new Font(fields.mouseCoordFont.getFontName(), fields.mouseCoordFont.getStyle(), (int)(fields.mouseCoordFont.getSize2D()*pixScale));
      
                 g2d.setFont(f);
-                DecimalFormat fmt = new DecimalFormat("#.00");
                 String mouseCoord = fmt.format(fields.unit.getScale()*tMouse.getX()/SCALE) + ", " + fmt.format(fields.unit.getScale()*tMouse.getY()/SCALE);
                 g2d.drawString(mouseCoord, (int)tMouse.getX() - 10*pixScale - fontMetrics.stringWidth(mouseCoord)*pixScale, (int)(tMouse.getY()) - 10*pixScale);
             }
@@ -1128,7 +1157,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             Font f = new Font(fields.mouseCoordFont.getFontName(), fields.mouseCoordFont.getStyle(), (int)(fields.mouseCoordFont.getSize2D()*pixScale));
 
             g2d.setFont(f);
-            DecimalFormat fmt = new DecimalFormat("#.00");
             Rectangle2D bounds = lastSelectedElement.getBounds2D();
             String mouseCoord = fmt.format(bounds.getWidth()) + ", " + fmt.format(bounds.getHeight());
             g2d.drawString(mouseCoord, mouseIn.x + 10*pixScale, mouseIn.y + 10*pixScale);
@@ -1155,7 +1183,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 Font f = new Font(fields.mouseCoordFont.getFontName(), fields.mouseCoordFont.getStyle(), (int)(fields.mouseCoordFont.getSize2D()*pixScale));
 
                 g2d.setFont(f);
-                DecimalFormat fmt = new DecimalFormat("#.00");
                 String mouseCoord = fmt.format(fields.unit.getScale()*mouseIn.x/SCALE) + ", " + fmt.format(fields.unit.getScale()*mouseIn.y/SCALE);
                 g2d.drawString(mouseCoord, mouseIn.x + 10*pixScale, mouseIn.y + fontMetrics.getHeight() + 10*pixScale);
             }
@@ -1208,6 +1235,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 if (contextMenu != null)
                     contextMenu.newSelections(lastSelectedElement, selectedElements);
                
+                for (SelectListener l : selectListeners)
+                    l.elementSelected(o);
        
                 Point location = o.getPosition(SCALE);  //get the upper left, find the mouse offset from the upper left
                 selectedObj_xOffset = mouseLoc.x - location.x;
@@ -1236,6 +1265,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         selectedResizeElement = null;
         lastSelectedElement = null;
+        for (SelectListener l : selectListeners)
+            l.noneSelected();
         lastMethod = null;        
         selectedElements.clear();
     }
@@ -1307,8 +1338,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         p.x *= (pixScale / zoom);
         p.y *= (pixScale / zoom);
-        p.x -= translate.x;
-        p.y -= translate.y;
+        p.x -= translate.x / zoom;
+        p.y -= translate.y / zoom;
         return p;
     }
     
@@ -1510,9 +1541,24 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
     }
 
+    /**
+     * For all elements on the canvas, checks to see if there are unsaved changes
+     * @return true if there are unsaved changes, false otherwise
+     */
+    public boolean hasUnsavedChanges() {
+                
+        if (canvasModified)
+            return true;
+        
+        for (ZElement e : fields.zElements)  //mark all has having been saved
+            if (e.hasChanges())
+                return true;
+        
+        return false;
+    }
    
     /**
-     * Save the canvas to an XML file
+     * Save the canvas to an XML file, and mark all elements as saved
      * @param f the file to write
      * @throws JAXBException 
      */
@@ -1533,6 +1579,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         jaxbMarshaller.marshal(fields, f);
         
+        for (ZElement e : fields.zElements)  //mark all has having been saved
+            e.wasSaved();
+        
+        canvasModified = false;
     }
     
     
