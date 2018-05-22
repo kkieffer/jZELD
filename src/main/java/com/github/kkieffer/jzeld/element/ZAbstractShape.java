@@ -72,6 +72,11 @@ public abstract class ZAbstractShape extends ZElement {
     }
     
     @Override
+    public int getOutlineWidth() {
+        return borderThickness;
+    }
+    
+    @Override
     public void setDashPattern(Float[] dashPattern) {
         this.dashPattern = dashPattern == null ? null : (Float[])Arrays.copyOf(dashPattern, dashPattern.length);
         hasChanges = true;

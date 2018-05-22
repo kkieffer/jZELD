@@ -237,6 +237,11 @@ public class ZEditableText extends ZElement {
     }
   
     @Override
+    public int getOutlineWidth() {
+        return borderThickness;
+    }
+    
+    @Override
     public void setDashPattern(Float[] dashPattern) {
     }
 

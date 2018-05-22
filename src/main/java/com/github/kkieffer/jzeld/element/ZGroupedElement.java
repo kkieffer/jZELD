@@ -116,6 +116,11 @@ public final class ZGroupedElement extends ZElement {
     public void setOutlineWidth(int width) {
         throw new UnsupportedOperationException("No outline."); 
     }
+    
+    @Override
+    public int getOutlineWidth() {
+        return 0;
+    }
 
     @Override
     public void setOutlineColor(Color outlineColor) {

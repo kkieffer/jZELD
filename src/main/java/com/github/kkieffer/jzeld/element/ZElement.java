@@ -160,6 +160,12 @@ public abstract class ZElement {
      */
     public abstract Color getOutlineColor();
     
+     /**
+     * For elements that support an outline, gets the current width in pixels of the outline.  Width of 0 is no outline 
+     * @return width in pixels
+     */
+    public abstract int getOutlineWidth();
+    
     /**
      * True if the element supports an outline
      * @return 
