@@ -58,7 +58,7 @@ public class ZRoundedRectangle extends ZRectangle {
     
     @Override
     protected void drawShape(Graphics2D g, int unitSize, int width, int height) {
-        g.drawRoundRect(0+borderThickness/2, 0+borderThickness/2, width-borderThickness, height-borderThickness, (int)(radius*unitSize*2), (int)(radius*unitSize*2));
+        g.drawRoundRect(0, 0, width, height, (int)(radius*unitSize*2), (int)(radius*unitSize*2));
     }
     
    

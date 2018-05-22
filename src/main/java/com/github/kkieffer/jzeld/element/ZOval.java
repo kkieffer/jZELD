@@ -59,7 +59,7 @@ public class ZOval extends ZRectangle {
     
     @Override
     protected void drawShape(Graphics2D g, int unitSize, int width, int height) {
-        g.drawOval(0+borderThickness/2, 0+borderThickness/2, width-borderThickness, height-borderThickness);
+        g.drawOval(0, 0, width, height);
     }
     
   

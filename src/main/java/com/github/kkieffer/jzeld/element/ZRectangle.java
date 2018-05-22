@@ -67,7 +67,7 @@ public class ZRectangle extends ZAbstractShape {
     
     @Override
     protected void drawShape(Graphics2D g, int unitSize, int width, int height) {
-        g.drawRect(0+borderThickness/2, 0+borderThickness/2, width-borderThickness, height-borderThickness);
+        g.drawRect(0, 0, width, height);
     }
     
 

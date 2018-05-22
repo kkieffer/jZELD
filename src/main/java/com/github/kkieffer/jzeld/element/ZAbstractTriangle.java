@@ -76,42 +76,17 @@ public abstract class ZAbstractTriangle extends ZRectangle {
             xc = x;  //for right triangle
 
         
-        Polygon fillTri = new Polygon(new int[]{xc, x, x2}, new int[]{y, y2, y2}, 3);
+        Polygon triangle = new Polygon(new int[]{xc, x, x2}, new int[]{y, y2, y2}, 3);
         
        if (backgroundColor != null) {
             g.setColor(backgroundColor);
-            g.fill(fillTri);
+            g.fill(triangle);
        }
 
        if (borderThickness != 0) {
             g.setColor(borderColor);
-            g.setStroke(new BasicStroke(borderThickness));
-
-            if (!flipHoriz) {
-                x += borderThickness/2;
-                x2 -= borderThickness;
-            }
-            else {
-                x -= borderThickness/2;
-                x2 += borderThickness;
-            }
-            
-            if (!flipVert) {
-                y += borderThickness;
-                y2 -= borderThickness/2;
-            }
-            else {
-                y -= borderThickness;
-                y2 += borderThickness/2;
-            }
-            
-            if (type == Type.ISOCELES)
-                xc = (int)Math.round((double)width/2.0);
-            else
-                xc = x;
-            
-            Polygon borderTri = new Polygon(new int[]{xc, x, x2}, new int[]{y, y2, y2}, 3);
-            g.draw(borderTri);
+            g.setStroke(new BasicStroke(borderThickness)); 
+            g.draw(triangle);
        }
        
     }
