@@ -37,7 +37,7 @@ public class ZLine extends ZAbstractShape {
      * @param lineThickness unit width of the border, use zero for no border
      * @param lineColor color of the border, which can be null only if the borderWidth is zero
      */
-    public ZLine(double x, double y, double width, double rotation, boolean canSelect, boolean canResize, int lineThickness, Color lineColor, Float[] dashPattern) {
+    public ZLine(double x, double y, double width, double rotation, boolean canSelect, boolean canResize, float lineThickness, Color lineColor, Float[] dashPattern) {
         super(x, y, width, .5, rotation, canSelect, canResize, lineThickness, lineColor, dashPattern, null);
              
         if (lineColor == null)

@@ -57,7 +57,7 @@ public class Demo extends javax.swing.JFrame {
     
     private void createDemoElements(ZCanvas c) throws IOException {
         //Create a grid in the back, dashed thin line
-        ZGrid grid = new ZGrid(1, Color.LIGHT_GRAY, new Float[]{.05f}, Unit.CM, 2);
+        ZGrid grid = new ZGrid(0.5f, Color.LIGHT_GRAY, new Float[]{.05f}, Unit.CM, 2);
         c.addElement(grid);
         
         //Create a red rectangle, large black border, moveable

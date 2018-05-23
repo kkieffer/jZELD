@@ -10,6 +10,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -26,7 +27,7 @@ public class LineBorderMenu extends JMenu {
     
     
     
-    private static final int[] WIDTHS = {0, 1, 2, 4, 6, 8};
+    private static final float[] WIDTHS = {0.0f, 0.5f, 1.0f, 1.5f, 2.0f, 3.0f, 4.0f, 6.0f, 8.0f};
     private static final Float[][] DASHES = {new Float[0],
                                         new Float[]{.05f, .05f},
                                         new Float[]{.1f, .1f},
@@ -41,21 +42,21 @@ public class LineBorderMenu extends JMenu {
     private class WeightMenuItem extends JMenuItem {
         
         
-        public WeightMenuItem(GraphicsConfiguration gC, int thickStep) {
+        public WeightMenuItem(GraphicsConfiguration gC, float thickStep) {
             
             super();
-
-            BufferedImage bimg = gC.createCompatibleImage(50, 16, Transparency.BITMASK);
+            DecimalFormat fmt = new DecimalFormat("0.0");
+            BufferedImage bimg = gC.createCompatibleImage(100, 16, Transparency.BITMASK);
             Graphics2D g = (Graphics2D)bimg.getGraphics();
+            
             g.setColor(Color.BLACK);
-            if (thickStep > 0) {
-                g.setStroke(new BasicStroke(thickStep));
-                g.drawLine(0, 8, 50, 8);
-            }
-            else {
-                g.setStroke(new BasicStroke(1));
-                g.drawString("Empty", 0, 12);
-            }
+            g.setStroke(new BasicStroke(thickStep));
+            String label = fmt.format(thickStep);
+            int strW = g.getFontMetrics().stringWidth(label) + 10;
+            g.drawString(label, 0, 12);
+            if (thickStep > 0.0)
+                g.drawLine(strW, 8, 100, 8);
+            
 
             this.setIcon(new ImageIcon(bimg));
                         
@@ -122,7 +123,7 @@ public class LineBorderMenu extends JMenu {
         switch (type) {
         
             case WEIGHT: //Solid lines
-                for (int i : WIDTHS) {
+                for (float i : WIDTHS) {
                     WeightMenuItem b = new WeightMenuItem(gC, i);
                     this.add(b);   
                 }

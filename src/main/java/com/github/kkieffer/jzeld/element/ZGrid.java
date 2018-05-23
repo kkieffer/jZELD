@@ -31,7 +31,7 @@ public final class ZGrid extends ZLine {
      * @param unit the grid unit size
      * @param majorTickStep the steps between major unit markings
     */
-    public ZGrid(int thickness, Color color, Float[] dashPattern, ZCanvasRuler.Unit unit, int majorTickStep) {
+    public ZGrid(float thickness, Color color, Float[] dashPattern, ZCanvasRuler.Unit unit, int majorTickStep) {
         super(0, 0, -1, 0.0, false, false, thickness, color, dashPattern);
         this.unit = unit;
         this.majorTickStep = majorTickStep;

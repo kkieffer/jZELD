@@ -35,7 +35,7 @@ public class ZRoundedRectangle extends ZRectangle {
      * @param fillColor color of the rectangle area, which can be null for transparent (but not in combination with a zero width border)
      * @param radius the radius of the rounded edges, in units
      */
-    public ZRoundedRectangle(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, int borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, double radius) {
+    public ZRoundedRectangle(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, double radius) {
         super(x, y, width, height, rotation, canSelect, canResize, borderWidth, borderColor, dashPattern, fillColor);
         this.radius = radius;
     }

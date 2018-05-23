@@ -108,17 +108,17 @@ public final class ZGroupedElement extends ZElement {
     
 
     @Override
-    public void setAttributes(int outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
+    public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
         throw new UnsupportedOperationException("Not supported."); 
     }
 
     @Override
-    public void setOutlineWidth(int width) {
+    public void setOutlineWidth(float width) {
         throw new UnsupportedOperationException("No outline."); 
     }
     
     @Override
-    public int getOutlineWidth() {
+    public float getOutlineWidth() {
         return 0;
     }
 

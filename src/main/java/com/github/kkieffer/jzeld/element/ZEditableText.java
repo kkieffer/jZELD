@@ -95,7 +95,7 @@ public class ZEditableText extends ZElement {
     @XmlJavaTypeAdapter(ColorAdapter.class)
     protected Color borderColor;
     
-    protected int borderThickness;
+    protected float borderThickness;
     
     @XmlJavaTypeAdapter(JTextPaneAdapter.class)
     @XmlElement(name = "Text")
@@ -184,7 +184,7 @@ public class ZEditableText extends ZElement {
      * @param backgroundColor color of the rectangle area, which can be null for transparent (but not in combination with a zero width border)
      * @param attr attributes of the text string
      */
-    public ZEditableText(double x, double y, double width, double height, double rotation, boolean selectable, String defaultText, int borderThickness, Color borderColor, Color backgroundColor, TextAttributes attr) {
+    public ZEditableText(double x, double y, double width, double height, double rotation, boolean selectable, String defaultText, float borderThickness, Color borderColor, Color backgroundColor, TextAttributes attr) {
         super(x, y, width, height, rotation, selectable, selectable);  //unknown bounds, height and width until we have a graphics context
                
         
@@ -222,7 +222,7 @@ public class ZEditableText extends ZElement {
     
     
     @Override
-    public void setAttributes(int outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
+    public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
         setFillColor(fillColor);
         setOutlineWidth(outlineWidth);
         setDashPattern(dashPattern);
@@ -231,13 +231,13 @@ public class ZEditableText extends ZElement {
     }
     
     @Override
-    public void setOutlineWidth(int width) {
+    public void setOutlineWidth(float width) {
         borderThickness = width; 
         hasChanges = true;
     }
   
     @Override
-    public int getOutlineWidth() {
+    public float getOutlineWidth() {
         return borderThickness;
     }
     
@@ -445,7 +445,7 @@ public class ZEditableText extends ZElement {
     public void paint(Graphics2D g, int unitSize, int width, int height) {
               
  
-        textWidget.setBorder(BorderFactory.createLineBorder(this.borderColor, borderThickness));
+        textWidget.setBorder(BorderFactory.createLineBorder(this.borderColor, (int)borderThickness));
 
         textWidget.setSize(new Dimension(width, height));
 

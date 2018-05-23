@@ -789,7 +789,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Sets the outline width of the selected elements
      * @param width the desired width, 0 for no outline
      */
-    public void setOutlineWidth(Integer width) {
+    public void setOutlineWidth(Float width) {
         if (selectedElements.isEmpty() || passThruElement != null) 
             return;
         
@@ -1201,7 +1201,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             g2d.setColor(Color.BLACK);
             Rectangle2D bounds = lastSelectedElement.getBounds2D();
             String mouseCoord = fmt.format(bounds.getWidth()) + ", " + fmt.format(bounds.getHeight());
-            g2d.drawString(mouseCoord, mouseIn.x + 10*pixScale/(float)zoom, mouseIn.y + 10*pixScale/(float)zoom);
+            g2d.drawString(mouseCoord, mouseIn.x + DRAG_BOX_SIZE*2*pixScale/(float)zoom, mouseIn.y + DRAG_BOX_SIZE*2*pixScale/(float)zoom);
             
         }
         

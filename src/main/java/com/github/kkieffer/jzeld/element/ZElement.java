@@ -120,13 +120,13 @@ public abstract class ZElement {
      * @param dashPattern a dash pattern for the outline, in pixels.  Null for solid line.  Values in units
      * @param fillColor interior fill color
      */
-    public abstract void setAttributes(int outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor);
+    public abstract void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor);
     
     /**
      * For elements that support an outline, sets the current width in pixels of the outline.  Width of 0 is no outline 
      * @param width width in pixels
      */
-    public abstract void setOutlineWidth(int width);
+    public abstract void setOutlineWidth(float width);
     
     
     /**
@@ -164,7 +164,7 @@ public abstract class ZElement {
      * For elements that support an outline, gets the current width in pixels of the outline.  Width of 0 is no outline 
      * @return width in pixels
      */
-    public abstract int getOutlineWidth();
+    public abstract float getOutlineWidth();
     
     /**
      * True if the element supports an outline

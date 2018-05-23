@@ -28,12 +28,12 @@ public abstract class ZAbstractShape extends ZElement {
     @XmlJavaTypeAdapter(ColorAdapter.class)
     protected Color backgroundColor;
     
-    protected int borderThickness;
+    protected float borderThickness;
     
     protected Float[] dashPattern = null;
     
     
-    protected ZAbstractShape(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, int borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
+    protected ZAbstractShape(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
         super(x, y, width, height, rotation, canSelect, canResize);
         setAttributes(borderWidth, borderColor, dashPattern, fillColor);
         hasChanges = false;
@@ -56,7 +56,7 @@ public abstract class ZAbstractShape extends ZElement {
 
      */
     @Override
-    public void setAttributes(int outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
+    public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
     
         setFillColor(fillColor);
         setOutlineWidth(outlineWidth);
@@ -66,13 +66,13 @@ public abstract class ZAbstractShape extends ZElement {
     }
     
     @Override
-    public void setOutlineWidth(int width) {
+    public void setOutlineWidth(float width) {
         borderThickness = width;
         hasChanges = true;
     }
     
     @Override
-    public int getOutlineWidth() {
+    public float getOutlineWidth() {
         return borderThickness;
     }
     

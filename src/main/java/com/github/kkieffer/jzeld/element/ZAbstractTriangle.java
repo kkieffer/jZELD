@@ -32,7 +32,7 @@ public abstract class ZAbstractTriangle extends ZRectangle {
     
     protected ZAbstractTriangle() {}
     
-    protected ZAbstractTriangle(Type t, double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, int borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
+    protected ZAbstractTriangle(Type t, double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
         super(x, y, width, height, rotation, canSelect, canResize, borderWidth, borderColor, dashPattern, fillColor);
         type = t;
     }

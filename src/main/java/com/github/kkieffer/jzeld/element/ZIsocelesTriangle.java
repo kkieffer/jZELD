@@ -18,7 +18,7 @@ public class ZIsocelesTriangle extends ZAbstractTriangle {
         super();
     }
     
-    public ZIsocelesTriangle(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, int borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
+    public ZIsocelesTriangle(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
         super(Type.ISOCELES, x, y, width, height, rotation, canSelect, canResize, borderWidth, borderColor, dashPattern, fillColor);
     }
     
