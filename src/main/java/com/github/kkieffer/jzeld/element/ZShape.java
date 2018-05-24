@@ -11,6 +11,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -86,6 +88,14 @@ public class ZShape extends ZAbstractShape {
     
     protected ZShape(ZShape src) {
         super(src);
+        
+        try {
+            //Make a copy of the shape
+            ShapeAdapter a = new ShapeAdapter();
+            this.shape = a.unmarshal(a.marshal(src.shape));
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
     
 

@@ -1303,6 +1303,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         p.x *= (pixScale / zoom);
         p.y *= (pixScale / zoom);
+        
+        p.x -= fields.origin.x / zoom;
+        p.y -= fields.origin.y / zoom;
+        
         return p;
     }
     
