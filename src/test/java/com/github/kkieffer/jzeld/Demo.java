@@ -206,13 +206,22 @@ public class Demo extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
         canvasPane = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        canvasPane.setSize(new java.awt.Dimension(600, 600));
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane1.setViewportView(canvasPane);
+
         canvasPane.setLayout(new java.awt.BorderLayout());
-        getContentPane().add(canvasPane, java.awt.BorderLayout.CENTER);
+        jScrollPane1.setViewportView(canvasPane);
+
+        jPanel1.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -267,5 +276,7 @@ public class Demo extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel canvasPane;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

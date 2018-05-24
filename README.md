@@ -20,7 +20,6 @@ to become familiar with the operations of a ZCanvas is to run the included Demo 
 5.  Move a selected ZElement with the arrow keys
 6.  Rotate a ZElement using the mouse wheel while holding Shift down
 7.	Zoom in/out the ZCanvas with the +/- keys
-8.  Pan the ZCanvas while zoomed in using the arrow keys (as long as nothing is selected)
 
 The ZCanvas supports other operations that can be invoked by shortcut keys, menu items, or programmatically.  The 
 Demo illustrates these using keys and right-click context menus.  The framework provides a default set of hotkeys and an optional

@@ -104,7 +104,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     }
     
-    private static final double TRANSLATE_SCALE = 10.0;
     private static final double ROTATION_MULTIPLIER = 1.0;
     private static final double SIZE_INCREASE_MULTIPLIER = 0.5;
     private final static float SCALE = 72.0f;
@@ -149,7 +148,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         @XmlElement(name="HorizontalRuler")        
         private ZCanvasRuler horizontalRuler;
         
-        @XmlElement(name="HorizontalRuler")        
+        @XmlElement(name="VerticalRuler")        
         private ZCanvasRuler verticalRuler;
         
         
@@ -168,7 +167,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private final int DRAG_BOX_SIZE = (int)(10 * pixScale);
     
     private double zoom = 1.0;
-    private Point translate;
     
     private final ArrayList<ZElement> selectedElements = new ArrayList<>();
     private ZElement[] clipboard;
@@ -193,7 +191,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
     private long mouseWheelLastMoved = -1;
     private long mouseFirstPressed = -1;
-    private long shiftLastPerformed = -1;
     private DrawClient drawClient = null;
     
     private boolean shiftPressed = false;
@@ -243,7 +240,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private void init() {
     
         undoStack = new UndoStack(fields.undoStackCount);
-        translate = new Point(fields.origin);
         canvasModified = false;
         
         addMouseListener(this);	
@@ -269,39 +265,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         InputMap im = getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = getActionMap();
 
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "RightArrow");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "LeftArrow");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "UpArrow");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "DownArrow");
+        
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "Plus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "Minus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, KeyEvent.SHIFT_DOWN_MASK), "ShiftPressed");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 0, true), "ShiftReleased");
         
-        am.put("RightArrow", new AbstractAction(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                shiftBy(new Dimension(1,0));
-            }
-        });
-        am.put("LeftArrow", new AbstractAction(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                shiftBy(new Dimension(-1,0));
-            }
-        });
-        am.put("UpArrow", new AbstractAction(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                shiftBy(new Dimension(0,-1));
-            }
-        });
-        am.put("DownArrow", new AbstractAction(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                shiftBy(new Dimension(0,1));
-            }
-        });
+       
         
         am.put("Plus", new AbstractAction(){
             @Override
@@ -315,9 +285,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 zoomOut();
             }
         });
-        
-       
-       
         am.put("ShiftPressed", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -366,10 +333,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public void reshape(int x, int y, int width, int height) {
         
         if (fields.bounds != null) {
-            if (width > fields.bounds.width * zoom)
-                width = (int)(fields.bounds.width * zoom);
-            if (height > fields.bounds.height * zoom)
-                height = (int)(fields.bounds.height * zoom);
+            if (width > fields.bounds.width * zoom + fields.origin.x)
+                width = (int)(fields.bounds.width * zoom + fields.origin.x);
+            if (height > fields.bounds.height * zoom + fields.origin.y)
+                height = (int)(fields.bounds.height * zoom + fields.origin.y);
         }
         
         super.reshape(x, y, width, height);
@@ -405,7 +372,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public final void setCanvasBounds(Dimension bounds, Orientation o) {
         if (bounds != null) { 
-            fields.bounds = new Dimension(bounds.width + fields.origin.x, bounds.height + fields.origin.y);
+            fields.bounds = new Dimension(bounds.width, bounds.height);
         }
         fields.orientation = o;
         
@@ -418,7 +385,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (fields.bounds == null)
             setPreferredSize(null);
         else {
-            Dimension d = new Dimension((int)(fields.bounds.width * zoom), (int)(fields.bounds.height * zoom));
+            Dimension d = new Dimension((int)(fields.bounds.width * zoom + fields.origin.x), (int)(fields.bounds.height * zoom + fields.origin.y));
             setPreferredSize(d);
         }
         canvasModified = true;
@@ -464,7 +431,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void resetView() {
         zoom = 1.0;
-        translate = new Point(fields.origin);
         repaint();
     }
     
@@ -673,41 +639,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     
     
-    /**
-     * Shift either the canvas or the selected elements by the requested dimension.  If there are no selected elements, the canvas
-     * is moved, otherwise the elements
-     * For canvas, this shifts the view into the canvas (with a scaling factor), but don't shift past the upper or left boundary.
-     * For elements, move the elements by the the requested dimension
-     * @param d the dimension to shift
-     */
-    protected void shiftBy(Dimension d) {
-        
-        if (selectedElements.isEmpty() || passThruElement != null)  {
-            translate.x += d.width * TRANSLATE_SCALE;
-            translate.y += d.height * TRANSLATE_SCALE;
-            if (translate.x > fields.origin.x)
-                translate.x = fields.origin.x;
-            if (translate.y > fields.origin.y)
-                translate.y = fields.origin.x;
-        }
-        else {
-            
-            if (System.nanoTime() - shiftLastPerformed > 1000000000) {
-                undoStack.saveContext(fields.zElements);
-            }
-            
-            for (ZElement selectedElement : selectedElements) 
-                selectedElement.move(pixScale*d.width/SCALE, pixScale*d.height/SCALE, this.getScaledWidth()/SCALE, this.getScaledHeight()/SCALE);  
-        
-            shiftLastPerformed = System.nanoTime();
-
-        
-        }
-        
-        repaint();
-        lastMethod = null;
-
-    }
+    
 
     /**
      * For all selected elements, builds a ZGroupedElement from them, removes the elements the canvas, and adds the ZGroupedElement to the 
@@ -1129,25 +1061,21 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         Graphics2D g2d = (Graphics2D)g;
         
         DecimalFormat fmt = new DecimalFormat("0.00");
-           
-        if (zoom == 1.0) {
-            translate = new Point(fields.origin);
-        }
-   
+          
           
         //Paint any rulers before scaling and translations
         if (fields.horizontalRuler != null) {
-            g2d.translate(translate.x, 0); 
+            g2d.translate(fields.origin.x, 0); 
             fields.horizontalRuler.paint(g2d, (int)(SCALE*zoom), getScaledWidth(), getScaledHeight());    
-            g2d.translate(-translate.x, 0);         
+            g2d.translate(-fields.origin.x, 0);         
         }
         if (fields.verticalRuler != null) {
-            g2d.translate(0, translate.y); 
+            g2d.translate(0, fields.origin.y); 
             fields.verticalRuler.paint(g2d, (int)(SCALE*zoom), getScaledWidth(), getScaledHeight());    
-            g2d.translate(0, -translate.y);         
+            g2d.translate(0, -fields.origin.y);         
         }
 
-        g2d.translate(translate.x, translate.y);
+        g2d.translate(fields.origin.x, fields.origin.y);
         g2d.scale(1/pixScale, 1/pixScale);
         g2d.scale(zoom, zoom);
                
@@ -1375,8 +1303,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         p.x *= (pixScale / zoom);
         p.y *= (pixScale / zoom);
-        p.x -= translate.x / zoom;
-        p.y -= translate.y / zoom;
         return p;
     }
     
