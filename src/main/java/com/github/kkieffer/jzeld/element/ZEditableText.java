@@ -317,6 +317,59 @@ public class ZEditableText extends ZElement {
         hasChanges = true;
     }
     
+    
+    public final void setFont(Font f) {
+        this.textAttributes.font = f;
+        textWidget.setFont(f);
+        hasChanges = true;
+    }
+
+    public final void setFontStyle(int style) {
+        Font f = new Font(textAttributes.font.getName(), style, textAttributes.font.getSize());
+        this.textAttributes.font = f;
+        hasChanges = true;
+    }
+    
+    public final void setFontSize(int size) {
+        Font f = new Font(textAttributes.font.getName(), textAttributes.font.getStyle(), size);
+        this.textAttributes.font = f;
+        hasChanges = true;
+    }
+    
+    public final void setFontName(String name) {
+        Font f = new Font(name, textAttributes.font.getStyle(), textAttributes.font.getSize());
+        this.textAttributes.font = f;
+        hasChanges = true;
+    }
+    
+    
+    public final void setFontColor(Color c) {
+        this.textAttributes.fontColor = c;
+        textWidget.setForeground(c);     
+        hasChanges = true;
+    }
+    
+    public final void setTextJustify(HorizontalJustify j) {
+        this.textAttributes.hj = j;
+        StyledDocument doc = textWidget.getStyledDocument();
+        SimpleAttributeSet a = new SimpleAttributeSet();
+        switch (j) {
+            case LEFT:
+                StyleConstants.setAlignment(a, StyleConstants.ALIGN_LEFT);
+                break;
+            case CENTER:
+                StyleConstants.setAlignment(a, StyleConstants.ALIGN_CENTER);
+                break;
+            case RIGHT:
+                StyleConstants.setAlignment(a, StyleConstants.ALIGN_RIGHT);
+                break;
+        }
+         
+        doc.setParagraphAttributes(0, doc.getLength(), a, false);
+
+        hasChanges = true;
+    }
+    
     /**
      * Change the text attributes for this element
      * @param attr the new attributes
@@ -324,21 +377,9 @@ public class ZEditableText extends ZElement {
     public final void setTextAttributes(TextAttributes attr) {
                 
         this.textAttributes = attr;
-
-        StyledDocument doc = textWidget.getStyledDocument();
-        SimpleAttributeSet a = new SimpleAttributeSet();
-        if (attr.hj == HorizontalJustify.CENTER)
-            StyleConstants.setAlignment(a, StyleConstants.ALIGN_CENTER);
-        else if (attr.hj == HorizontalJustify.RIGHT)
-            StyleConstants.setAlignment(a, StyleConstants.ALIGN_RIGHT);
-         
-        doc.setParagraphAttributes(0, doc.getLength(), a, false);
-        
-        textWidget.setFont(attr.font);
-        textWidget.setForeground(attr.fontColor);     
-     
-        hasChanges = true;
-
+        setFont(attr.font);
+        setFontColor(attr.fontColor);
+        setTextJustify(attr.hj);
     }
     
     
