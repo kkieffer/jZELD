@@ -1,8 +1,12 @@
 
 package com.github.kkieffer.jzeld.element;
 
+import com.github.kkieffer.jzeld.ZCanvas;
+import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -16,6 +20,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZRoundedRectangle extends ZRectangle {
 
+    public static final ImageIcon radiusIcon = new ImageIcon(ZCanvas.class.getResource("/radius.png")); 
+
+    
     protected double radius;
 
     protected ZRoundedRectangle(){}
@@ -49,6 +56,24 @@ public class ZRoundedRectangle extends ZRectangle {
         hasChanges = true;
     }
      
+    
+    @Override
+    public boolean selected(ZCanvas canvas) {
+        
+        
+        
+        String rc = (String)JOptionPane.showInputDialog(canvas, "Update Corner Radius", "Modify Rounded Rectangle", JOptionPane.QUESTION_MESSAGE, radiusIcon,
+                                                (Object[])null, (Object)String.valueOf(radius));
+        if (rc != null) {
+            try {
+                 setRadius(Double.parseDouble(rc));
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(canvas, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
+            }
+        }
+        
+        return false;
+    }
     
      
     @Override

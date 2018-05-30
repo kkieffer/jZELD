@@ -50,6 +50,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -103,6 +104,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
     
     }
+    
+    public static final ImageIcon errorIcon = new ImageIcon(ZCanvas.class.getResource("/error.png")); 
+  
     
     private static final double ROTATION_MULTIPLIER = 1.0;
     private static final double SIZE_INCREASE_MULTIPLIER = 0.5;
@@ -1526,7 +1530,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
    
     /**
      * Save the canvas to an XML file, and mark all elements as saved
-     * @param f the file to write
+     * @param f the file to write, if f is null, nothing is saved, but the canvas is marked as no longer modified
      * @throws JAXBException 
      */
     public void toFile(File f) throws JAXBException {
@@ -1545,7 +1549,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-        jaxbMarshaller.marshal(fields, f);
+        if (f != null)
+            jaxbMarshaller.marshal(fields, f);
         
         for (ZElement e : fields.zElements)  //mark all has having been saved
             e.wasSaved();
@@ -1610,6 +1615,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         resetView();
         selectedElements.clear();
+        canvasModified = false;
+
         updatePreferredSize();
         repaint();
         
