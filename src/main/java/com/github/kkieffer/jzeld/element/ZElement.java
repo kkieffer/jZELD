@@ -143,6 +143,13 @@ public abstract class ZElement {
     public abstract void setDashPattern(Float[] dashPattern);
     
     /**
+     * For elements that support an outline, gets the dash pattern of the outline.  Null is a solid line.  Dash pattern is the same
+     * as for the Stroke component.
+     * @return dashPattern dash pattern with values in units
+     */
+    public abstract Float[] getDashPattern();
+    
+    /**
      * For elements that support a fill, sets the color of the fill.  Null is transparent.
      * @param fillColor 
      */

@@ -3,6 +3,9 @@ package com.github.kkieffer.jzeld.element;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -51,6 +54,11 @@ public class ZOval extends ZRectangle {
         return new ZOval(this);
     }
     
+    @Override
+    public Shape getShape(double unitSize) {
+        Rectangle2D r = getBounds2D(unitSize);
+        return new Ellipse2D.Double(0, 0, r.getWidth(), r.getHeight());
+    }
     
      @Override
     protected void fillShape(Graphics2D g, int unitSize, int width, int height) {

@@ -7,6 +7,7 @@ import static java.awt.BasicStroke.CAP_SQUARE;
 import static java.awt.BasicStroke.JOIN_MITER;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.util.Arrays;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -83,6 +84,14 @@ public abstract class ZAbstractShape extends ZElement {
     }
     
     @Override
+    public Float[] getDashPattern() {
+        if (dashPattern == null)
+            return null;
+        else
+            return (Float[])Arrays.copyOf(dashPattern, dashPattern.length);
+    }
+    
+    @Override
     public void setOutlineColor(Color outlineColor) {
         this.borderColor = outlineColor;
         hasChanges = true;
@@ -119,7 +128,7 @@ public abstract class ZAbstractShape extends ZElement {
         return true;
     }
     
-    
+    public abstract Shape getShape(double unitSize);
     protected abstract void fillShape(Graphics2D g, int unitSize, int width, int height);
     protected abstract void drawShape(Graphics2D g, int unitSize, int width, int height);
     

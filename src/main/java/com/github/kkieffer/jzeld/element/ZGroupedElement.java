@@ -133,6 +133,11 @@ public final class ZGroupedElement extends ZElement {
     }
 
     @Override
+    public Float[] getDashPattern() {
+        return null;
+    }
+    
+    @Override
     public void setFillColor(Color fillColor) {
         throw new UnsupportedOperationException("No fill");
     }

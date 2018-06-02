@@ -11,8 +11,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -104,6 +102,12 @@ public class ZShape extends ZAbstractShape {
         return new ZShape(this);
     }
     
+    
+    @Override
+    public Shape getShape(double unitSize) {
+        ZShape copy = copyOf();
+        return copy.shape;
+    }
     
     /**
      * Resize the object, new width and height in pixels

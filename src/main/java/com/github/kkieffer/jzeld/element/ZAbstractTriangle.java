@@ -5,6 +5,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -48,13 +50,19 @@ public abstract class ZAbstractTriangle extends ZRectangle {
         return true;
     }
     
+    
     @Override
-    public void paint(Graphics2D g, int unitSize, int width, int height) {
-
+    public Shape getShape(double unitSize) {
+        Rectangle2D r = getBounds2D(unitSize);
+        return getTriangle((int)r.getWidth(), (int)r.getHeight());
+    }
+    
+    protected Polygon getTriangle(int width, int height) {
+           
         if (type == null)
-            throw new RuntimeException("Custom triangles must override paint");
+            throw new RuntimeException("Custom triangles must override getTriange()");
 
-        
+   
         int x = 0;
         int x2 = width;
         if (flipHoriz) {
@@ -76,8 +84,15 @@ public abstract class ZAbstractTriangle extends ZRectangle {
             xc = x;  //for right triangle
 
         
-        Polygon triangle = new Polygon(new int[]{xc, x, x2}, new int[]{y, y2, y2}, 3);
+        return new Polygon(new int[]{xc, x, x2}, new int[]{y, y2, y2}, 3);
+    }
+    
+    @Override
+    public void paint(Graphics2D g, int unitSize, int width, int height) {
+ 
         
+       Polygon triangle = getTriangle(width, height);
+               
        if (backgroundColor != null) {
             g.setColor(backgroundColor);
             g.fill(triangle);

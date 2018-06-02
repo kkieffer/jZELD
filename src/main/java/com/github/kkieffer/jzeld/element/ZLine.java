@@ -3,6 +3,7 @@ package com.github.kkieffer.jzeld.element;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -88,6 +89,10 @@ public class ZLine extends ZAbstractShape {
         g.drawLine(0, height/2, width, height/2);
     }
 
-  
-    
+    @Override
+    public Shape getShape(double unitSize) {
+        return null;
+    }
+
+      
 }

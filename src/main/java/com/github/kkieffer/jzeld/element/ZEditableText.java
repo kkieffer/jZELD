@@ -244,6 +244,11 @@ public class ZEditableText extends ZElement {
     @Override
     public void setDashPattern(Float[] dashPattern) {
     }
+    
+    @Override
+    public Float[] getDashPattern() {
+        return null;
+    }
 
     @Override
     public void setOutlineColor(Color outlineColor) {
