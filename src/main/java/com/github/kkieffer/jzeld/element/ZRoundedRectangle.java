@@ -47,6 +47,17 @@ public class ZRoundedRectangle extends ZRectangle {
         this.radius = radius;
     }
     
+    
+    public ZRoundedRectangle(ZRoundedRectangle copy) {
+        super(copy);
+        this.radius = copy.radius;
+    }
+    
+    @Override
+    public ZRoundedRectangle copyOf() {
+        return new ZRoundedRectangle(this);
+    }
+    
     /**
      * Adjust the radius
      * @param r the value in units
