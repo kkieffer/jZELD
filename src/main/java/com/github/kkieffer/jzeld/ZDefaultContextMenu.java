@@ -1,6 +1,7 @@
 
 package com.github.kkieffer.jzeld;
 
+import com.github.kkieffer.jzeld.ZCanvas.Merge;
 import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.Component;
 import java.awt.Font;
@@ -39,6 +40,7 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
     protected ColorMenuItem lineColorMenuItem;
     protected JMenu alignMenu;
     protected JPopupMenu contextPopupMenu;
+    private final JMenu combineMenu;
     
     
     public ZDefaultContextMenu(ZCanvas c) {
@@ -92,6 +94,20 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         }
         
         
+        combineMenu = new JMenu("Combine");
+        for (Merge g : Merge.values()) {
+            JMenuItem m = new JMenuItem(g.toString());
+            m.addActionListener(new java.awt.event.ActionListener() {
+                @Override
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                   c.mergeSelectedElements(g);
+                }
+            });
+            combineMenu.add(m);
+            
+        }        
+        
+                
         attributesMenu = new JMenu("Attributes");
         lineWeightMenu = new LineBorderMenu("Line Weight", c, LineBorderMenu.Type.WEIGHT);
         lineDashMenu = new LineBorderMenu("Dash Pattern", c, LineBorderMenu.Type.DASH);
@@ -110,6 +126,7 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         contextPopupMenu.add(rotateMenu);
         contextPopupMenu.add(arrangeMenu);
         contextPopupMenu.add(attributesMenu);
+        contextPopupMenu.add(combineMenu);
         contextPopupMenu.add(alignMenu);
         
         copyMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -186,6 +203,8 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
                 c.flip(false);
             }
         }); 
+        
+        
                 
     }
 
@@ -214,7 +233,8 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         fillColorMenuItem.setEnabled(lastSelected.hasFill());
          
         alignMenu.setEnabled(selectedElements.size() > 1);
-
+        combineMenu.setEnabled(selectedElements.size() > 1);
+        
 
 
     }

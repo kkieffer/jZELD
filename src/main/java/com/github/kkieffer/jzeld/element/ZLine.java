@@ -90,7 +90,7 @@ public class ZLine extends ZAbstractShape {
     }
 
     @Override
-    public Shape getShape(double unitSize) {
+    protected Shape getAbstractShape() {
         return null;
     }
 

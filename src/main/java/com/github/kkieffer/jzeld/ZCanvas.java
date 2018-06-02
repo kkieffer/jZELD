@@ -12,6 +12,7 @@ import com.github.kkieffer.jzeld.element.ZAbstractShape;
 import com.github.kkieffer.jzeld.element.ZCanvasRuler;
 import com.github.kkieffer.jzeld.element.ZGrid;
 import com.github.kkieffer.jzeld.element.ZGroupedElement;
+import com.github.kkieffer.jzeld.element.ZShape;
 import java.awt.BasicStroke;
 import static java.awt.BasicStroke.CAP_SQUARE;
 import static java.awt.BasicStroke.JOIN_MITER;
@@ -93,6 +94,14 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 public class ZCanvas extends JComponent implements Printable, MouseListener, MouseMotionListener, MouseWheelListener  {
 
+    public enum Merge {Join, Subtract, Intersect, Exclusive_Join;
+    
+        @Override
+        public String toString() {
+            return this.name().replace("_", " ");
+        }
+    }
+    
     public enum Orientation {PORTRAIT, LANDSCAPE, REVERSE_LANDSCAPE}  //The ordinals conform to the PageFormat integer defines
    
     public enum Alignment {Left_Edge, Top_Edge, Right_Edge, Bottom_Edge, Centered_Vertically, Centered_Horizontally;
@@ -401,6 +410,19 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         else
             return new Rectangle2D.Double(fields.origin.getX()/SCALE, fields.origin.getY()/SCALE, fields.bounds.width/SCALE, fields.bounds.height/SCALE);
     }
+    
+    
+    /**
+     * Provides the drawing area of the canvas, in pixels 
+     * @return a Rectangle2D where x,y are the origin and width,height are the bounds, returns null if unbounded
+     */
+    public Rectangle getCanvasPixelBounds() {
+        if (fields.bounds == null)
+            return null;
+        else
+            return new Rectangle((int)fields.origin.getX(), (int)fields.origin.getY(), fields.bounds.width, fields.bounds.height);
+    }
+    
     
     public Orientation getOrientation() {
         return fields.orientation;
@@ -742,6 +764,51 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             this.addElement(e);
          
         
+    }
+    
+    
+    /**
+     * Merge the selected elements, starting with the first selected and applying the merge operation to each selected one
+     * The attributes of the newly merged shape are those of the first selected element
+     * @param operation the operation to apply
+     */
+    public void mergeSelectedElements(Merge operation) {
+        if (selectedElements.size() <= 1 || passThruElement != null) 
+            return;
+
+        undoStack.saveContext(fields.zElements);
+
+        ZAbstractShape ref = null;
+        
+        for (ZElement e: selectedElements) {   
+            if (e instanceof ZAbstractShape) {  
+                 
+                if (ref == null) {
+                    ref = (ZAbstractShape)e;  //the first one selected is the reference element
+                    removeElement(ref);
+                }
+                else {
+                   
+                    Shape mergedShape = ref.mergeShape(operation, (ZAbstractShape)e);  //merge any abstract shapes
+                    if (mergedShape != null) {  //was something that could be merged
+                        ZShape shape = new ZShape(ref.getPosition().getX(), ref.getPosition().getY(), mergedShape, 0.0, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor());
+                        removeElement(e);  //remove the merged element
+                        ref = shape;  //assign to the new reference
+                    }
+                    
+                }
+
+            }
+        }
+        
+        if (ref == null)  //nothing merged
+            return;
+        
+        
+        addElement(ref);  //add the merged shape
+        lastMethod = null;
+        selectedElements.clear();
+        selectedElements.add(ref);  //make the reference the selected one
     }
    
     

@@ -52,8 +52,8 @@ public abstract class ZAbstractTriangle extends ZRectangle {
     
     
     @Override
-    public Shape getShape(double unitSize) {
-        Rectangle2D r = getBounds2D(unitSize);
+    protected Shape getAbstractShape() {
+        Rectangle2D r = getBounds2D();
         return getTriangle((int)r.getWidth(), (int)r.getHeight());
     }
     

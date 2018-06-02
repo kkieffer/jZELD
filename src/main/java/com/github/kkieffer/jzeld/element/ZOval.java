@@ -55,8 +55,8 @@ public class ZOval extends ZRectangle {
     }
     
     @Override
-    public Shape getShape(double unitSize) {
-        Rectangle2D r = getBounds2D(unitSize);
+    protected Shape getAbstractShape() {
+        Rectangle2D r = getBounds2D();
         return new Ellipse2D.Double(0, 0, r.getWidth(), r.getHeight());
     }
     

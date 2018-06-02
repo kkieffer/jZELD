@@ -104,7 +104,7 @@ public class ZShape extends ZAbstractShape {
     
     
     @Override
-    public Shape getShape(double unitSize) {
+    protected Shape getAbstractShape() {
         ZShape copy = copyOf();
         return copy.shape;
     }
