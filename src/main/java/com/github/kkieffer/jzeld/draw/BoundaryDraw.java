@@ -116,6 +116,14 @@ public abstract class BoundaryDraw implements DrawClient {
         mousePoints.add(p);
     }
     
+    
+    protected void drawToMouse(Graphics g, Point2D last, Point mouse) {
+        //Draw temporary line to the current mouse point
+        if (last != null && mouse != null)
+            g.drawLine((int)last.getX(), (int)last.getY(), mouse.x, mouse.y);
+        
+    }
+    
     @Override
     public void drawClientPaint(Graphics g, Point currentMouse) {
         
@@ -134,9 +142,7 @@ public abstract class BoundaryDraw implements DrawClient {
             previous = curr;
         }
         
-        //Draw temporary line to the current mouse point
-        if (currentMouse != null && previous != null)
-            g2d.drawLine((int)previous.getX(), (int)previous.getY(), currentMouse.x, currentMouse.y);
+        drawToMouse(g, previous, currentMouse);
         
         
     }

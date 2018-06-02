@@ -73,6 +73,7 @@ DrawClients that subclass BoundaryDraw are provided.
 
 1.  FreeformDraw draws a continous path while the mouse is held down.  When released, a line is drawn from the last mouse point to the first mouse point to complete the shape.
 2.  StraightLineDraw draws straight lines between each mouse click.  Double-clicking the mouse draws a line from the last mouse point to the first mouse point and completes the shape.
+3.  OrthogonalLineDraw draws straight lines at 90 degree angles with each mouse click.  Double clicking closes the shape with right angle lines.
 
 In both of the cases below, when the draw is complete the ZShape is added to the ZCanvas.  It can then be modified by filling, changing color, etc.
 
@@ -85,6 +86,7 @@ additional hotkeys.
 2.  Save the ZCanvas to an XML file (Ctrl-S)
 3.  Create a freeform drawing (Ctrl-F)
 4.  Create a straight-line drawing (Ctrl-D)
+5.  Create a orthogonal-line drawing (Ctrl-O)
 
 When starting the demo, if a previous instance was saved with Ctrl-S, it can be loaded.  If the user chooses not to load, a default ZCanvas is loaded with a collection
 of demo ZElements.  The default Demo is shown below.
