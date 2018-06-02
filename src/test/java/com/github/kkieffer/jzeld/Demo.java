@@ -56,9 +56,7 @@ public class Demo extends javax.swing.JFrame {
     
     
     private void createDemoElements(ZCanvas c) throws IOException {
-        //Create a grid in the back, dashed thin line
-        ZGrid grid = new ZGrid(0.5f, Color.LIGHT_GRAY, new Float[]{.05f}, Unit.CM, 2);
-        c.addElement(grid);
+        
         
         //Create a red rectangle, large black border, moveable
         ZRectangle r = new ZRectangle(1.0, 1.0, 2.0, 1.0, 25.0, true, true, 3, Color.BLACK, new Float[]{.2f, .2f}, Color.RED);
@@ -135,7 +133,10 @@ public class Demo extends javax.swing.JFrame {
         c.setHorizontalRuler(hRule);
         ZCanvasRuler vRule = new ZCanvasRuler(20, false, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, Unit.CM, 2, 2);
         c.setVerticalRuler(vRule);
-       
+      
+        //Create a grid in the back, dashed thin line
+        ZGrid grid = new ZGrid(0.5f, Color.LIGHT_GRAY, new Float[]{.05f}, Unit.CM, 2);
+        c.setGrid(grid);
 
         ZDefaultContextMenu m = new ZDefaultContextMenu(c);
         c.setContextMenu(m);

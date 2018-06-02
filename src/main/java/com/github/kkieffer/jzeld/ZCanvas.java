@@ -10,6 +10,7 @@ import com.github.kkieffer.jzeld.element.ZCanvasRuler.Unit;
 import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZAbstractShape;
 import com.github.kkieffer.jzeld.element.ZCanvasRuler;
+import com.github.kkieffer.jzeld.element.ZGrid;
 import com.github.kkieffer.jzeld.element.ZGroupedElement;
 import java.awt.BasicStroke;
 import static java.awt.BasicStroke.CAP_SQUARE;
@@ -154,6 +155,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         @XmlElement(name="VerticalRuler")        
         private ZCanvasRuler verticalRuler;
+        
+        @XmlElement(name="Grid")
+        private ZGrid grid;
         
         
     }
@@ -325,6 +329,39 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         repaint();
     }
     
+    /**
+     * Set the grid to use
+     * @param g the grid to use, or null to remove
+     */
+    public void setGrid(ZGrid g) {
+        fields.grid = g;
+        canvasModified = true;
+        repaint();
+    }
+    
+    /**
+     * True if there is a grid set, false otherwise
+     * @return 
+     */
+    public boolean hasGrid() {
+        return fields.grid != null;
+    }
+    
+    
+    /**
+     * Change the measure unit
+     * @param u the new measure unit (cannot be null)
+     */
+    public void changeUnit(Unit u) {
+        fields.unit = u;
+        canvasModified = true;
+        repaint();
+    }
+    
+    
+    public Unit getUnit() {
+        return fields.unit;
+    }
     
     public void registerSelectListener(SelectListener l) {
         if (!selectListeners.contains(l))
@@ -928,7 +965,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
-     * Makes a deep copy of the last selected element, if there is one, and stores it for later.  Does nothing if the control is currently with an element.
+     * Makes a deep copy of the selected elements and stores it for later.  Does nothing if the control is currently with an element.
      * @return a copy of the copied elements, or null if none was copied
      */
     public ZElement[] copy() {
@@ -1088,6 +1125,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             g2d.clearRect(0, 0, getScaledWidth(), getScaledHeight());
         }
         
+        if (fields.grid != null)
+            paintElement(g2d, fields.grid, false);
+        
         //Start from the deepest point in the stack, drawing elements up to the top z layer
         Iterator<ZElement> it = fields.zElements.descendingIterator();  
         while (it.hasNext()) {
@@ -1132,7 +1172,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (selectedElementResizeOn && mouseIn != null && lastSelectedElement != null && fields.mouseCoordFont != null) {
             g2d.setColor(Color.BLACK);
             Rectangle2D bounds = lastSelectedElement.getBounds2D();
-            String mouseCoord = fmt.format(bounds.getWidth()) + ", " + fmt.format(bounds.getHeight());
+            String mouseCoord = fmt.format(fields.unit.getScale()*bounds.getWidth()) + ", " + fmt.format(fields.unit.getScale()*bounds.getHeight());
             g2d.drawString(mouseCoord, mouseIn.x + DRAG_BOX_SIZE*2*pixScale/(float)zoom, mouseIn.y + DRAG_BOX_SIZE*2*pixScale/(float)zoom);
             
         }
@@ -1535,9 +1575,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void toFile(File f) throws JAXBException {
                
-        Class[] contextClasses = new Class[elementTypes.size() + 4]; 
+        Class[] contextClasses = new Class[elementTypes.size() + 5]; 
         elementTypes.toArray(contextClasses);
 
+        contextClasses[contextClasses.length-5] = ZGrid.class;        
         contextClasses[contextClasses.length-4] = ZCanvasRuler.class;        
         contextClasses[contextClasses.length-3] = ZAbstractShape.class;        
         contextClasses[contextClasses.length-2] = ZCanvas.CanvasFields.class;
@@ -1599,9 +1640,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         elementTypes.clear();
         elementTypes.addAll(newElementClasses);
                
-        Class[] contextClasses = new Class[elementTypes.size() + 4]; 
+        Class[] contextClasses = new Class[elementTypes.size() + 5]; 
         elementTypes.toArray(contextClasses);
        
+        contextClasses[contextClasses.length-5] = ZGrid.class;        
         contextClasses[contextClasses.length-4] = ZCanvasRuler.class;        
         contextClasses[contextClasses.length-3] = ZAbstractShape.class;        
         contextClasses[contextClasses.length-2] = ZCanvas.CanvasFields.class;
