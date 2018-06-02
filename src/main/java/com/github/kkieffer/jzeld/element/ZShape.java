@@ -155,8 +155,29 @@ public class ZShape extends ZAbstractShape {
 
     @Override
     public boolean supportsFlip() {
-        return false;
+        return true;
     }
+    
+    @Override
+    public void flipHorizontal() {
+        Rectangle2D bounds = getBounds2D();
+        AffineTransform scaleInstance = AffineTransform.getScaleInstance(-1.0, 1.0);  //scaling negative creates a mirror image the other direction
+        shape = scaleInstance.createTransformedShape(shape);
+        AffineTransform translateInstance = AffineTransform.getTranslateInstance(bounds.getWidth(), 0);  //move back to where it was
+        shape = translateInstance.createTransformedShape(shape);
+        hasChanges = true;
+    }
+    
+    @Override
+    public void flipVertical() {
+        Rectangle2D bounds = getBounds2D();
+        AffineTransform scaleInstance = AffineTransform.getScaleInstance(1.0, -1.0);  //scaling negative creates a mirror image the other direction
+        shape = scaleInstance.createTransformedShape(shape);
+        AffineTransform translateInstance = AffineTransform.getTranslateInstance(0, bounds.getHeight());  //move back to where it was
+        shape = translateInstance.createTransformedShape(shape);
+        hasChanges = true;
+    }
+    
     
     @Override
     public void paint(Graphics2D g, int unitSize, int width, int height) {
