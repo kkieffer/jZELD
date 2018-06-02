@@ -94,7 +94,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 public class ZCanvas extends JComponent implements Printable, MouseListener, MouseMotionListener, MouseWheelListener  {
 
-    public enum Merge {Join, Subtract, Intersect, Exclusive_Join;
+    public enum CombineOperation {Join, Subtract, Intersect, Exclusive_Join;
     
         @Override
         public String toString() {
@@ -562,7 +562,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Flips the selected elements.
      * @param horiz if true, flips horizontal, else vertical
      */
-    public void flip(boolean horiz) {
+    public void flip(Boolean horiz) {
         if (selectedElements.isEmpty() || passThruElement != null) 
             return;
                        
@@ -768,11 +768,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     
     /**
-     * Merge the selected elements, starting with the first selected and applying the merge operation to each selected one
-     * The attributes of the newly merged shape are those of the first selected element
+     * Merge the selected elements, starting with the first selected and applying the operation to each selected one
+     * The attributes of the newly combined shape are those of the first selected element
      * @param operation the operation to apply
      */
-    public void mergeSelectedElements(Merge operation) {
+    public void combineSelectedElements(CombineOperation operation) {
         if (selectedElements.size() <= 1 || passThruElement != null) 
             return;
 
@@ -789,7 +789,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 }
                 else {
                    
-                    Shape mergedShape = ref.mergeShape(operation, (ZAbstractShape)e);  //merge any abstract shapes
+                    Shape mergedShape = ref.combineWith(operation, (ZAbstractShape)e);  //combine shapes
                     if (mergedShape != null) {  //was something that could be merged
                         ZShape shape = new ZShape(ref.getPosition().getX(), ref.getPosition().getY(), mergedShape, 0.0, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor());
                         removeElement(e);  //remove the merged element

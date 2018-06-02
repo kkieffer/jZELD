@@ -1,7 +1,7 @@
 
 package com.github.kkieffer.jzeld;
 
-import com.github.kkieffer.jzeld.ZCanvas.Merge;
+import com.github.kkieffer.jzeld.ZCanvas.CombineOperation;
 import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.Component;
 import java.awt.Font;
@@ -95,12 +95,12 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         
         
         combineMenu = new JMenu("Combine");
-        for (Merge g : Merge.values()) {
+        for (CombineOperation g : CombineOperation.values()) {
             JMenuItem m = new JMenuItem(g.toString());
             m.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                   c.mergeSelectedElements(g);
+                   c.combineSelectedElements(g);
                 }
             });
             combineMenu.add(m);

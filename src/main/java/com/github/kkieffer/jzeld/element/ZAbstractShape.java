@@ -2,7 +2,7 @@
 package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.JAXBAdapter.ColorAdapter;
-import com.github.kkieffer.jzeld.ZCanvas.Merge;
+import com.github.kkieffer.jzeld.ZCanvas.CombineOperation;
 import java.awt.BasicStroke;
 import static java.awt.BasicStroke.CAP_SQUARE;
 import static java.awt.BasicStroke.JOIN_MITER;
@@ -163,12 +163,12 @@ public abstract class ZAbstractShape extends ZElement {
     
     
     /**
-     * Merge this shape with the provided ZAbstractShape
+     * Combine this shape with the provided ZAbstractShape
      * @param operation the merge operation
      * @param zShape the shape to merge with
      * @return true if a merge occurred, false if the provided ZAbstractShape does not support being merged
      */
-    public final Shape mergeShape(Merge operation, ZAbstractShape zShape) {
+    public final Shape combineWith(CombineOperation operation, ZAbstractShape zShape) {
         
         Shape mergeShape = getShape();
         
