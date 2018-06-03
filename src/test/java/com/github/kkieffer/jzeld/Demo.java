@@ -124,25 +124,7 @@ public class Demo extends javax.swing.JFrame {
         setSize(900, 600);
         setTitle("jZELD Demo");
 
-        //Create our ZCanvas with a dark grey background, label font, centimeter scale, dark grey cursor lines, 10 undo stack
-        ZCanvas c = new ZCanvas(Color.WHITE, LABEL_FONT, Unit.CM, Color.DARK_GRAY, 10, new Point(36, 36), new Dimension(1400, 800), Orientation.LANDSCAPE);
-        canvasPane.add(c, BorderLayout.CENTER);
-        
-       //Create two rulers, 20 pixels thick, with different minor tick spacing
-        ZCanvasRuler hRule = new ZCanvasRuler(20, true, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, Unit.CM, 4, 2);
-        c.setHorizontalRuler(hRule);
-        ZCanvasRuler vRule = new ZCanvasRuler(20, false, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, Unit.CM, 2, 2);
-        c.setVerticalRuler(vRule);
-      
-        //Create a grid in the back, dashed thin line
-        ZGrid grid = new ZGrid(0.5f, Color.LIGHT_GRAY, new Float[]{.05f}, Unit.CM, 2);
-        c.setGrid(grid);
-
-        ZDefaultContextMenu m = new ZDefaultContextMenu(c);
-        c.setContextMenu(m);
-        
-        new ZDefaultCanvasHotkeys(c);  //add hotkeys
-        
+        ZCanvas c;
         
         if (loadFromFile) {
             File f = new File("test.xml");
@@ -150,13 +132,36 @@ public class Demo extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "File does not exist yet.  Create by running Demo and CTRL-S to save a file", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            c.fromFile(f);
+            c = ZCanvas.fromFile(f);
+            
         } else {
+            
+            //Create our ZCanvas with a dark grey background, label font, centimeter scale, dark grey cursor lines, 10 undo stack
+            c = new ZCanvas(Color.WHITE, LABEL_FONT, Unit.CM, Color.DARK_GRAY, 10, new Point(36, 36), new Dimension(1400, 800), Orientation.LANDSCAPE);
+        
+            //Create two rulers, 20 pixels thick, with different minor tick spacing
+             ZCanvasRuler hRule = new ZCanvasRuler(20, true, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, Unit.CM, 4, 2);
+             c.setHorizontalRuler(hRule);
+             ZCanvasRuler vRule = new ZCanvasRuler(20, false, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, Unit.CM, 2, 2);
+             c.setVerticalRuler(vRule);
+
+             //Create a grid in the back, dashed thin line
+             ZGrid grid = new ZGrid(0.5f, Color.LIGHT_GRAY, new Float[]{.05f}, Unit.CM, 2);
+             c.setGrid(grid);
+            
             createDemoElements(c);
         }
 
-        c.requestFocusInWindow();
+         
+
+        ZDefaultContextMenu m = new ZDefaultContextMenu(c);
+        c.setContextMenu(m);
         
+        new ZDefaultCanvasHotkeys(c);  //add hotkeys
+        
+        c.requestFocusInWindow();
+        canvasPane.add(c, BorderLayout.CENTER);
+
  
         InputMap im = c.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = c.getActionMap();

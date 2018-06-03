@@ -42,9 +42,9 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -126,7 +126,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     /* This class is used because JaxB can't handle JComponent superclass*/
     @XmlRootElement(name="ZCanvas")
     @XmlAccessorType(XmlAccessType.FIELD)
-    private static class CanvasFields {
+    public static class CanvasStore implements Serializable {
 
         @XmlElement(name="ZElement")        
         private LinkedList<ZElement> zElements = new LinkedList<>();  //list of all Z-plane objects, first is top, bottom is last
@@ -172,10 +172,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     /*----------------------------------------------------------------------*/
     
-    CanvasFields fields = new CanvasFields();
-    
-    ArrayList<Class<? extends ZElement>> elementTypes = new ArrayList<>();
-    
+    CanvasStore fields = new CanvasStore();
+        
     private final float pixScale = SCALE/72.0f;
     
     private final float[] dashedBorder = new float[]{0.0f, pixScale*5.0f, pixScale*5.0f};
@@ -249,11 +247,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         init();
     }
     
-    protected void afterUnmarshal(Unmarshaller u, Object parent) {
-         init();
-    }
-        
-    
+   
     private void init() {
     
         undoStack = new UndoStack(fields.undoStackCount);
@@ -314,7 +308,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 shiftPressed = false;
             }
         });
-        
+        updatePreferredSize();
+        repaint();
 
     }
     
@@ -913,8 +908,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         lastMethod = null;
         canvasModified = true;
       
-        if (!elementTypes.contains(o.getClass()))  //Add this class type to our list of types
-            elementTypes.add(o.getClass());
     }
     
     /**
@@ -1636,47 +1629,38 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
    
     /**
-     * Save the canvas to an XML file, and mark all elements as saved
-     * @param f the file to write, if f is null, nothing is saved, but the canvas is marked as no longer modified
-     * @throws JAXBException 
+     * Retrieves an array of required classes for storing a ZCanvas using a JAXB context.  Includes required classes plus all element classes for elements
+     * that have been added to the canvas
+     * @return 
      */
-    public void toFile(File f) throws JAXBException {
-               
+    public Class[] getContextClasses() {
+        
+        ArrayList<Class<? extends ZElement>> elementTypes = new ArrayList<>();
+        for (ZElement e : fields.zElements) {         
+            if (!elementTypes.contains(e.getClass()))  //Add this class type to our list of types
+                 elementTypes.add(e.getClass());
+        }
+        
         Class[] contextClasses = new Class[elementTypes.size() + 5]; 
         elementTypes.toArray(contextClasses);
 
         contextClasses[contextClasses.length-5] = ZGrid.class;        
         contextClasses[contextClasses.length-4] = ZCanvasRuler.class;        
         contextClasses[contextClasses.length-3] = ZAbstractShape.class;        
-        contextClasses[contextClasses.length-2] = ZCanvas.CanvasFields.class;
+        contextClasses[contextClasses.length-2] = ZCanvas.CanvasStore.class;
         contextClasses[contextClasses.length-1] = ZElement.class;
-        
-        JAXBContext jaxbContext = JAXBContext.newInstance(contextClasses);
- 
-        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-        if (f != null)
-            jaxbMarshaller.marshal(fields, f);
-        
-        for (ZElement e : fields.zElements)  //mark all has having been saved
-            e.wasSaved();
-        
-        canvasModified = false;
+        return contextClasses;
     }
     
-    
     /**
-     * Restores a canvas from an XML file
-     * @param f the file to read
-     * @throws JAXBException on unmarshall error
-     * @throws java.io.FileNotFoundException f cannot be found
+     * Retrieves an array of required classes for loading a ZCanvas using a JAXB context.  Includes required classes plus all element classes for elements
+     * that are in the file
+     * @param f the file to search
+     * @return
+     * @throws java.io.IOException f cannot be found or read
      * @throws java.lang.ClassNotFoundException if an Element defined in the file has no corresponding subclass of ZElement
      */
-    public void fromFile(File f) throws JAXBException, FileNotFoundException, IOException, ClassNotFoundException {
-      
-        
+    public static Class[] getContextClasses(File f) throws IOException, ClassNotFoundException {
         //First, look through the file to find all the specific Element classes
         int lineNo = 1;
         LinkedList<Class<? extends ZElement>> newElementClasses = new LinkedList<>(); 
@@ -1703,32 +1687,95 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         b.close();
         
-        //Wipe out the old classes, add the ones found in the file
-        elementTypes.clear();
-        elementTypes.addAll(newElementClasses);
-               
-        Class[] contextClasses = new Class[elementTypes.size() + 5]; 
-        elementTypes.toArray(contextClasses);
+  
+        Class[] contextClasses = new Class[newElementClasses.size() + 5]; 
+        newElementClasses.toArray(contextClasses);
        
         contextClasses[contextClasses.length-5] = ZGrid.class;        
         contextClasses[contextClasses.length-4] = ZCanvasRuler.class;        
         contextClasses[contextClasses.length-3] = ZAbstractShape.class;        
-        contextClasses[contextClasses.length-2] = ZCanvas.CanvasFields.class;
+        contextClasses[contextClasses.length-2] = ZCanvas.CanvasStore.class;
         contextClasses[contextClasses.length-1] = ZElement.class;
         
-        JAXBContext jaxbContext = JAXBContext.newInstance(contextClasses);
+        return contextClasses;
+    }
+    
+    /**
+     * Retrieves an object that can be used to store the ZCanvas, in a custom format (if JAXB is not desired). The returned object is
+     * serializable and also marshallable with JAXB
+     * @return 
+     */
+    public CanvasStore getCanvasStore() {
+        return this.fields;
+    }
+    
+    /**
+     * Creates a new ZCanvas from the provided canvas store
+     * @param s the store to use
+     * @return a restored ZCanvas
+     */
+    public static ZCanvas fromCanvasStore(CanvasStore s) {
+
+        ZCanvas c = new ZCanvas();
+        c.fields = s;
+        
+        c.canvasModified = false;
+        c.init();
+        return c;
+    }
+    
+    /**
+     * Mark the canvas and its elements has having been saed
+     */
+    public void markAsSaved() {
+        for (ZElement e : fields.zElements)  //mark all has having been saved
+            e.wasSaved();
+        
+        canvasModified = false;
+    }
+    
+    /**
+     * Save the canvas to an XML file, and mark all elements as saved
+     * @param f the file to write, if f is null, nothing is saved, but the canvas is marked as no longer modified
+     * @throws JAXBException 
+     */
+    public void toFile(File f) throws JAXBException {
+               
+  
+        JAXBContext jaxbContext = JAXBContext.newInstance(getContextClasses());
+ 
+        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        if (f != null)
+            jaxbMarshaller.marshal(fields, f);
+        
+        markAsSaved();
+        
+    }
+    
+    
+    /**
+     * Restores a canvas from an XML file
+     * @param f the file to read
+     * @return the loaded ZCanvas
+     * @throws JAXBException on unmarshall error
+     * @throws java.io.IOException f cannot be found or read
+     * @throws java.lang.ClassNotFoundException if an Element defined in the file has no corresponding subclass of ZElement
+     */
+    public static ZCanvas fromFile(File f) throws JAXBException, IOException, ClassNotFoundException {
+      
+        JAXBContext jaxbContext = JAXBContext.newInstance(getContextClasses(f));
  
         Unmarshaller jaxbUnMarshaller = jaxbContext.createUnmarshaller();
  
-        fields = (ZCanvas.CanvasFields)jaxbUnMarshaller.unmarshal(f);
+        ZCanvas c = new ZCanvas();
+        c.fields = (ZCanvas.CanvasStore)jaxbUnMarshaller.unmarshal(f);
         
-        resetView();
-        selectedElements.clear();
-        canvasModified = false;
-
-        updatePreferredSize();
-        repaint();
-        
+        c.canvasModified = false;
+        c.init();
+        return c;
     }
     
    
