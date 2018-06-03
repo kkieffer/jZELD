@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -33,7 +34,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlRootElement(name = "ZElement")
 @XmlAccessorType(XmlAccessType.FIELD)
-public abstract class ZElement {
+public abstract class ZElement implements Serializable {
     
     @XmlJavaTypeAdapter(Rectangle2DAdapter.class)
     private Rectangle2D.Double bounds; 
@@ -223,6 +224,7 @@ public abstract class ZElement {
      */
     public void setRotation(double r) {
         rotation = r;
+        hasChanges = true;
     }
     
     /**
@@ -231,6 +233,7 @@ public abstract class ZElement {
      */
     public void rotate(double angle) {
         rotation += angle;
+        hasChanges = true;
     }
     
     /**
@@ -241,6 +244,7 @@ public abstract class ZElement {
     public void reposition(double x, double y) {
         position.x = x;
         position.y = y;
+        hasChanges = true;
     }
     
     
@@ -258,6 +262,8 @@ public abstract class ZElement {
         
         if (position.y + y < yLimit && position.y + y + bounds.height > 0)
             position.y += y;
+    
+        hasChanges = true;
         
     }
     
@@ -279,7 +285,8 @@ public abstract class ZElement {
             bounds.width = minSize/scale;  //don't go to zero
         if (bounds.height <= 0)
             bounds.height = minSize/scale; //don't go to zero
-    }
+         hasChanges = true;
+   }
     
     public final void changeSize(double w, double h, double minSize, double scale) {
         if (!resizable)
@@ -384,6 +391,7 @@ public abstract class ZElement {
      */
     public void flipHorizontal() {
         flipHoriz = !flipHoriz;
+        hasChanges = true;
     }
         
     
@@ -392,6 +400,7 @@ public abstract class ZElement {
      */
     public void flipVertical() {
         flipVert = !flipVert;
+        hasChanges = true;
     }    
     
     /**
