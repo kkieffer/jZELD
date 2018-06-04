@@ -194,6 +194,13 @@ public class Demo extends javax.swing.JFrame {
                 }
             }
         });
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.META_DOWN_MASK), "SelectAll");
+        am.put("SelectAll", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                c.selectAll();
+            }
+        });
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.META_DOWN_MASK), "Print");
         am.put("Print", new AbstractAction(){
             @Override

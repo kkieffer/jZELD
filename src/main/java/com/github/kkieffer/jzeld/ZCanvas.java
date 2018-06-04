@@ -1155,6 +1155,21 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         } 
     }
     
+    
+    public void selectAll() {
+        
+        selectedElements.clear();
+        for (ZElement e : fields.zElements) {
+            if (e.isSelectable())
+                selectedElements.add(e);
+        }
+        if (lastSelectedElement == null)
+            lastSelectedElement = selectedElements.get(0);
+     
+        repaint();
+    }
+    
+    
     @Override
     public synchronized void paintComponent(Graphics g) {
 
