@@ -19,7 +19,7 @@ public class ZRightTriangle extends ZAbstractTriangle {
     }
     
     public ZRightTriangle(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
-        super(Type.RIGHT, x, y, width, height, rotation, canSelect, canResize, borderWidth, borderColor, dashPattern, fillColor);
+        super(TriType.RIGHT, x, y, width, height, rotation, canSelect, canResize, borderWidth, borderColor, dashPattern, fillColor);
     }
     
     protected ZRightTriangle(ZRightTriangle copy) {

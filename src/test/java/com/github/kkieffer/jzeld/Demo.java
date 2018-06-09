@@ -10,10 +10,13 @@ import com.github.kkieffer.jzeld.element.ZCanvasRuler.Unit;
 import com.github.kkieffer.jzeld.element.ZEditableText;
 import com.github.kkieffer.jzeld.element.ZEditableText.HorizontalJustify;
 import com.github.kkieffer.jzeld.element.ZEditableText.TextAttributes;
+import com.github.kkieffer.jzeld.element.ZEquilateralPolygon;
 import com.github.kkieffer.jzeld.element.ZGrid;
 import com.github.kkieffer.jzeld.element.ZImage;
 import com.github.kkieffer.jzeld.element.ZLine;
 import com.github.kkieffer.jzeld.element.ZOval;
+import com.github.kkieffer.jzeld.element.ZQuadrilateral;
+import com.github.kkieffer.jzeld.element.ZQuadrilateral.QuadType;
 import com.github.kkieffer.jzeld.element.ZRectangle;
 import com.github.kkieffer.jzeld.element.ZRightTriangle;
 import com.github.kkieffer.jzeld.element.ZRoundedRectangle;
@@ -81,6 +84,14 @@ public class Demo extends javax.swing.JFrame {
         //Right triangle, yellow, big borders
         ZRightTriangle t = new ZRightTriangle(1.0, 6.0, 1.0, 1.0, 0.0, true, true, 4, Color.BLACK, null, Color.YELLOW);
         c.addElement(t);
+        
+        
+        ZEquilateralPolygon p = new ZEquilateralPolygon(6.0, 4.0, 1.0, 1.0, 0.0, true, true, 4, Color.BLACK, null, Color.BLUE, 5);
+        c.addElement(p);
+        
+          
+        ZQuadrilateral pg = new ZQuadrilateral(QuadType.RHOMBUS, 6.0, 2.0, 1.0, 1.0, 0.0, true, true, 4, Color.BLACK, null, Color.BLUE, 20);
+        c.addElement(pg);
             
         //Add the test image
         InputStream testImg = Demo.class.getClassLoader().getResourceAsStream("tiger.jpg");
