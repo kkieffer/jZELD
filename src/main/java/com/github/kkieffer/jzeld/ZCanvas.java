@@ -755,8 +755,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
         }
         
-        for (ZElement e : restoredElements)
+        for (ZElement e : restoredElements) {
             this.addElement(e);
+            selectedElements.add(e);
+        }
          
         
     }
@@ -1237,8 +1239,18 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             //Draw Position string
             if (fields.mouseCoordFont != null) {
                 g2d.setColor(Color.BLACK);               
-                String mouseCoord = fmt.format(fields.unit.getScale()*tMouse.getX()/SCALE) + ", " + fmt.format(fields.unit.getScale()*tMouse.getY()/SCALE);                       
-                g2d.drawString(mouseCoord, (int)tMouse.getX() - (int)Math.ceil(fontMetrics.stringWidth(mouseCoord) + 10.0 * pixScale/zoom), (int)(tMouse.getY()) - 10*pixScale/(float)zoom);
+
+                String mouseCoord = fmt.format(fields.unit.getScale()*tMouse.getX()/SCALE) + ", " + fmt.format(fields.unit.getScale()*tMouse.getY()/SCALE);                                       
+                int stringX = (int)tMouse.getX() - (int)Math.ceil(fontMetrics.stringWidth(mouseCoord) + 10.0 * pixScale/zoom);
+                int stringY = (int)tMouse.getY() - (int)Math.ceil(10*pixScale/zoom);
+                
+                g2d.drawString(mouseCoord, stringX, stringY);
+                               
+                String rotationString = fmt.format(selectedElement.getRotation());
+                stringX = (int)tMouse.getX() - (int)Math.ceil(fontMetrics.stringWidth(rotationString) + 10.0 * pixScale/zoom);
+                stringY = (int)tMouse.getY() + (int)Math.ceil(10*pixScale/zoom) + fontMetrics.getHeight();
+
+                g2d.drawString(rotationString, stringX, stringY);
             }
 
         }
