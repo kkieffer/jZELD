@@ -3,8 +3,11 @@ package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.ZCanvas;
 import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
+import com.github.kkieffer.jzeld.draw.BoundaryDraw;
 import java.awt.Color;
-import java.awt.Polygon;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -20,7 +23,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZQuadrilateral extends ZPolygon {
 
-    public static final ImageIcon radiusIcon = new ImageIcon(ZCanvas.class.getResource("/radius.png")); 
+    public static final ImageIcon radiusIcon = new ImageIcon(ZCanvas.class.getResource("/skew.png")); 
      
     public enum QuadType {SQUARE, PARALLELOGRAM, TRAPEZOID, RHOMBUS, DIAMOND}
     
@@ -28,10 +31,10 @@ public class ZQuadrilateral extends ZPolygon {
     protected int percent;
 
     @XmlTransient
-    int[] x = new int[4];  //x verticies
-        
+    double[] x = new double[4];  //x verticies
+    
     @XmlTransient
-    int[] y = new int[4];  //y verticies
+    double[] y = new double[4];  //y verticies
     
     protected ZQuadrilateral(){}
     
@@ -84,7 +87,8 @@ public class ZQuadrilateral extends ZPolygon {
     @Override
     public boolean selected(ZCanvas canvas) {
         
-        
+        if (type == QuadType.SQUARE) //square has no skew
+            return false;
         
         String rc = (String)JOptionPane.showInputDialog(canvas, "Update Percent of Maximum Skew", "Modify Quadrilateral", JOptionPane.QUESTION_MESSAGE, radiusIcon,
                                                 (Object[])null, (Object)String.valueOf(percent));
@@ -107,19 +111,19 @@ public class ZQuadrilateral extends ZPolygon {
     
     
     @Override
-    protected Polygon getPolygon(int width, int height) {
-        
+    protected Path2D getPath2D(double width, double height) {
+                  
         //Move counterclockwise around - these are defaults (rectangle)
         x[0] = 0;
         x[1] = width;
         x[2] = width;
         x[3] = 0;
-        
+       
         y[0] = 0;
         y[1] = 0;
         y[2] = height;
         y[3] = height;
-             
+        
         
         switch (type) {
             case SQUARE:
@@ -142,13 +146,18 @@ public class ZQuadrilateral extends ZPolygon {
                 
         }
         
-        return new Polygon(x, y, 4);
+        ArrayList<Point2D> points = new ArrayList<>(4);
+        for (int i=0; i<4; i++)
+            points.add(new Point2D.Double(x[i], y[i]));
+
+        
+        return BoundaryDraw.pathFromPoints(points);
   
     }
     
-    private void getSquare(int w, int h) {
+    private void getSquare(double w, double h) {
        
-        int side = w > h ? h : w;
+        double side = w > h ? h : w;
         
         x[1] = side;
         x[2] = side;
@@ -156,41 +165,40 @@ public class ZQuadrilateral extends ZPolygon {
         y[3] = side;
     }
        
-    private void getParallelogram(int w, int h) {            
-        x[0] = (int)((double)w * ((double)percent / 100.0));
+    private void getParallelogram(double w, double h) {            
+        x[0] = (double)w * ((double)percent / 100.0);
         x[2] = w - x[0];
 
     }
 
-    private void getTrapezoid(int w, int h) {
-        x[0] = (int)((double)w * ((double)percent / 200.0));
+    private void getTrapezoid(double w, double h) {
+        x[0] = (double)w * ((double)percent / 200.0);
         x[1] = w - x[0];
     }
     
     
-    private void getDiamond(int w, int h) {
-        x[0] = (int)((double)w * ((double)percent / 100.0));
+    private void getDiamond(double w, double h) {
+        x[0] = (double)w * ((double)percent / 100.0);
         x[2] = w - x[0];
         
-        y[1] = (int)((double)h * ((double)percent / 100.0));
+        y[1] = (double)h * ((double)percent / 100.0);
         y[2] = h;
         y[3] = h - y[1];
     }
     
     
     
-    private void getRhombus(int w, int h) {
+    private void getRhombus(double w, double h) {
         
-        int shorter = w > h ? h : w;
+        double shorter = w > h ? h : w;
 
-            
-        
-        x[0] = (int)((double)shorter * ((double)percent / 200.0));
+ 
+        x[0] = (double)shorter * ((double)percent / 200.0);
         x[1] = shorter;
         x[2] = x[1] - x[0];
         double hypotenuse = x[1] - x[0];
 
-        y[2] = (int)Math.sqrt(Math.pow(hypotenuse, 2) - Math.pow(x[0], 2));
+        y[2] = Math.sqrt(Math.pow(hypotenuse, 2) - Math.pow(x[0], 2));
         y[3] = y[2];
         
     }

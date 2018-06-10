@@ -3,9 +3,11 @@ package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.ZCanvas;
 import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
+import com.github.kkieffer.jzeld.draw.BoundaryDraw;
 import java.awt.Color;
-import java.awt.Point;
-import java.awt.Polygon;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -21,7 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZEquilateralPolygon extends ZPolygon {
 
-    public static final ImageIcon radiusIcon = new ImageIcon(ZCanvas.class.getResource("/radius.png")); 
+    public static final ImageIcon radiusIcon = new ImageIcon(ZCanvas.class.getResource("/sides.png")); 
     
     protected int sides;
 
@@ -79,10 +81,10 @@ public class ZEquilateralPolygon extends ZPolygon {
                                                 (Object[])null, (Object)String.valueOf(sides));
         if (rc != null) {
             try {
-                int sides = Integer.parseInt(rc);
-                if (sides < 3)
+                int numSides = Integer.parseInt(rc);
+                if (numSides < 3)
                     throw new NumberFormatException("Sides must be greater than 2");
-                setSides(sides);
+                setSides(numSides);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(canvas, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
             }
@@ -92,9 +94,9 @@ public class ZEquilateralPolygon extends ZPolygon {
     }
     
     @Override
-    protected Polygon getPolygon(int width, int height) {
+    protected Path2D getPath2D(double width, double height) {
         
-        Point center = new Point(width/2, height/2);
+        Point2D center = new Point2D.Double(width/2.0, height/2.0);
         double angleStep = Math.toRadians(360.0/sides);
         
         //Determine the starting angle for the best "look"
@@ -109,16 +111,19 @@ public class ZEquilateralPolygon extends ZPolygon {
         
         double radius = (width > height ? height/2 : width/2);
         
-        int[] x = new int[sides];
-        int[] y = new int[sides];
-        
-        for (int i=0; i<x.length; i++) {
-            x[i] = (int)(radius * Math.cos(angle)) + center.x;
-            y[i] = -(int)(radius * Math.sin(angle)) + center.y;
+     
+        ArrayList<Point2D> points = new ArrayList<>(sides);
+
+        for (int i=0; i<sides; i++) {
+            double x = radius * Math.cos(angle) + center.getX();
+            double y = -(radius * Math.sin(angle)) + center.getY();
+            
+            points.add(new Point2D.Double(x,y));
+            
             angle += angleStep;
         }
         
-        return new Polygon(x, y, sides);
+        return BoundaryDraw.pathFromPoints(points);
     }
     
      

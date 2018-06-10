@@ -3,8 +3,8 @@ package com.github.kkieffer.jzeld.element;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
 import java.awt.Shape;
+import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlTransient;
 public abstract class ZPolygon extends ZAbstractShape {
     
     @XmlTransient
-    private Polygon polygon; 
+    private Path2D polygon; 
   
     protected ZPolygon(){}
     
@@ -34,7 +34,7 @@ public abstract class ZPolygon extends ZAbstractShape {
         super(x, y, width, height, rotation, canSelect, canResize, borderWidth, borderColor, dashPattern, fillColor);
     }
     
-    protected abstract Polygon getPolygon(int width, int height); 
+    protected abstract Path2D getPath2D(double width, double height); 
     
     @Override
     protected void fillShape(Graphics2D g, int unitSize, int width, int height) {
@@ -50,14 +50,14 @@ public abstract class ZPolygon extends ZAbstractShape {
     @Override
     public void paint(Graphics2D g, int unitSize, int width, int height) {
  
-       polygon = getPolygon(width, height);
+       polygon = getPath2D(width, height);
        super.paint(g, unitSize, width, height);
     }
 
     @Override
     protected Shape getAbstractShape() {
         Rectangle2D r = getBounds2D();
-        return getPolygon((int)r.getWidth(), (int)r.getHeight());
+        return getPath2D(r.getWidth(), r.getHeight());
     }
 
     @Override

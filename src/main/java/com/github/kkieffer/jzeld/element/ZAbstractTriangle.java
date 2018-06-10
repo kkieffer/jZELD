@@ -1,8 +1,11 @@
 
 package com.github.kkieffer.jzeld.element;
 
+import com.github.kkieffer.jzeld.draw.BoundaryDraw;
 import java.awt.Color;
-import java.awt.Polygon;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -49,34 +52,39 @@ public abstract class ZAbstractTriangle extends ZPolygon {
 
     
     @Override
-    protected Polygon getPolygon(int width, int height) {
+    protected Path2D getPath2D(double width, double height) {
            
         if (type == null)
-            throw new RuntimeException("Custom triangles must override getPolygon()");
+            throw new RuntimeException("Custom triangles must override getPath2D()");
 
-   
-        int x = 0;
-        int x2 = width;
+        ArrayList<Point2D> points = new ArrayList<>(3);
+        
+        double x = 0;
+        double x2 = width;
         if (flipHoriz) {
             x = width;
             x2 = 0;                  
         }
         
-        int y=0;
-        int y2=height;
+        double y=0;
+        double y2=height;
         if (flipVert) {
             y = height;
             y2 = 0;
         }
         
-        int xc;  
+        double xc;  
         if (type == TriType.ISOCELES)
-            xc = (int)Math.round((double)width/2.0);
+            xc = width/2.0;
         else 
             xc = x;  //for right triangle
 
+        points.add(new Point2D.Double(xc, y));
+        points.add(new Point2D.Double(x, y2));
+        points.add(new Point2D.Double(x2, y2));
         
-        return new Polygon(new int[]{xc, x, x2}, new int[]{y, y2, y2}, 3);
+        
+        return BoundaryDraw.pathFromPoints(points);
     }
     
  
