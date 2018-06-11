@@ -37,6 +37,7 @@ public class ZLine extends ZAbstractShape {
      * @param canResize if the object can be resized by the mouse drag
      * @param lineThickness unit width of the border, use zero for no border
      * @param lineColor color of the border, which can be null only if the borderWidth is zero
+     * @param dashPattern
      */
     public ZLine(double x, double y, double width, double rotation, boolean canSelect, boolean canResize, float lineThickness, Color lineColor, Float[] dashPattern) {
         super(x, y, width, .5, rotation, canSelect, canResize, lineThickness, lineColor, dashPattern, null);
@@ -46,9 +47,7 @@ public class ZLine extends ZAbstractShape {
         
         if (lineThickness <= 0)
             throw new IllegalArgumentException("Line thickness must be positive");
-
-
-        
+  
     }
     
     public ZLine(ZLine copy) {
@@ -73,12 +72,6 @@ public class ZLine extends ZAbstractShape {
         return false;
     }
     
-    
-    protected void drawLine(Graphics2D g, int unitSize, int width, int height) {
-        g.drawLine(0, height/2, width, height/2);
-    }
-    
-   
 
     @Override
     protected void fillShape(Graphics2D g, int unitSize, int width, int height) {

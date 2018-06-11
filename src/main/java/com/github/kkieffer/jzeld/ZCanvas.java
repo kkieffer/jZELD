@@ -1395,12 +1395,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return;
         }
         
-        selectElement(e); //check to select an object
-      
         if (passThruElement != null) {
             passThroughMouse(e);
             return;
         }
+
+        selectElement(e); //check to select an object
                          
         if (e.getClickCount() > 1 && lastSelectedElement != null) {  //Transfer control to the selected element
                             
@@ -1441,11 +1441,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         return p;
     }
     
-    private int getScaledHeight() {
+    public int getScaledHeight() {
         return (int)(this.getHeight() * pixScale);
     }
     
-    private int getScaledWidth() {
+    public int getScaledWidth() {
         return (int)(this.getWidth() * pixScale);
     }
      
