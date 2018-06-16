@@ -23,6 +23,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZImage extends ZRectangle {
     
+    protected static BufferedImage copyImage(BufferedImage i) {
+        ColorModel cm = i.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = i.copyData(i.getRaster().createCompatibleWritableRaster());
+        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    }
+    
+    
     protected Image image;
 
     protected ZImage() {}
@@ -56,11 +64,7 @@ public class ZImage extends ZRectangle {
         this.flipVert = copy.flipVert;
         
         //Copy image
-        BufferedImage i = (BufferedImage)copy.image;
-        ColorModel cm = i.getColorModel();
-        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-        WritableRaster raster = i.copyData(i.getRaster().createCompatibleWritableRaster());
-        this.image = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+        this.image = copyImage((BufferedImage)copy.image);
     }
     
     @Override
@@ -102,21 +106,33 @@ public class ZImage extends ZRectangle {
         return false;     
     }
 
+  
+    /**
+     * Draw the image on the graphics. This allows subclass overriding to modify the image or change rendering
+     * @param g graphics to draw on
+     * @param img the loaded image
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param width the image width
+     * @param height the image height
+     */
+    protected void paintImage(Graphics2D g, Image img, final int x, final int y, final int width, final int height) {      
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.drawImage(img, x, y, width, height, null);
+    }
     
     
     @Override
     public void paint(Graphics2D g, int unitSize, int width, int height) {
-
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        
+     
         if (image != null) {
             int x = flipHoriz ? width : 0;
             int w = flipHoriz ? -width : width;
             int y = flipVert ? height : 0;
             int h = flipVert ? -height : height;
             
-            g.drawImage(image, x, y, w, h, null);
+            paintImage(g, image, x, y, w, h);
         }
         super.paint(g, unitSize, width, height);       
     }
