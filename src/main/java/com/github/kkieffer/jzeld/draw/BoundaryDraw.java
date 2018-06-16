@@ -25,12 +25,15 @@ import java.util.List;
 public abstract class BoundaryDraw implements DrawClient {
 
     
+    
+    
     /**
      * From a list of 2D points, creates a 2D line path between them. This may be overriden to draw more complex curve-fit paths.
      * @param points coordinate points 
+     * @param closePath true to close the path, drawing a line from the last point to the first
      * @return a Path2D object, or null if the points array is null
      */
-    public static Path2D pathFromPoints(List<Point2D> points) {
+    public static Path2D pathFromPoints(List<Point2D> points, boolean closePath) {
         
         if (points.isEmpty())
             return null;
@@ -45,7 +48,9 @@ public abstract class BoundaryDraw implements DrawClient {
             path.lineTo(p.getX(), p.getY());
         }
        
-        path.closePath();
+        if (closePath)
+            path.closePath();
+        
         return path;
     
     }
@@ -54,10 +59,11 @@ public abstract class BoundaryDraw implements DrawClient {
         
     protected ArrayList<Point2D> mousePoints = new ArrayList<>();
     private final ZCanvas canvas;
-    
+    private final boolean close;
  
-    protected BoundaryDraw(ZCanvas canvas) {
+    protected BoundaryDraw(ZCanvas canvas, boolean close) {
         this.canvas = canvas;
+        this.close = close;
     }
 
     /**
@@ -84,10 +90,10 @@ public abstract class BoundaryDraw implements DrawClient {
             mousePoints.set(i, new Point2D.Double(x, y));
         }
         
-        Path2D path = pathFromPoints(mousePoints);
+        Path2D path = pathFromPoints(mousePoints, close);
   
         Rectangle2D bounds2D = path.getBounds2D();  //get the bounds to find the x and y location on the canvas
-                
+        
         Shape shape = path.createTransformedShape(AffineTransform.getTranslateInstance(-bounds2D.getX(), -bounds2D.getY()));
   
         return new ZShape(bounds2D.getX(), bounds2D.getY(), shape, 0.0, true, true, 1, Color.BLACK, null, null);

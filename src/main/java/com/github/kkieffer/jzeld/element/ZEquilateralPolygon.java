@@ -123,7 +123,7 @@ public class ZEquilateralPolygon extends ZPolygon {
             angle += angleStep;
         }
         
-        return BoundaryDraw.pathFromPoints(points);
+        return BoundaryDraw.pathFromPoints(points, true);
     }
     
      

@@ -84,7 +84,7 @@ public abstract class ZAbstractTriangle extends ZPolygon {
         points.add(new Point2D.Double(x2, y2));
         
         
-        return BoundaryDraw.pathFromPoints(points);
+        return BoundaryDraw.pathFromPoints(points, true);
     }
     
  

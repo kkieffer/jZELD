@@ -178,18 +178,25 @@ public class Demo extends javax.swing.JFrame {
         ActionMap am = c.getActionMap();
 
         //Add some shortcuts to add line or free drawings to the canvas
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.META_DOWN_MASK), "LineDrawNoClose");
+        am.put("LineDrawNoClose", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                c.drawOn(new StraightLineDraw(c, false));
+            }
+        });
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.META_DOWN_MASK), "LineDraw");
         am.put("LineDraw", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                c.drawOn(new StraightLineDraw(c));
+                c.drawOn(new StraightLineDraw(c, true));
             }
         });
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.META_DOWN_MASK), "FreeDraw");
         am.put("FreeDraw", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                c.drawOn(new FreeformDraw(c));
+                c.drawOn(new FreeformDraw(c, true));
             }
         });
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.META_DOWN_MASK), "Save");

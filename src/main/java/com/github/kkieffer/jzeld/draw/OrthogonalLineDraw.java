@@ -10,13 +10,14 @@ import java.awt.geom.Point2D;
  * A drawing object that creates a straight line drawing with lines at 90 or 180 degrees to each other. Each time the mouse is clicked a line 
  * is drawn from the previous point to the closest orthogonal line using the clicked point.  While the mouse is moved a temporary line is drawn to the new mouse position. 
  * A double-click completes the drawing and it is added to the canvas.
+ * If the close parameter is specified, the shape is closed by drawing a line from the last point to the first.
  * 
  * @author kkieffer
  */
 public class OrthogonalLineDraw extends BoundaryDraw {
 
-    public OrthogonalLineDraw(ZCanvas canvas) {
-        super(canvas);
+    public OrthogonalLineDraw(ZCanvas canvas, boolean close) {
+        super(canvas, close);
     }
     
     private Point getDrawToPoint(Point2D mouse, Point2D last) {

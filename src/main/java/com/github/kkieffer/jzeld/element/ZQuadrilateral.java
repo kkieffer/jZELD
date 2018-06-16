@@ -151,7 +151,7 @@ public class ZQuadrilateral extends ZPolygon {
             points.add(new Point2D.Double(x[i], y[i]));
 
         
-        return BoundaryDraw.pathFromPoints(points);
+        return BoundaryDraw.pathFromPoints(points, true);
   
     }
     
