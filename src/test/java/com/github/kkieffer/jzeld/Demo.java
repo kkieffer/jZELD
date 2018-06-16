@@ -98,8 +98,9 @@ public class Demo extends javax.swing.JFrame {
         BufferedImage image = ImageIO.read(testImg);
      
         ZImage img = new ZImage(5.0, 5.0, 3.0, 3.0, 0.0, true, true, 0, Color.BLACK, null, Color.GRAY, image);  
+        img.setName("Tiger");
         c.addElement(img);
-
+        
         //Create some editable text
         Font f = new Font("SERIF", Font.BOLD, 22);
         TextAttributes t2 = new TextAttributes(HorizontalJustify.CENTER, f, Color.RED);

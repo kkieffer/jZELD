@@ -36,6 +36,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ZElement implements Serializable {
     
+    private String name;  //user friendly name
+    
     @XmlJavaTypeAdapter(Rectangle2DAdapter.class)
     private Rectangle2D.Double bounds; 
     private Point2D.Double position;
@@ -71,6 +73,7 @@ public abstract class ZElement implements Serializable {
         canSelect = selectable;
         this.resizable = resizable;
         this.className = this.getClass().getName();
+        this.name = this.getClass().getSimpleName();
     }
     
     protected ZElement() {
@@ -86,6 +89,7 @@ public abstract class ZElement implements Serializable {
         this.rotation = src.rotation;
         this.canSelect = src.canSelect;
         this.resizable = src.resizable;
+        this.name = src.name; 
         flipHoriz = src.flipHoriz;
         flipVert = src.flipVert;
         className = src.className;
@@ -225,6 +229,22 @@ public abstract class ZElement implements Serializable {
     public void setRotation(double r) {
         rotation = r;
         hasChanges = true;
+    }
+    
+    /**
+     * Retrieves the user friendly name
+     * @return 
+     */
+    public String getName() {
+        return name;
+    }
+    
+    /**
+     * Sets a user-friendly name for this specific element, for reference purposes
+     * @param n the name
+     */
+    public void setName(String n) {
+        name = n;
     }
     
     /**
