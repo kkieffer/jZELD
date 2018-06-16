@@ -1157,6 +1157,36 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         } 
     }
     
+    /**
+     * Select or deselect an element, if the element is on the canvas
+     * @param toSel the element to select/deselect
+     * @param select true to select, false to deselect
+     * @return if the element was selected/deselected, returns true.  Returns false if the element is not selectable or not found on the canvas.
+     */
+    public boolean selectElement(ZElement toSel, boolean select) {
+        
+        if (!toSel.isSelectable())
+            return false;
+                    
+        for (ZElement e : fields.zElements) {
+            if (e.equals(toSel)) {
+                if (!selectedElements.contains(e) && select) {  // not selected, add it
+                    selectedElements.add(e);  
+                    lastSelectedElement = e;                  
+                }
+                else if (!select) {
+                    boolean rc = selectedElements.remove(e);  //true if removed
+                    if (rc && selectedElements.isEmpty())
+                        lastSelectedElement = null;
+                }
+                repaint();
+                return true;
+            }
+        }
+        return false;
+     
+    }
+    
     
     public void selectAll() {
         
