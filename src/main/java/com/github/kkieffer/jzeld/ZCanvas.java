@@ -1158,27 +1158,24 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
-     * Select or deselect an element, if the element is on the canvas
-     * @param toSel the element to select/deselect
-     * @param select true to select, false to deselect
-     * @return if the element was selected/deselected, returns true.  Returns false if the element is not selectable or not found on the canvas.
+     * Select  an element, if the element is on the canvas
+     * @param toSel the element to select
+     * @return if the element was selected, returns true.  Returns false if the element is not selectable or not found on the canvas.
      */
-    public boolean selectElement(ZElement toSel, boolean select) {
+    public boolean selectElement(ZElement toSel) {
         
         if (!toSel.isSelectable())
             return false;
                     
         for (ZElement e : fields.zElements) {
             if (e.equals(toSel)) {
-                if (!selectedElements.contains(e) && select) {  // not selected, add it
+                if (!selectedElements.contains(e)) {  // not selected, add it
                     selectedElements.add(e);  
-                    lastSelectedElement = e;                  
+                    lastSelectedElement = e;   
+                    for (SelectListener l : selectListeners)
+                        l.elementSelected(e);
                 }
-                else if (!select) {
-                    boolean rc = selectedElements.remove(e);  //true if removed
-                    if (rc && selectedElements.isEmpty())
-                        lastSelectedElement = null;
-                }
+                
                 repaint();
                 return true;
             }
@@ -1192,8 +1189,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         selectedElements.clear();
         for (ZElement e : fields.zElements) {
-            if (e.isSelectable())
+            if (e.isSelectable()) {
                 selectedElements.add(e);
+                for (SelectListener l : selectListeners)
+                    l.elementSelected(e);   
+            }
         }
         if (lastSelectedElement == null)
             lastSelectedElement = selectedElements.get(0);
@@ -1855,9 +1855,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
       
     }
 
-  
 
-    
-    
     
 }

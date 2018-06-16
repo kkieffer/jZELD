@@ -109,7 +109,7 @@ public abstract class BoundaryDraw implements DrawClient {
             return;
         
         canvas.addElement(s);
-        canvas.selectElement(s, true);
+        canvas.selectElement(s);
         canvas.repaint();
     }
     
