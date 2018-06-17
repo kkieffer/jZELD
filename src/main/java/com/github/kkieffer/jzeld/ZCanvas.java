@@ -209,8 +209,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private DrawClient drawClient = null;
     
     private boolean shiftPressed = false;
-    private Point2D mouseDrag;
-    private Point2D mousePress;
+    private Point2D selectedMouseDrag;
+    private Point mouseDrag;
+    private Point mousePress;
+    private Point2D selectedMousePress;
     private ZCanvasContextMenu contextMenu;
     
     private final ArrayList<SelectListener> selectListeners = new ArrayList<>();
@@ -262,8 +264,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             @Override
             public void actionPerformed(ActionEvent e) {
                 selectedAlternateBorder = !selectedAlternateBorder;
-                if (mousePress != null && System.nanoTime() - mouseFirstPressed > 500000000)
-                    mouseDrag = mousePress;
+                if (selectedMousePress != null && System.nanoTime() - mouseFirstPressed > 500000000)
+                    selectedMouseDrag = selectedMousePress;
                     
                     
                 repaint();
@@ -281,8 +283,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "Minus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, KeyEvent.SHIFT_DOWN_MASK), "ShiftPressed");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 0, true), "ShiftReleased");
-        
-       
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), "MoveLeft");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK), "MoveRight");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK), "MoveUp");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK), "MoveDown");
         
         am.put("Plus", new AbstractAction(){
             @Override
@@ -308,6 +312,34 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 shiftPressed = false;
             }
         });
+        am.put("MoveLeft", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                moveSelected(-1/SCALE, 0);
+            }
+        });
+        am.put("MoveRight", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                moveSelected(1/SCALE, 0);
+                System.out.println("rgith");
+            }
+        });
+        am.put("MoveUp", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                moveSelected(0, -1/SCALE);
+            }
+        });
+        am.put("MoveDown", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                moveSelected(0, 1/SCALE);
+            }
+        });
+        
+        
+        
         updatePreferredSize();
         repaint();
 
@@ -512,6 +544,16 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         updatePreferredSize();
     }
     
+    private Rectangle getDragSelectRectangle() {
+    
+        int x = mousePress.x < mouseDrag.x ? mousePress.x : mouseDrag.x;
+        int y = mousePress.y < mouseDrag.y ? mousePress.y : mouseDrag.y;
+        int w = mousePress.x < mouseDrag.x ? mouseDrag.x - mousePress.x : mousePress.x - mouseDrag.x;
+        int h = mousePress.y < mouseDrag.y ? mouseDrag.y - mousePress.y : mousePress.y - mouseDrag.y;
+        
+        return new Rectangle(x, y, w, h);
+    }
+    
    
     private void setLastMethod(String name, Object... params) {
         try {
@@ -618,6 +660,16 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
             }
             selectedElement.setRotation(newRotation);
+        }
+        repaint();
+    }
+    
+    public void moveSelected(double x, double y) {
+         
+        Iterator<ZElement> it = selectedElements.iterator();
+        while (it.hasNext()) {
+           ZElement e =  it.next();
+           e.move(x, y, this.getScaledWidth()/SCALE, this.getScaledHeight()/SCALE);
         }
         repaint();
     }
@@ -1249,14 +1301,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         g2d.setFont(mouseFont);
    
         //ELEMENT IS BEING DRAGGED - DRAW SELECTED HIGHLIGHT AND POSITION LINES/TEXT
-        if (mouseDrag != null && !selectedElements.isEmpty()) {
+        if (selectedMouseDrag != null && !selectedElements.isEmpty()) {
                         
             ZElement selectedElement = lastSelectedElement;
             
             Rectangle r = selectedElement.getBounds(SCALE);  //find the location and bounds of the selected element
 
             AffineTransform t = AffineTransform.getRotateInstance(Math.toRadians(selectedElement.getRotation()), r.x + r.width/2, r.y + r.height/2);
-            Point2D tMouse = t.transform(mouseDrag, null);   
+            Point2D tMouse = t.transform(selectedMouseDrag, null);   
             
             //Draw crosshair
             if (fields.mouseCursorColor != null) {
@@ -1311,6 +1363,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 g2d.setColor(Color.BLACK);
                 String mouseCoord = fmt.format(fields.unit.getScale()*mouseIn.x/SCALE) + ", " + fmt.format(fields.unit.getScale()*mouseIn.y/SCALE);
                 g2d.drawString(mouseCoord, mouseIn.x + (int)Math.ceil(10.0 * pixScale/zoom), mouseIn.y + (int)Math.ceil(fontMetrics.getHeight() + 10.0 * pixScale/zoom));
+            }
+            
+            if (mouseDrag != null) {
+                g2d.setColor(Color.BLACK);
+                g2d.setStroke(new BasicStroke(1.0f * pixScale / (float)zoom));
+                g2d.draw(getDragSelectRectangle());
             }
             
         }
@@ -1483,11 +1541,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     @Override
     public void mousePressed(MouseEvent e) {
         
+        this.requestFocusInWindow();
+        
         if (mouseFirstPressed < 0)
             mouseFirstPressed = System.nanoTime();
         
+        
         Point mouseLoc = getScaledMouse(e);
-
+        mousePress = mouseLoc;
+        
         if (drawClient != null) {
             drawClient.drawClientMousePressed(mouseLoc);
             return;
@@ -1511,7 +1573,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             }
             
             if (!selectedElementResizeOn) 
-                mousePress = new Point2D.Double((mouseLoc.x - selectedObj_xOffset), (mouseLoc.y - selectedObj_yOffset));  
+                selectedMousePress = new Point2D.Double((mouseLoc.x - selectedObj_xOffset), (mouseLoc.y - selectedObj_yOffset));  
             
             
             undoStack.saveContext(fields.zElements);
@@ -1535,8 +1597,33 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             passThroughMouse(e);
             return;
         }
-        mouseDrag = null;
+        
+        //If drag-selecting, select all elements falling in the bounds
+        if (mousePress != null && mouseDrag != null) {
+            
+            Rectangle dragSelect = getDragSelectRectangle();
+            
+            Iterator<ZElement> it = fields.zElements.iterator();
+            while (it.hasNext()) {
+                ZElement o = it.next();
+                if (!o.isSelectable()) //don't select anything that's unselectable
+                    continue;
+                
+                Rectangle boundsBox = o.getBounds(SCALE);
+                AffineTransform t = o.getElementTransform(SCALE, false);
+                Shape s = t.createTransformedShape(boundsBox);
+                
+                if (dragSelect.contains(s.getBounds()))
+                    selectElement(o);
+            }
+            
+            
+        }
+        
+        selectedMouseDrag = null;
+        selectedMousePress = null;
         mousePress = null;
+        mouseDrag = null;
         mouseFirstPressed = -1;
         selectedElementResizeOn = false;
         
@@ -1564,8 +1651,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         Point mouseLoc = getScaledMouse(e);
         mouseIn = mouseLoc;
 
-        mouseDrag = null;
-        mousePress = null;
+        selectedMouseDrag = null;
+        selectedMousePress = null;
+        mouseDrag = mouseLoc;
  
         if (drawClient != null) {
             drawClient.drawClientMouseDragged(getScaledMouse(e));
@@ -1585,7 +1673,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (!selectedElementResizeOn) { //Reposition the object to the mouse, only when it won't take the object off the component
                 
                 lastSelectedElement.reposition((mouseLoc.x - selectedObj_xOffset)/SCALE, (mouseLoc.y - selectedObj_yOffset)/SCALE);  
-                mouseDrag = new Point2D.Double((mouseLoc.x - selectedObj_xOffset), (mouseLoc.y - selectedObj_yOffset));  
+                selectedMouseDrag = new Point2D.Double((mouseLoc.x - selectedObj_xOffset), (mouseLoc.y - selectedObj_yOffset));  
                  
             } else { //Resize the object
                 
@@ -1623,10 +1711,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                
             }
                         
-            lastMethod = null;            
-     
-            repaint();  //update selected object
+            lastMethod = null;                 
         }
+        repaint();  //update selected object
     }
 
     @Override

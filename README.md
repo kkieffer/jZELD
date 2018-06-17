@@ -14,12 +14,13 @@ the paintable area. The user interacts with the ZCanvas with the mouse and keybo
 to become familiar with the operations of a ZCanvas is to run the included Demo class. The core operations that are supported in the canvas are:
 
 1.  Select a ZElement with a mouse click (shift-Click to select multiple ZElements)
-2.  Drag the ZElement to a new position with the mouse
-3.  Drag the ZElement's resize box (bottom-right corner of the element) to resize it
-4.  Resize a ZElement using the mouse wheel
-5.  Move a selected ZElement with the arrow keys
-6.  Rotate a ZElement using the mouse wheel while holding Shift down
-7.	Zoom in/out the ZCanvas with the +/- keys
+2.  Select multiple ZElements by dragging a selection box around them
+3.  Drag the ZElement to a new position with the mouse
+4.  Drag the ZElement's resize box (bottom-right corner of the element) to resize it
+5.  Resize selected ZElements using the mouse wheel
+6.  Move the selected ZElements with the arrow keys while holding Shift down
+7.  Rotate selected ZElements using the mouse wheel while holding Shift down
+8.	Zoom in/out the ZCanvas with the +/- keys
 
 The ZCanvas supports other operations that can be invoked by shortcut keys, menu items, or programmatically.  The 
 Demo illustrates these using keys and right-click context menus.  The framework provides a default set of hotkeys and an optional
