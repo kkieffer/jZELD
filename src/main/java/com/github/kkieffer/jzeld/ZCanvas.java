@@ -1166,6 +1166,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         while (it.hasNext()) {
             ZElement s = it.next();
             fields.zElements.remove(s);
+            s.removedFrom(this);
             it.remove();
         }
           
