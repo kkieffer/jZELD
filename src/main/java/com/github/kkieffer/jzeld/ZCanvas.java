@@ -572,11 +572,23 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Removes the previous change from the canvas
      */
     public void undo() {
-                
+        
         LinkedList<ZElement> restoreContext = undoStack.restoreContext();
         if (restoreContext != null) {
-            fields.zElements = restoreContext;
+            
+            //Tell all they were removed
+            for (ZElement e : fields.zElements) 
+                e.removedFrom(this);
+
+            
+            fields.zElements = restoreContext;  //replace all the elements
+            for (ZElement e : fields.zElements)
+                e.addedTo(this); //tell they were added
+            
+            
             selectedElements.clear();
+            lastSelectedElement = null;
+            passThruElement = null;
         }
         repaint();
     }
@@ -1471,7 +1483,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         MouseEvent m = new MouseEvent(this, e.getID(), e.getWhen(), e.getModifiers(), xOffset, yOffset, e.getClickCount(), false, e.getButton());
         passThruElement.mouseEvent(this, m);  //tell the element about the mouse                  
-        
+        repaint();
     }
     
     
@@ -1492,9 +1504,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         selectElement(e); //check to select an object
                          
         if (e.getClickCount() > 1 && lastSelectedElement != null) {  //Transfer control to the selected element
-                            
+
             if (lastSelectedElement.selected(this))  //tell the element it was selected
                 passThruElement = lastSelectedElement;  
+
+            undoStack.saveContext(fields.zElements);
 
             lastMethod = null;            
         }
@@ -1575,8 +1589,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
             if (!selectedElementResizeOn) 
                 selectedMousePress = new Point2D.Double((mouseLoc.x - selectedObj_xOffset), (mouseLoc.y - selectedObj_yOffset));  
-            
-            
+
+
             undoStack.saveContext(fields.zElements);
 
 
@@ -1654,7 +1668,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         selectedMouseDrag = null;
         selectedMousePress = null;
-        mouseDrag = mouseLoc;
  
         if (drawClient != null) {
             drawClient.drawClientMouseDragged(getScaledMouse(e));
@@ -1713,6 +1726,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             }
                         
             lastMethod = null;                 
+        }
+        else {  //nothing selected
+            mouseDrag = mouseLoc;
+
         }
         repaint();  //update selected object
     }
