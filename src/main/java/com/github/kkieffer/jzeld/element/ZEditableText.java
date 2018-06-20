@@ -86,6 +86,10 @@ public class ZEditableText extends ZElement {
         }
     }
 
+    @XmlTransient
+    private ZCanvas canvas;
+
+
     /* ----- JAXB FIELDS ---------*/
     protected TextAttributes textAttributes;
     
@@ -136,11 +140,13 @@ public class ZEditableText extends ZElement {
             @Override
             public void keyTyped(KeyEvent e) {
             }
-
+            
             @Override
             public void keyPressed(KeyEvent e) {
                 textWidget.repaint();
                 textWidget.getParent().repaint();
+                if (canvas != null)
+                    canvas.repaint();
                 hasChanges = true;
         }
 
@@ -304,12 +310,14 @@ public class ZEditableText extends ZElement {
     @Override
     public void addedTo(ZCanvas c) {
         c.add(textPanel);
+        canvas = c;
     }
     
     
     @Override
     public void removedFrom(ZCanvas c) {
         c.remove(textPanel);
+        canvas = null;
     }
     
     
