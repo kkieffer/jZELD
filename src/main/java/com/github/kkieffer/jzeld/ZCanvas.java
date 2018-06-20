@@ -576,11 +576,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         LinkedList<ZElement> restoreContext = undoStack.restoreContext();
         if (restoreContext != null) {
             
-            //Tell all they were removed
-            for (ZElement e : fields.zElements) 
-                e.removedFrom(this);
-
-            
+            deleteAll();
+          
             fields.zElements = restoreContext;  //replace all the elements
             for (ZElement e : fields.zElements)
                 e.addedTo(this); //tell they were added
@@ -1162,6 +1159,19 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         repaint();  
     }
     
+    /**
+     * Delete all elements on the canvas
+     */
+    public void deleteAll() {
+        
+        //Tell all they were removed
+        for (ZElement e : fields.zElements) 
+            e.removedFrom(this);
+        
+        fields.zElements.clear();
+        repaint();
+ 
+    }
     
     
     /**
@@ -1493,6 +1503,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                         
         if (drawClient != null) {
             drawClient.drawClientMouseClicked(getScaledMouse(e), e.getClickCount());
+            repaint();
             return;
         }
         
@@ -1567,6 +1578,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         if (drawClient != null) {
             drawClient.drawClientMousePressed(mouseLoc);
+            repaint();
             return;
         }
        
@@ -1605,6 +1617,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         if (drawClient != null) {
             drawClient.drawClientMouseReleased(getScaledMouse(e));
+            repaint();
             return;
         }
         
@@ -1671,6 +1684,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
  
         if (drawClient != null) {
             drawClient.drawClientMouseDragged(getScaledMouse(e));
+            repaint();
             return;
         }
         
@@ -1881,6 +1895,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         ZCanvas c = new ZCanvas();
         c.fields = s;
         
+        Iterator<ZElement> it = c.fields.zElements.iterator();
+        while (it.hasNext()) {
+            it.next().addedTo(c);
+        }
+        
+        
         c.canvasModified = false;
         c.init();
         return c;
@@ -1934,6 +1954,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
  
         ZCanvas c = new ZCanvas();
         c.fields = (ZCanvas.CanvasStore)jaxbUnMarshaller.unmarshal(f);
+        
+        Iterator<ZElement> it = c.fields.zElements.iterator();
+        while (it.hasNext()) {
+            it.next().addedTo(c);
+        }
         
         c.canvasModified = false;
         c.init();
