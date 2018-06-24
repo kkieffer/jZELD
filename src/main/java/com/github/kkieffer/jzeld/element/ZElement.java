@@ -117,6 +117,13 @@ public abstract class ZElement implements Serializable {
         return hasChanges;
     }
     
+    /**
+     * Flag that the element has changed
+     */
+    public void changed() {
+        hasChanges = true;
+    }
+    
     
     /**
      * Sets the attributes of an element.  An Element does not need to support all or any of these fields.

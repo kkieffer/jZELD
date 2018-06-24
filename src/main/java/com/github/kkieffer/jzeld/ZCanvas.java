@@ -546,6 +546,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     private Rectangle getDragSelectRectangle() {
     
+        if (mouseDrag == null)
+            return null;
+        
         int x = mousePress.x < mouseDrag.x ? mousePress.x : mouseDrag.x;
         int y = mousePress.y < mouseDrag.y ? mousePress.y : mouseDrag.y;
         int w = mousePress.x < mouseDrag.x ? mouseDrag.x - mousePress.x : mousePress.x - mouseDrag.x;
@@ -1381,18 +1384,26 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 g2d.drawLine(mouseIn.x, -fields.origin.y, mouseIn.x, getScaledHeight()); //vert crosshair
             }
 
-            //Draw mouse position
-            if (fields.mouseCoordFont != null) {
-                g2d.setColor(Color.BLACK);
-                String mouseCoord = fmt.format(fields.unit.getScale()*mouseIn.x/SCALE) + ", " + fmt.format(fields.unit.getScale()*mouseIn.y/SCALE);
-                g2d.drawString(mouseCoord, mouseIn.x + (int)Math.ceil(10.0 * pixScale/zoom), mouseIn.y + (int)Math.ceil(fontMetrics.getHeight() + 10.0 * pixScale/zoom));
-            }
-            
+            Rectangle dragRect = getDragSelectRectangle();
+
             if (mouseDrag != null) {
                 g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke(1.0f * pixScale / (float)zoom));
-                g2d.draw(getDragSelectRectangle());
+                g2d.draw(dragRect);
             }
+            
+            //Draw mouse position or drag box size
+            if (fields.mouseCoordFont != null) {
+                g2d.setColor(Color.BLACK);
+                String s;
+                if (mouseDrag == null)
+                    s = fmt.format(fields.unit.getScale()*mouseIn.x/SCALE) + ", " + fmt.format(fields.unit.getScale()*mouseIn.y/SCALE);
+                else {
+                    s = fmt.format(fields.unit.getScale()*dragRect.width/SCALE) + ", " + fmt.format(fields.unit.getScale()*dragRect.height/SCALE);
+                }
+                g2d.drawString(s, mouseIn.x + (int)Math.ceil(10.0 * pixScale/zoom), mouseIn.y + (int)Math.ceil(fontMetrics.getHeight() + 10.0 * pixScale/zoom));
+            }
+  
             
         }
             

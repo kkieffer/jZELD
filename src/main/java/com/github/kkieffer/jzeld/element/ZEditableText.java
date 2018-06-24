@@ -3,8 +3,8 @@ package com.github.kkieffer.jzeld.element;
 
 
 import com.github.kkieffer.jzeld.JAXBAdapter.ColorAdapter;
-import com.github.kkieffer.jzeld.JAXBAdapter.FontAdapter;
 import com.github.kkieffer.jzeld.ZCanvas;
+import com.github.kkieffer.jzeld.element.TextAttributes.HorizontalJustify;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -49,43 +49,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlRootElement(name = "ZEditableText")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ZEditableText extends ZElement {
+public class ZEditableText extends ZElement implements TextAttributes.TextInterface {
 
-    
-    public enum HorizontalJustify {LEFT, CENTER, RIGHT};
-    
-    /**
-     * Specifies text attributes for drawing
-     */
-    @XmlRootElement(name = "TextAttributes")
-    @XmlAccessorType(XmlAccessType.FIELD)
-    public static class TextAttributes {
-
-        @XmlElement(name = "justify")        
-        public HorizontalJustify hj;
-
-        @XmlJavaTypeAdapter(FontAdapter.class)
-        public Font font;
-    
-        @XmlJavaTypeAdapter(ColorAdapter.class)
-        public Color fontColor;
         
-        
-        public TextAttributes(HorizontalJustify _hj, Font _font, Color fontColor) {
-            hj = _hj;
-            font = _font;
-            this.fontColor = fontColor;
-        }
-        
-        protected TextAttributes() {}
-        
-        protected TextAttributes(TextAttributes source) {
-            hj = source.hj;
-            font = new Font(source.font.getName(), source.font.getStyle(), source.font.getSize());
-            fontColor = source.fontColor;
-        }
-    }
-
     @XmlTransient
     private ZCanvas canvas;
 
@@ -197,6 +163,7 @@ public class ZEditableText extends ZElement {
         textPanel = new JPanel();
         textWidget = new JTextPane();
         
+        textAttributes = new TextAttributes();
         setTextAttributes(attr);
         modifyText(defaultText);
         setAttributes(borderThickness, borderColor, null, backgroundColor);
@@ -212,6 +179,7 @@ public class ZEditableText extends ZElement {
         textPanel = new JPanel();
         textWidget = new JTextPane();
         
+        textAttributes = new TextAttributes();
         setTextAttributes(copy.textAttributes);
         modifyText(copy.textWidget.getText());
         setAttributes(copy.borderThickness, copy.borderColor, null, copy.backgroundColor);
@@ -331,37 +299,22 @@ public class ZEditableText extends ZElement {
     }
     
     
+    @Override
     public final void setFont(Font f) {
         this.textAttributes.font = f;
         textWidget.setFont(f);
         hasChanges = true;
     }
 
-    public final void setFontStyle(int style) {
-        Font f = new Font(textAttributes.font.getName(), style, textAttributes.font.getSize());
-        this.textAttributes.font = f;
-        hasChanges = true;
-    }
-    
-    public final void setFontSize(int size) {
-        Font f = new Font(textAttributes.font.getName(), textAttributes.font.getStyle(), size);
-        this.textAttributes.font = f;
-        hasChanges = true;
-    }
-    
-    public final void setFontName(String name) {
-        Font f = new Font(name, textAttributes.font.getStyle(), textAttributes.font.getSize());
-        this.textAttributes.font = f;
-        hasChanges = true;
-    }
-    
-    
+    @Override
     public final void setFontColor(Color c) {
         this.textAttributes.fontColor = c;
         textWidget.setForeground(c);     
         hasChanges = true;
     }
     
+    
+    @Override
     public final void setTextJustify(HorizontalJustify j) {
         this.textAttributes.hj = j;
         StyledDocument doc = textWidget.getStyledDocument();
@@ -383,25 +336,16 @@ public class ZEditableText extends ZElement {
         hasChanges = true;
     }
     
-    /**
-     * Change the text attributes for this element
-     * @param attr the new attributes
-     */
-    public final void setTextAttributes(TextAttributes attr) {
-                
-        this.textAttributes = attr;
-        setFont(attr.font);
-        setFontColor(attr.fontColor);
-        setTextJustify(attr.hj);
-    }
+   
     
     
     /**
-     * Returns a copy of the element's text attributes
+     * Returns the element's text attributes
      * @return 
      */
+    @Override
     public final TextAttributes getTextAttributes() {
-        return new TextAttributes(this.textAttributes); //copy
+        return textAttributes; 
     }
     
     
