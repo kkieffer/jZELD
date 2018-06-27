@@ -298,6 +298,36 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         hasChanges = true;
     }
     
+    /**
+     * Get all the text from this element
+     * @return all the text
+     */
+    public String getText() {
+        return textWidget.getText();
+    }
+    
+    /**
+     * Replace any selected text, or if nothing is selected, insert at the caret position
+     * @param t the text to replace with, or insert
+     * @return true if it was inserted (the element is currently being edited), false otherwise
+     */
+    public boolean insertText(String t) {
+        if (!isEditing())
+            return false;
+        
+        textWidget.replaceSelection(t);
+        return true;
+    }
+    
+    /**
+     * Retrieve the selected text, if nothing is selected, return null
+     * @return the selected text, or null
+     */
+    public String getSelectedText() {
+        if (!isEditing())
+            return null;
+        return textWidget.getSelectedText();
+    }
     
     @Override
     public final void setFont(Font f) {
@@ -354,6 +384,13 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         return false;
     }
     
+    /**
+     * Determine if the user is actively editing this text (has focus and caret flashing)
+     * @return true if the text is being edited, false otherwise
+     */
+    public boolean isEditing() {
+        return isSelected;
+    }
     
     @Override
     public boolean selected(ZCanvas canvas) {
