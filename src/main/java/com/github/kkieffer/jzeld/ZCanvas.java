@@ -6,7 +6,6 @@ import com.github.kkieffer.jzeld.JAXBAdapter.DimensionAdapter;
 import com.github.kkieffer.jzeld.JAXBAdapter.FontAdapter;
 import com.github.kkieffer.jzeld.JAXBAdapter.PointAdapter;
 import com.github.kkieffer.jzeld.draw.DrawClient;
-import com.github.kkieffer.jzeld.element.ZCanvasRuler.Unit;
 import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZAbstractShape;
 import com.github.kkieffer.jzeld.element.ZCanvasRuler;
@@ -143,7 +142,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         private Font mouseCoordFont;
         
         @XmlElement(name="MeasureScale")
-        private Unit unit;
+        private UnitMeasure unit;
 
         @XmlElement(name="UndoStackCount")        
         private int undoStackCount = 1;       
@@ -233,7 +232,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param bounds the maximum bounds of the canvas (width and height).  If null, unlimited
      * @param o the page orientation, for printing
      */
-    public ZCanvas(Color background, Font mouseCoordFont, Unit unitType, Color mouseCursorColor, int undoStackCount, Point origin, Dimension bounds, Orientation o) {
+    public ZCanvas(Color background, Font mouseCoordFont, UnitMeasure unitType, Color mouseCursorColor, int undoStackCount, Point origin, Dimension bounds, Orientation o) {
         super();
         fields.backgroundColor = background;
         fields.unit = unitType;
@@ -388,14 +387,16 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Change the measure unit
      * @param u the new measure unit (cannot be null)
      */
-    public void changeUnit(Unit u) {
+    public void changeUnit(UnitMeasure u) {
         fields.unit = u;
         canvasModified = true;
+        for (ZElement e : fields.zElements)
+            e.unitChanged(this, u);
         repaint();
     }
     
     
-    public Unit getUnit() {
+    public UnitMeasure getUnit() {
         return fields.unit;
     }
     

@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.JAXBAdapter.FontAdapter;
+import com.github.kkieffer.jzeld.UnitMeasure;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -22,22 +23,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "ZCanvasRuler")
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class ZCanvasRuler extends ZRectangle {
-
-
-    public enum Unit {INCHES(1.0)    {@Override public String toString(){return "in";}},
-                      CM(2.54)        {@Override public String toString(){return "cm";}},
-                      PIXELS(72.0)    {@Override public String toString(){return "px";}};
-                      
-            
-        private final double scale;
-        private Unit(double s) {
-            scale = s;
-        }
-        public double getScale() {return scale;};
-    }
     
     private boolean isHoriz;
-    private Unit unit;
+    private UnitMeasure unit;
 
     @XmlJavaTypeAdapter(FontAdapter.class)
     private Font labelFont;
@@ -57,11 +45,11 @@ public final class ZCanvasRuler extends ZRectangle {
      * @param borderColor color of the ruler border, null for no border
      * @param backgroundColor fill color of the ruler, null for transparent
      * @param labelFont the font for the unit and major tick markers
-     * @param unit the type of unit, inches or centimeters
+     * @param unit the type of unit
      * @param majorTickStep number of units between major ticks
      * @param minorTicks minor ticks per unit, 0 for none. One minor tick will lie directly on the major tick.
      */
-    public ZCanvasRuler(int width, boolean isHorizontal, float borderThickness, Color borderColor, Color backgroundColor, Font labelFont, Unit unit, int majorTickStep, int minorTicks) {
+    public ZCanvasRuler(int width, boolean isHorizontal, float borderThickness, Color borderColor, Color backgroundColor, Font labelFont, UnitMeasure unit, int majorTickStep, int minorTicks) {
         super(0, 0, isHorizontal ? -1 : width, !isHorizontal ? -1 : width, 0.0, false, false, borderThickness, borderColor, null, backgroundColor);
         fixedWidth = width;
         isHoriz = isHorizontal;
@@ -99,7 +87,7 @@ public final class ZCanvasRuler extends ZRectangle {
                 }
                 
                 if (i==0)
-                    g.drawString(unit.toString(), 2, fontMetrics.getHeight());  //draw unit name instead of zero
+                    g.drawString(unit.getName(), 2, fontMetrics.getHeight());  //draw unit name instead of zero
                 else
                     g.drawString(Integer.toString(majorVal), inc+2, height-2);
 
@@ -120,7 +108,7 @@ public final class ZCanvasRuler extends ZRectangle {
                  }
                  
                 if (i==0)
-                    g.drawString(unit.toString(), 0, fontMetrics.getHeight());  //draw unit name instead of zero
+                    g.drawString(unit.getName(), 0, fontMetrics.getHeight());  //draw unit name instead of zero
                 else
                     g.drawString(Integer.toString(majorVal), 2, inc-2);
 

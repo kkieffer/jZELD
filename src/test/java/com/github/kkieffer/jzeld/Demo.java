@@ -6,7 +6,6 @@ import com.github.kkieffer.jzeld.ZCanvas.Orientation;
 import com.github.kkieffer.jzeld.draw.FreeformDraw;
 import com.github.kkieffer.jzeld.draw.StraightLineDraw;
 import com.github.kkieffer.jzeld.element.ZCanvasRuler;
-import com.github.kkieffer.jzeld.element.ZCanvasRuler.Unit;
 import com.github.kkieffer.jzeld.element.ZEditableText;
 import com.github.kkieffer.jzeld.element.TextAttributes.HorizontalJustify;
 import com.github.kkieffer.jzeld.element.TextAttributes;
@@ -149,16 +148,16 @@ public class Demo extends javax.swing.JFrame {
         } else {
             
             //Create our ZCanvas with a dark grey background, label font, centimeter scale, dark grey cursor lines, 10 undo stack
-            c = new ZCanvas(Color.WHITE, LABEL_FONT, Unit.CM, Color.DARK_GRAY, 10, new Point(36, 36), new Dimension(1400, 800), Orientation.LANDSCAPE);
+            c = new ZCanvas(Color.WHITE, LABEL_FONT, UnitMeasure.cmUnit, Color.DARK_GRAY, 10, new Point(36, 36), new Dimension(1400, 800), Orientation.LANDSCAPE);
         
             //Create two rulers, 20 pixels thick, with different minor tick spacing
-             ZCanvasRuler hRule = new ZCanvasRuler(20, true, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, Unit.CM, 4, 2);
+             ZCanvasRuler hRule = new ZCanvasRuler(20, true, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, UnitMeasure.cmUnit, 4, 2);
              c.setHorizontalRuler(hRule);
-             ZCanvasRuler vRule = new ZCanvasRuler(20, false, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, Unit.CM, 2, 2);
+             ZCanvasRuler vRule = new ZCanvasRuler(20, false, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, UnitMeasure.cmUnit, 2, 2);
              c.setVerticalRuler(vRule);
 
              //Create a grid in the back, dashed thin line
-             ZGrid grid = new ZGrid(0.5f, Color.LIGHT_GRAY, new Float[]{.05f}, Unit.CM, 2);
+             ZGrid grid = new ZGrid(0.5f, Color.LIGHT_GRAY, new Float[]{.05f}, UnitMeasure.cmUnit, 2);
              c.setGrid(grid);
             
             createDemoElements(c);

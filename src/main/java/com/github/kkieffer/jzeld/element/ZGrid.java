@@ -1,6 +1,7 @@
 
 package com.github.kkieffer.jzeld.element;
 
+import com.github.kkieffer.jzeld.UnitMeasure;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -17,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class ZGrid extends ZLine {
 
-    private ZCanvasRuler.Unit unit;
+    private UnitMeasure unit;
     private int majorTickStep;
 
     
@@ -31,7 +32,7 @@ public final class ZGrid extends ZLine {
      * @param unit the grid unit size
      * @param majorTickStep the steps between major unit markings
     */
-    public ZGrid(float thickness, Color color, Float[] dashPattern, ZCanvasRuler.Unit unit, int majorTickStep) {
+    public ZGrid(float thickness, Color color, Float[] dashPattern, UnitMeasure unit, int majorTickStep) {
         super(0, 0, -1, 0.0, false, false, thickness, color, dashPattern);
         this.unit = unit;
         this.majorTickStep = majorTickStep;

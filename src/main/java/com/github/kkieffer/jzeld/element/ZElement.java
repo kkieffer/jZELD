@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.JAXBAdapter.Rectangle2DAdapter;
+import com.github.kkieffer.jzeld.UnitMeasure;
 import com.github.kkieffer.jzeld.ZCanvas;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -462,6 +463,13 @@ public abstract class ZElement implements Serializable {
      * @param canvas 
      */
     public void removedFrom(ZCanvas canvas) {}
+    
+    /**
+     * When the canvas measure unit is changed, this method is called
+     * @param canvas
+     * @param u  the new unit
+     */
+    public void unitChanged(ZCanvas canvas, UnitMeasure u) {}
     
     
     /**
