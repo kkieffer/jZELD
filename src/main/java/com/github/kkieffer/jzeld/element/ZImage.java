@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ZImage extends ZRectangle {
     
     protected static BufferedImage copyImage(BufferedImage i) {
+        if (i == null)
+            return null;
         ColorModel cm = i.getColorModel();
         boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
         WritableRaster raster = i.copyData(i.getRaster().createCompatibleWritableRaster());
@@ -80,6 +82,15 @@ public class ZImage extends ZRectangle {
         image = i;
         hasChanges = true;
     }
+    
+    /**
+     * Retrieves a copy of the image from this element.  
+     * @return a copy of the image
+     */
+    public Image getImage() {
+        return copyImage((BufferedImage)image);
+    }
+    
 
      @Override
     public void setFillColor(Color fillColor) {
