@@ -1287,7 +1287,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         super.paintComponent(g);  
         Graphics2D g2d = (Graphics2D)g;
         
-        DecimalFormat fmt = new DecimalFormat("0.00");
+        DecimalFormat degreeFormat = new DecimalFormat("0.00\u00b0");
           
           
         //Paint any rulers before scaling and translations
@@ -1349,13 +1349,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (fields.mouseCoordFont != null) {
                 g2d.setColor(Color.BLACK);               
 
-                String mouseCoord = fmt.format(fields.unit.getScale()*tMouse.getX()/SCALE) + ", " + fmt.format(fields.unit.getScale()*tMouse.getY()/SCALE);                                       
+                String mouseCoord = fields.unit.format(tMouse.getX()/SCALE) + ", " + fields.unit.format(tMouse.getY()/SCALE);                                       
                 int stringX = (int)tMouse.getX() - (int)Math.ceil(fontMetrics.stringWidth(mouseCoord) + 10.0 * pixScale/zoom);
                 int stringY = (int)tMouse.getY() - (int)Math.ceil(10*pixScale/zoom);
                 
                 g2d.drawString(mouseCoord, stringX, stringY);
                                
-                String rotationString = fmt.format(selectedElement.getRotation());
+                String rotationString = degreeFormat.format(selectedElement.getRotation());
                 stringX = (int)tMouse.getX() - (int)Math.ceil(fontMetrics.stringWidth(rotationString) + 10.0 * pixScale/zoom);
                 stringY = (int)tMouse.getY() + (int)Math.ceil(10*pixScale/zoom) + fontMetrics.getHeight();
 
@@ -1368,7 +1368,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (selectedElementResizeOn && mouseIn != null && lastSelectedElement != null && fields.mouseCoordFont != null) {
             g2d.setColor(Color.BLACK);
             Rectangle2D bounds = lastSelectedElement.getBounds2D();
-            String mouseCoord = fmt.format(fields.unit.getScale()*bounds.getWidth()) + ", " + fmt.format(fields.unit.getScale()*bounds.getHeight());
+            String mouseCoord = fields.unit.format(bounds.getWidth()) + ", " + fields.unit.format(bounds.getHeight());
             g2d.drawString(mouseCoord, mouseIn.x + DRAG_BOX_SIZE*2*pixScale/(float)zoom, mouseIn.y + DRAG_BOX_SIZE*2*pixScale/(float)zoom);
             
         }
@@ -1398,9 +1398,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 g2d.setColor(Color.BLACK);
                 String s;
                 if (mouseDrag == null)
-                    s = fmt.format(fields.unit.getScale()*mouseIn.x/SCALE) + ", " + fmt.format(fields.unit.getScale()*mouseIn.y/SCALE);
+                    s = fields.unit.format(mouseIn.x/SCALE) + ", " + fields.unit.format(mouseIn.y/SCALE);
                 else {
-                    s = fmt.format(fields.unit.getScale()*dragRect.width/SCALE) + ", " + fmt.format(fields.unit.getScale()*dragRect.height/SCALE);
+                    s = fields.unit.format(dragRect.width/SCALE) + ", " + fields.unit.format(dragRect.height/SCALE);
                 }
                 g2d.drawString(s, mouseIn.x + (int)Math.ceil(10.0 * pixScale/zoom), mouseIn.y + (int)Math.ceil(fontMetrics.getHeight() + 10.0 * pixScale/zoom));
             }
