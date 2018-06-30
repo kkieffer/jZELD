@@ -1245,9 +1245,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     /**
      * Select  an element, if the element is on the canvas
      * @param toSel the element to select
+     * @param passThru true to also pass through events to the element (aka double click)
      * @return if the element was selected, returns true.  Returns false if the element is not selectable or not found on the canvas.
      */
-    public boolean selectElement(ZElement toSel) {
+    public boolean selectElement(ZElement toSel, boolean passThru) {
         
         if (!toSel.isSelectable())
             return false;
@@ -1259,6 +1260,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                     lastSelectedElement = e;   
                     for (SelectListener l : selectListeners)
                         l.elementSelected(e);
+        
+                    if (passThru) {
+                        if (lastSelectedElement.selected(this))  //tell the element it was selected
+                            passThruElement = lastSelectedElement; 
+                    }
+                    
                 }
                 
                 repaint();
@@ -1309,7 +1316,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             next = getNext(next);
             if (next.isSelectable()) {
                 selectNone();
-                selectElement(next);
+                selectElement(next, false);
                 repaint();
                 return;
             }
@@ -1719,7 +1726,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 Shape s = t.createTransformedShape(boundsBox);
                 
                 if (dragSelect.contains(s.getBounds()))
-                    selectElement(o);
+                    selectElement(o, false);
             }
             
             
