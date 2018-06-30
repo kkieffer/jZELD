@@ -9,6 +9,7 @@ import com.github.kkieffer.jzeld.element.ZCanvasRuler;
 import com.github.kkieffer.jzeld.element.ZEditableText;
 import com.github.kkieffer.jzeld.element.TextAttributes.HorizontalJustify;
 import com.github.kkieffer.jzeld.element.TextAttributes;
+import com.github.kkieffer.jzeld.element.ZArc;
 import com.github.kkieffer.jzeld.element.ZEquilateralPolygon;
 import com.github.kkieffer.jzeld.element.ZGrid;
 import com.github.kkieffer.jzeld.element.ZImage;
@@ -91,6 +92,10 @@ public class Demo extends javax.swing.JFrame {
           
         ZQuadrilateral pg = new ZQuadrilateral(QuadType.RHOMBUS, 6.0, 2.0, 1.0, 1.0, 0.0, true, true, 4, Color.BLACK, null, Color.BLUE, 20);
         c.addElement(pg);
+        
+         //Create a red rectangle, large black border, moveable
+        ZArc a = new ZArc(1.0, 4.0, 1.0, 1.0, 0.0, true, true, 7, Color.ORANGE, null, Color.RED, 30.0, 45.0);
+        c.addElement(a);
             
         //Add the test image
         InputStream testImg = Demo.class.getClassLoader().getResourceAsStream("tiger.jpg");

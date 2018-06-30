@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  * If the triangle's height or width is negative, the the rectangle is drawn to the width or height of the panel.
  * 
- * The triangle's border is drawn inside the bounds of the rectangle, no matter how thick.
+ * The triangle's border is drawn centered on the bounds of the rectangle, no matter how thick.
  * 
  * A subclass could override this by providing a custom paint method for different triangle types.  The Type can then be NULL.
  * 

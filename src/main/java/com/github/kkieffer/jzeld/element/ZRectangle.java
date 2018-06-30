@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  * If the rectangle's height or width is negative, the the rectangle is drawn to the width or height of the panel.
  * 
- * The rectangle's border is drawn inside the bounds of the rectangle, no matter how thick.
+ * The rectangle's border is drawn centered on the bounds of the rectangle, no matter how thick.
  * 
  * @author kkieffer
  */
