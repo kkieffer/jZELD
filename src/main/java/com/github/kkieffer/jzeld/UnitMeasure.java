@@ -65,4 +65,8 @@ public class UnitMeasure {
     }
     
     
+    public double parseFormat(String text) {
+        return Double.parseDouble(text);
+    }
+    
 }

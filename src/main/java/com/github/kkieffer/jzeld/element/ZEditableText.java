@@ -123,6 +123,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
                 
         
         textPanel.add(textWidget);
+        textPanel.setFocusTraversalKeysEnabled(false);
         
         timer = new Timer(20, new ActionListener() {  //needed to flash the caret
             @Override
