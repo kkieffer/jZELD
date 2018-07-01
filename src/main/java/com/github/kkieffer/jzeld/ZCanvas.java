@@ -859,7 +859,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                    
                     Shape mergedShape = ref.combineWith(operation, (ZAbstractShape)e);  //combine shapes
                     if (mergedShape != null) {  //was something that could be merged
-                        ZShape shape = new ZShape(ref.getPosition().getX(), ref.getPosition().getY(), mergedShape, 0.0, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor());
+                        ZShape shape = new ZShape(ref.getPosition().getX(), ref.getPosition().getY(), mergedShape, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor());
                         removeElement(e);  //remove the merged element
                         ref = shape;  //assign to the new reference
                     }
@@ -1784,9 +1784,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
             if (!selectedElementResizeOn) { //Reposition the object to the mouse, only when it won't take the object off the component
                 
-                lastSelectedElement.reposition((mouseLoc.x - selectedObj_xOffset)/SCALE, (mouseLoc.y - selectedObj_yOffset)/SCALE);  
-                selectedMouseDrag = new Point2D.Double((mouseLoc.x - selectedObj_xOffset), (mouseLoc.y - selectedObj_yOffset));  
-                 
+                if (lastSelectedElement.isMoveable()) {
+                    lastSelectedElement.reposition((mouseLoc.x - selectedObj_xOffset)/SCALE, (mouseLoc.y - selectedObj_yOffset)/SCALE);  
+                    selectedMouseDrag = new Point2D.Double((mouseLoc.x - selectedObj_xOffset), (mouseLoc.y - selectedObj_yOffset));  
+                }
             } else { //Resize the object
                 
                 

@@ -33,7 +33,7 @@ public final class ZGrid extends ZLine {
      * @param majorTickStep the steps between major unit markings
     */
     public ZGrid(float thickness, Color color, Float[] dashPattern, UnitMeasure unit, int majorTickStep) {
-        super(0, 0, -1, 0.0, false, false, thickness, color, dashPattern);
+        super(0, 0, -1, 0.0, false, false, false, thickness, color, dashPattern);
         this.unit = unit;
         this.majorTickStep = majorTickStep;
         setSize(-1, -1, -1, 1);

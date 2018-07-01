@@ -46,14 +46,15 @@ public class ZImage extends ZRectangle {
      * @param rotation desired rotation of the component in degrees, clockwise
      * @param canSelect if the object can be selected by the ZCanvas mouse click
      * @param canResize if the object can be resized by the mouse drag
+     * @param canMove if the object can be moved by the mouse drag
      * @param borderWidth unit width of the border, use zero for no border
      * @param borderColor color of the border, which can be null only if the borderWidth is zero
      * @param dashPattern the dash pattern of the border, null for solid
      * @param fillColor color of the rectangle area, which can be null for transparent. Any transparent image pixels will have this color
      * @param img the image painted on this element, if null, it is not painted
      */
-    public ZImage(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, BufferedImage img) {
-        super(x, y, width, height, rotation, canSelect, canResize, borderWidth, borderColor, dashPattern, fillColor);
+    public ZImage(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove,  float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, BufferedImage img) {
+        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);
         if (width <= 0 || height <= 0)
             throw new IllegalArgumentException("Width and height must be positive value");
 

@@ -35,12 +35,13 @@ public class ZLine extends ZAbstractShape {
      * @param rotation desired rotation of the component in degrees, clockwise
      * @param canSelect if the object can be selected by the ZCanvas mouse click
      * @param canResize if the object can be resized by the mouse drag
+     * @param canMove if the object can be moved by mouse drag
      * @param lineThickness unit width of the border, use zero for no border
      * @param lineColor color of the border, which can be null only if the borderWidth is zero
      * @param dashPattern
      */
-    public ZLine(double x, double y, double width, double rotation, boolean canSelect, boolean canResize, float lineThickness, Color lineColor, Float[] dashPattern) {
-        super(x, y, width, .5, rotation, canSelect, canResize, lineThickness, lineColor, dashPattern, null);
+    public ZLine(double x, double y, double width, double rotation, boolean canSelect, boolean canResize, boolean canMove, float lineThickness, Color lineColor, Float[] dashPattern) {
+        super(x, y, width, .5, rotation, canSelect, canResize, canMove, lineThickness, lineColor, dashPattern, null);
              
         if (lineColor == null)
             throw new IllegalArgumentException("Line color cannot be null");

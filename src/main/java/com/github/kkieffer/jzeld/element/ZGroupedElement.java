@@ -64,7 +64,7 @@ public final class ZGroupedElement extends ZElement {
 
     
     private ZGroupedElement(double x, double y, double w, double h, ArrayList<ZElement> srcElements) {
-        super(x, y, w, h, 0.0, true, false);
+        super(x, y, w, h, 0.0, true, false, true);
         elements = copyElements(srcElements);
         
         //Remove the x,y offset from each element's position

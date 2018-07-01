@@ -37,13 +37,14 @@ public class ZRectangle extends ZAbstractShape {
      * @param rotation desired rotation of the component in degrees, clockwise
      * @param canSelect if the object can be selected by the ZCanvas mouse click
      * @param canResize if the object can be resized by the mouse drag
+     * @param canMove if the object can be moved by the mouse drag
      * @param borderWidth unit width of the border, use zero for no border
      * @param borderColor color of the border, which can be null only if the borderWidth is zero
      * @param dashPattern the border dash pattern, null for solid
      * @param fillColor color of the rectangle area, which can be null for transparent (but not in combination with a zero width border)
      */
-    public ZRectangle(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
-        super(x, y, width, height, rotation, canSelect, canResize, borderWidth, borderColor, dashPattern, fillColor);        
+    public ZRectangle(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
+        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);        
     }
     
     protected ZRectangle(ZRectangle src) {

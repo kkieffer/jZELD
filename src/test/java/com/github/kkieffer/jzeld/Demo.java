@@ -62,46 +62,46 @@ public class Demo extends javax.swing.JFrame {
         
         
         //Create a red rectangle, large black border, moveable
-        ZRectangle r = new ZRectangle(1.0, 1.0, 2.0, 1.0, 25.0, true, true, 3, Color.BLACK, new Float[]{.2f, .2f}, Color.RED);
+        ZRectangle r = new ZRectangle(1.0, 1.0, 2.0, 1.0, 25.0, true, true, true, 3, Color.BLACK, new Float[]{.2f, .2f}, Color.RED);
         c.addElement(r);
 
         //Create an immovable, unselectable green square, rotated to 45 degrees (its a diamond!)
-        ZRectangle r2 = new ZRectangle(1.0, 1.0, 1.0, 1.0, 45.0, false, false, 1, Color.BLACK, null, Color.GREEN);
+        ZRectangle r2 = new ZRectangle(1.0, 1.0, 1.0, 1.0, 45.0, false, false, false, 1, Color.BLACK, null, Color.GREEN);
         c.addElement(r2);
         
         //Create a non-filled rectangle with rounded edges
-        ZRectangle r3 = new ZRoundedRectangle(4.0, 1.0, 1.0, 1.0, 0.0, true, true, 1, Color.BLACK, new Float[]{.1f, .1f}, null, 0.1);
+        ZRectangle r3 = new ZRoundedRectangle(4.0, 1.0, 1.0, 1.0, 0.0, true, true, true, 1, Color.BLACK, new Float[]{.1f, .1f}, null, 0.1);
         c.addElement(r3);
         
         //Create a semi-transparent circle
-        ZOval o = new ZOval(1.0, 3.0, 1.0, 1.0, 0.0, true, true, 0, Color.BLACK, null, new Color(0, 0, 255, 128));
+        ZOval o = new ZOval(1.0, 3.0, 1.0, 1.0, 0.0, true, true, true, 0, Color.BLACK, null, new Color(0, 0, 255, 128));
         c.addElement(o);
        
         //Create a simple black line
-        ZLine l = new ZLine(5.0, 2.5, 1.0, 0.0, true, true, 1, Color.BLACK, null);
+        ZLine l = new ZLine(5.0, 2.5, 1.0, 0.0, true, true, true, 1, Color.BLACK, null);
         c.addElement(l);
         
-        //Right triangle, yellow, big borders
-        ZRightTriangle t = new ZRightTriangle(1.0, 6.0, 1.0, 1.0, 0.0, true, true, 4, Color.BLACK, null, Color.YELLOW);
+        //Right triangle, yellow, big borders, immoveable
+        ZRightTriangle t = new ZRightTriangle(1.0, 6.0, 1.0, 1.0, 0.0, true, true, false, 4, Color.BLACK, null, Color.YELLOW);
         c.addElement(t);
         
         
-        ZEquilateralPolygon p = new ZEquilateralPolygon(6.0, 4.0, 1.0, 1.0, 0.0, true, true, 4, Color.BLACK, null, Color.BLUE, 5);
+        ZEquilateralPolygon p = new ZEquilateralPolygon(6.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, 5);
         c.addElement(p);
         
           
-        ZQuadrilateral pg = new ZQuadrilateral(QuadType.RHOMBUS, 6.0, 2.0, 1.0, 1.0, 0.0, true, true, 4, Color.BLACK, null, Color.BLUE, 20);
+        ZQuadrilateral pg = new ZQuadrilateral(QuadType.RHOMBUS, 6.0, 2.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, 20);
         c.addElement(pg);
         
          //Create a red rectangle, large black border, moveable
-        ZArc a = new ZArc(1.0, 4.0, 1.0, 1.0, 0.0, true, true, 7, Color.ORANGE, null, Color.RED, 30.0, 45.0);
+        ZArc a = new ZArc(1.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 7, Color.ORANGE, null, Color.RED, 30.0, 45.0);
         c.addElement(a);
             
         //Add the test image
         InputStream testImg = Demo.class.getClassLoader().getResourceAsStream("tiger.jpg");
         BufferedImage image = ImageIO.read(testImg);
      
-        ZImage img = new ZImage(5.0, 5.0, 3.0, 3.0, 0.0, true, true, 0, Color.BLACK, null, Color.GRAY, image);  
+        ZImage img = new ZImage(5.0, 5.0, 3.0, 3.0, 0.0, true, true, true, 0, Color.BLACK, null, Color.GRAY, image);  
         img.setName("Tiger");
         c.addElement(img);
         

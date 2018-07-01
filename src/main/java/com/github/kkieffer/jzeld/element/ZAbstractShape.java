@@ -38,8 +38,8 @@ public abstract class ZAbstractShape extends ZElement {
     protected Float[] dashPattern = null;
     
    
-    protected ZAbstractShape(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
-        super(x, y, width, height, rotation, canSelect, canResize);
+    protected ZAbstractShape(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
+        super(x, y, width, height, rotation, canSelect, canResize, canMove);
         setAttributes(borderWidth, borderColor, dashPattern, fillColor);
         hasChanges = false;
     }

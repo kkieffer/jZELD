@@ -158,7 +158,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
      * @param attr attributes of the text string
      */
     public ZEditableText(double x, double y, double width, double height, double rotation, boolean selectable, String defaultText, float borderThickness, Color borderColor, Color backgroundColor, TextAttributes attr) {
-        super(x, y, width, height, rotation, selectable, selectable);  //unknown bounds, height and width until we have a graphics context
+        super(x, y, width, height, rotation, selectable, selectable, selectable);  //unknown bounds, height and width until we have a graphics context
                
         
         textPanel = new JPanel();

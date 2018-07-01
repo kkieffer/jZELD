@@ -103,7 +103,7 @@ public abstract class BoundaryDraw implements DrawClient {
         
         Shape shape = path.createTransformedShape(AffineTransform.getTranslateInstance(-bounds2D.getX(), -bounds2D.getY()));
  
-        return new ZShape(bounds2D.getX(), bounds2D.getY(), shape, 0.0, true, true, 1, Color.BLACK, null, null);
+        return new ZShape(bounds2D.getX(), bounds2D.getY(), shape, 0.0, true, true, true, 1, Color.BLACK, null, null);
         
     }
     

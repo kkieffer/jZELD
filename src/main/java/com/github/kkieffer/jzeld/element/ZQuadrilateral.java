@@ -54,8 +54,8 @@ public class ZQuadrilateral extends ZPolygon {
      * @param fillColor color of the rectangle area, which can be null for transparent (but not in combination with a zero width border)
      * @param percent the percent of skew from 0 (rectangle) to 100 (maximum angle in bounds)
      */
-    public ZQuadrilateral(QuadType type, double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, int percent) {
-        super(x, y, width, height, rotation, canSelect, canResize, borderWidth, borderColor, dashPattern, fillColor);
+    public ZQuadrilateral(QuadType type, double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, int percent) {
+        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);
         this.type = type;
         this.percent = percent;
     }

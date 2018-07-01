@@ -45,6 +45,7 @@ public abstract class ZElement implements Serializable {
     private double rotation;  //degrees
     private boolean canSelect;
     private boolean resizable;
+    private boolean canMove;
     
     protected boolean flipHoriz = false;
     protected boolean flipVert = false;
@@ -66,13 +67,15 @@ public abstract class ZElement implements Serializable {
      * @param rotation desired rotation of the component in degrees, clockwise
      * @param selectable if the object can be selected by the ZCanvas mouse click
      * @param resizable if the object can be resized by the mouse drag
+     * @param moveable if the object can be moved by the mouse drag
      */
-    protected ZElement(double x, double y, double width, double height, double rotation, boolean selectable, boolean resizable) {
+    protected ZElement(double x, double y, double width, double height, double rotation, boolean selectable, boolean resizable, boolean moveable) {
         bounds = new Rectangle2D.Double(0, 0, width, height);
         position = new Point2D.Double(x, y);
         this.rotation = rotation;
         canSelect = selectable;
         this.resizable = resizable;
+        this.canMove = moveable;
         this.className = this.getClass().getName();
         this.name = this.getClass().getSimpleName();
     }
@@ -90,6 +93,7 @@ public abstract class ZElement implements Serializable {
         this.rotation = src.rotation;
         this.canSelect = src.canSelect;
         this.resizable = src.resizable;
+        this.canMove = src.canMove;
         this.name = src.name; 
         flipHoriz = src.flipHoriz;
         flipVert = src.flipVert;
@@ -213,12 +217,28 @@ public abstract class ZElement implements Serializable {
         return canSelect;
     }
     
+    public void setSelectable(boolean selectable) {
+        canSelect = selectable;
+    }
+    
+    public void setResizable(boolean resizable) {
+        this.resizable = resizable;
+    }
+    
     /**
      * True if the element can be resized by the cursor
      * @return 
      */
     public boolean isResizable() {
         return resizable;
+    }
+    
+    public boolean isMoveable() {
+        return canMove;
+    }
+    
+    public void setMoveable(boolean move) {
+        canMove = move;
     }
     
     /**
@@ -270,6 +290,10 @@ public abstract class ZElement implements Serializable {
      * @param y position in units
      */
     public void reposition(double x, double y) {
+        
+        if (!canMove)
+            return;
+        
         position.x = x;
         position.y = y;
         hasChanges = true;
@@ -284,6 +308,9 @@ public abstract class ZElement implements Serializable {
      * @param yLimit the furthest y
      */
     public void move(double x, double y, double xLimit, double yLimit) {
+        
+        if (!canMove)
+            return;
         
         if (position.x + x < xLimit && position.x + x + bounds.width > 0)   
             position.x += x;
