@@ -7,8 +7,12 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,12 +36,28 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZArc extends ZRectangle {
 
+
+    public enum ArcType {
+        OPEN (Arc2D.OPEN), 
+        PIE (Arc2D.PIE), 
+        CHORD (Arc2D.CHORD);
+    
+        private final int typeVal;
+        private ArcType(int t) {
+            typeVal = t;
+        }
+    };
+    
     private double startAngle;
     private double arcAngle;
+    private ArcType type;
     
     @XmlTransient
     private ArcDialog dialog;
+    @XmlTransient    
     
+    private Shape shape;
+
     protected ZArc() {}
     
     /**
@@ -54,13 +74,15 @@ public class ZArc extends ZRectangle {
      * @param borderColor color of the border, which can be null only if the borderWidth is zero
      * @param dashPattern the border dash pattern, null for solid
      * @param fillColor color of the rectangle area, which can be null for transparent (but not in combination with a zero width border)
-     * @param startAngle
-     * @param arcAngle
+     * @param startAngle start angle, 0 = "east pointing"
+     * @param arcAngle sweep angle, counterclockwise
+     * @param arcType the type of closure
      */
-    public ZArc(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, double startAngle, double arcAngle) {
+    public ZArc(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, double startAngle, double arcAngle, ArcType arcType) {
         super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);
         this.startAngle = startAngle;
         this.arcAngle = arcAngle;
+        this.type = arcType;
     }
     
     public ZArc(ZArc copy) {
@@ -75,17 +97,17 @@ public class ZArc extends ZRectangle {
     @Override
     protected Shape getAbstractShape() {
         Rectangle2D r = getBounds2D();
-        return new Ellipse2D.Double(0, 0, r.getWidth(), r.getHeight());
-    }
-    
-     @Override
-    protected void fillShape(Graphics2D g, int unitSize, int width, int height) {
-        g.fillArc(0, 0, width, height, (int)startAngle, (int)arcAngle);
+        return new Arc2D.Double(0, 0, r.getWidth(), r.getHeight(), startAngle, arcAngle, type.typeVal);
     }
     
     @Override
+    protected void fillShape(Graphics2D g, int unitSize, int width, int height) {
+        g.fill(shape);
+    }
+
+    @Override
     protected void drawShape(Graphics2D g, int unitSize, int width, int height) {
-        g.drawArc(0, 0, width, height, (int)startAngle, (int)arcAngle);
+        g.draw(shape);
     }
     
     public void setStartAngle(double start) {
@@ -98,6 +120,11 @@ public class ZArc extends ZRectangle {
         hasChanges = true;
     }
     
+    public void setArcType(ArcType t) {
+        type = t;
+        hasChanges = true;
+    }
+    
     public double getStartAngle() {
         return startAngle;
     }
@@ -106,6 +133,9 @@ public class ZArc extends ZRectangle {
         return arcAngle;
     }
    
+    public ArcType getArcType() {
+        return type;
+    }
 
     @Override
     public boolean selected(ZCanvas canvas) {
@@ -131,6 +161,14 @@ public class ZArc extends ZRectangle {
         deselected();
     }
 
+     @Override
+    public void paint(Graphics2D g, int unitSize, int width, int height) {
+        AffineTransform scaleInstance = AffineTransform.getScaleInstance(unitSize, unitSize);
+        shape = scaleInstance.createTransformedShape(getAbstractShape());
+        
+        super.paint(g, unitSize, width, height);
+
+    }
   
     
     private static class ArcDialog extends JFrame {
@@ -153,6 +191,18 @@ public class ZArc extends ZRectangle {
             arcAngleSpinner.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, 360.0d, 1.0d));
             arcAngleSpinner.setValue(arc.getArcAngle());
 
+            JLabel typeLabel = new JLabel("Closure Type");
+            JComboBox<ArcType> typeCombo = new JComboBox<>();
+            for (ArcType t : ArcType.values())
+                typeCombo.addItem(t);
+            typeCombo.setSelectedItem(arc.getArcType());
+            typeCombo.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    arc.setArcType((ArcType)typeCombo.getSelectedItem());
+                }
+                
+            });
             
             startAngleSpinner.addChangeListener(new ChangeListener() {
                 @Override
@@ -171,8 +221,8 @@ public class ZArc extends ZRectangle {
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
             java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
-            layout.columnWidths = new int[] {0, 10, 0};
-            layout.rowHeights = new int[] {0, 10, 0};
+            layout.columnWidths = new int[] {0, 10, 0, 10, 0};
+            layout.rowHeights = new int[] {0, 10, 0, 10, 0};
             p.setLayout(layout);
         
             GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
@@ -198,11 +248,23 @@ public class ZArc extends ZRectangle {
             gridBagConstraints.gridy = 2;
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             p.add(arcAngleSpinner, gridBagConstraints);
+            
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 4;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+            p.add(typeLabel, gridBagConstraints);
+
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = 4;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            p.add(typeCombo, gridBagConstraints);
 
             getContentPane().add(p, java.awt.BorderLayout.CENTER);
 
             pack();
-            Dimension d = new Dimension(300, 200);
+            Dimension d = new Dimension(300, 300);
             setMinimumSize(d);
             setPreferredSize(d);
         }

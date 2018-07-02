@@ -8,6 +8,7 @@ import static java.awt.BasicStroke.CAP_SQUARE;
 import static java.awt.BasicStroke.JOIN_MITER;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -56,7 +57,7 @@ public abstract class ZAbstractShape extends ZElement {
      * Change the attributes
      * @param outlineWidth unit width of the border, use zero for no border
      * @param outlineColor color of the border, which can be null for a transparent border
-     * @param dashPattern the dash pattern for the border, if null, solid line
+     * @param dashPattern the dash pattern for the border, if null, solid line 
      * @param fillColor color of the rectangle area, which can be null for transparent 
 
      */
@@ -206,6 +207,9 @@ public abstract class ZAbstractShape extends ZElement {
     
     @Override
     public void paint(Graphics2D g, int unitSize, int width, int height) {
+
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
        if (backgroundColor != null) {
             g.setColor(backgroundColor);

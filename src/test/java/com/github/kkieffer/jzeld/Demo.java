@@ -4,12 +4,14 @@ package com.github.kkieffer.jzeld;
 
 import com.github.kkieffer.jzeld.ZCanvas.Orientation;
 import com.github.kkieffer.jzeld.draw.FreeformDraw;
+import com.github.kkieffer.jzeld.draw.OrthogonalLineDraw;
 import com.github.kkieffer.jzeld.draw.StraightLineDraw;
 import com.github.kkieffer.jzeld.element.ZCanvasRuler;
 import com.github.kkieffer.jzeld.element.ZEditableText;
 import com.github.kkieffer.jzeld.element.TextAttributes.HorizontalJustify;
 import com.github.kkieffer.jzeld.element.TextAttributes;
 import com.github.kkieffer.jzeld.element.ZArc;
+import com.github.kkieffer.jzeld.element.ZArc.ArcType;
 import com.github.kkieffer.jzeld.element.ZEquilateralPolygon;
 import com.github.kkieffer.jzeld.element.ZGrid;
 import com.github.kkieffer.jzeld.element.ZImage;
@@ -94,7 +96,7 @@ public class Demo extends javax.swing.JFrame {
         c.addElement(pg);
         
          //Create a red rectangle, large black border, moveable
-        ZArc a = new ZArc(1.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 7, Color.ORANGE, null, Color.RED, 30.0, 45.0);
+        ZArc a = new ZArc(1.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 7, Color.ORANGE, null, Color.RED, 30.0, 45.0, ArcType.PIE);
         c.addElement(a);
             
         //Add the test image
@@ -183,6 +185,15 @@ public class Demo extends javax.swing.JFrame {
         ActionMap am = c.getActionMap();
 
         //Add some shortcuts to add line or free drawings to the canvas
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK), "OrthoDraw");
+        am.put("OrthoDraw", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                c.drawOn(new OrthogonalLineDraw(c, false));
+            }
+        });
+        
+        
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.META_DOWN_MASK), "LineDrawNoClose");
         am.put("LineDrawNoClose", new AbstractAction(){
             @Override

@@ -5,6 +5,9 @@ import com.github.kkieffer.jzeld.ZCanvas;
 import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -67,6 +70,12 @@ public class ZRoundedRectangle extends ZRectangle {
         hasChanges = true;
     }
      
+    
+    @Override
+    protected Shape getAbstractShape() {
+        Rectangle2D r = getBounds2D();
+        return new RoundRectangle2D.Double(0, 0, r.getWidth(), r.getHeight(), radius*2, radius*2);
+    }
     
     @Override
     public boolean selected(ZCanvas canvas) {
