@@ -51,7 +51,7 @@ public class ZOval extends ZRectangle {
     }
     
     @Override
-    public ZRectangle copyOf() {
+    public ZOval copyOf() {
         return new ZOval(this);
     }
     

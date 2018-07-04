@@ -20,7 +20,7 @@ to become familiar with the operations of a ZCanvas is to run the included Demo 
 5.  Resize selected ZElements using the mouse wheel
 6.  Move the selected ZElements with the arrow keys while holding Shift down
 7.  Rotate selected ZElements using the mouse wheel while holding Shift down
-8.	Zoom in/out the ZCanvas with the +/- keys
+8.  Zoom in/out the ZCanvas with the +/- keys
 
 The ZCanvas supports other operations that can be invoked by shortcut keys, menu items, or programmatically.  The 
 Demo illustrates these using keys and right-click context menus.  The framework provides a default set of hotkeys and an optional
@@ -30,7 +30,7 @@ illustrated in the demo.
 Operations supported by the ZCanvas are below.  All operations are available in the default context menu, and if there is a hotkey that invokes it as
 well it is defined in parenthesis.  For MacOS, substitute Command instead of Ctrl below.
 
-1.	Copy selected ZElements  (Ctrl-C)
+1.  Copy selected ZElements  (Ctrl-C)
 2.  Paste copied ZElements   (Ctrl-V)
 3.  Delete selected ZElements  (Delete or Backspace)
 4.  Repeat the last operation (not all operations can be repeated)  (Ctrl-Y)
@@ -52,7 +52,7 @@ A ZElement is an abstract superclass for items that can be drawn on the canvas. 
 the range of where the ZElement is painted), as well as a rotation. Three units are defined for position and sizes: inches, centimeters, and pixels.  Rotation is in
 degrees.  
 
-Optional items that can subclasses can allow are the ability to select, resize, and flip the ZElement, a line width, color, and dash-pattern, and fill color.  
+Optional items that can subclasses can allow are the ability to select, resize, and flip the ZElement, a line width, color, and dash-pattern, and fill color, gradient, or pattern.  
 ZElements can receive mouseEvents passed to them by the ZCanvas, as well as notifications when they are selected, deselected, added to, or removed from a ZCanvas. 
 Double-clicking a ZElement forwards mouseEvents to the ZElement, and clicking outside the ZElement stops the forwarding of mouse events.  All ZElements must also 
 support a copy operation.

@@ -38,6 +38,7 @@ public abstract class ZAbstractShape extends ZElement {
     
     protected Float[] dashPattern = null;
     
+    protected PaintAttributes paintAttr = null;
    
     protected ZAbstractShape(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
         super(x, y, width, height, rotation, canSelect, canResize, canMove);
@@ -48,6 +49,7 @@ public abstract class ZAbstractShape extends ZElement {
     protected ZAbstractShape(ZAbstractShape src) {
         super(src);
         setAttributes(src.borderThickness, src.borderColor, src.dashPattern, src.backgroundColor);
+        paintAttr = src.paintAttr == null ? null : new PaintAttributes(src.paintAttr);
         hasChanges = false;
     }
     
@@ -133,6 +135,17 @@ public abstract class ZAbstractShape extends ZElement {
         return true;
     }
     
+    
+    public void setPaintAttributes(PaintAttributes p) {
+        paintAttr = p;
+        hasChanges = true;
+    }
+    
+    
+    public PaintAttributes getPaintAttributes() {
+        return paintAttr;
+    }
+    
     protected abstract Shape getAbstractShape();
     protected abstract void fillShape(Graphics2D g, int unitSize, int width, int height);
     protected abstract void drawShape(Graphics2D g, int unitSize, int width, int height);
@@ -211,10 +224,14 @@ public abstract class ZAbstractShape extends ZElement {
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-       if (backgroundColor != null) {
+        if (paintAttr != null) {
+            paintAttr.applyPaintAttribute(g, width, height, unitSize);
+            fillShape(g, unitSize, width, height);
+        }
+        else if (backgroundColor != null) {
             g.setColor(backgroundColor);
             fillShape(g, unitSize, width, height);
-       }
+        }
 
 
        if (borderThickness != 0) {

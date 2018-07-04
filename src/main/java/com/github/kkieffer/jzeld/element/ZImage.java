@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZImage extends ZRectangle {
     
-    protected static BufferedImage copyImage(BufferedImage i) {
+    public static BufferedImage copyImage(BufferedImage i) {
         if (i == null)
             return null;
         ColorModel cm = i.getColorModel();

@@ -6,6 +6,8 @@ import com.github.kkieffer.jzeld.ZCanvas.Orientation;
 import com.github.kkieffer.jzeld.draw.FreeformDraw;
 import com.github.kkieffer.jzeld.draw.OrthogonalLineDraw;
 import com.github.kkieffer.jzeld.draw.StraightLineDraw;
+import com.github.kkieffer.jzeld.element.PaintAttributes;
+import com.github.kkieffer.jzeld.element.PaintAttributes.RadiusRelative;
 import com.github.kkieffer.jzeld.element.ZCanvasRuler;
 import com.github.kkieffer.jzeld.element.ZEditableText;
 import com.github.kkieffer.jzeld.element.TextAttributes.HorizontalJustify;
@@ -26,9 +28,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.MultipleGradientPaint;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
@@ -78,6 +82,12 @@ public class Demo extends javax.swing.JFrame {
         //Create a semi-transparent circle
         ZOval o = new ZOval(1.0, 3.0, 1.0, 1.0, 0.0, true, true, true, 0, Color.BLACK, null, new Color(0, 0, 255, 128));
         c.addElement(o);
+        
+         //Create a semi-transparent circle
+        ZOval o2 = new ZOval(2.5, 3.0, 1.0, 1.0, 0.0, true, true, true, 1, Color.BLACK, null, null);
+        PaintAttributes radPaint = PaintAttributes.createRadialPaintAttribute(new Point2D.Double(0.5, 0.5), null, 0.5f, RadiusRelative.SHORTEST, new float[]{0.0f, 1.0f}, new Color[]{Color.WHITE, Color.BLACK}, MultipleGradientPaint.CycleMethod.NO_CYCLE);
+        o2.setPaintAttributes(radPaint);
+        c.addElement(o2);
        
         //Create a simple black line
         ZLine l = new ZLine(5.0, 2.5, 1.0, 0.0, true, true, true, 1, Color.BLACK, null);
@@ -88,14 +98,15 @@ public class Demo extends javax.swing.JFrame {
         c.addElement(t);
         
         
-        ZEquilateralPolygon p = new ZEquilateralPolygon(6.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, 5);
+        ZEquilateralPolygon p = new ZEquilateralPolygon(6.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, 5);        
+        PaintAttributes linPaint = PaintAttributes.createLinearPaintAttribute(new Point2D.Double(.25,.5), new Point2D.Double(.75,.5), new float[]{0.1f, 0.5f, 0.8f}, new Color[]{Color.BLUE, Color.RED, Color.GREEN}, MultipleGradientPaint.CycleMethod.REFLECT);
+        p.setPaintAttributes(linPaint);
         c.addElement(p);
-        
           
         ZQuadrilateral pg = new ZQuadrilateral(QuadType.RHOMBUS, 6.0, 2.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, 20);
         c.addElement(pg);
         
-         //Create a red rectangle, large black border, moveable
+         //Create an arc
         ZArc a = new ZArc(1.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 7, Color.ORANGE, null, Color.RED, 30.0, 45.0, ArcType.PIE);
         c.addElement(a);
             
@@ -106,6 +117,11 @@ public class Demo extends javax.swing.JFrame {
         ZImage img = new ZImage(5.0, 5.0, 3.0, 3.0, 0.0, true, true, true, 0, Color.BLACK, null, Color.GRAY, image);  
         img.setName("Tiger");
         c.addElement(img);
+        
+        ZRectangle r4 = new ZRectangle(5.5, 6.0, 2.0, 1.0, 0.0, true, true, true, 3, Color.BLACK, null, Color.RED);
+        PaintAttributes textPaint = PaintAttributes.createTexturePaintAttribute(image, .4f, .4f);
+        r4.setPaintAttributes(textPaint);
+        c.addElement(r4);
         
         //Create some editable text
         Font f = new Font("SERIF", Font.BOLD, 22);
