@@ -18,7 +18,7 @@ public class FreeformDraw extends BoundaryDraw {
     }
 
     @Override
-    public void drawClientMouseClicked(Point mouse, int clickCount) {
+    public void drawClientMouseClicked(Point mouse, int clickCount, int button) {
     }
 
     @Override
@@ -28,8 +28,7 @@ public class FreeformDraw extends BoundaryDraw {
 
     @Override
     public void drawClientMouseReleased(Point mouse) {
-        this.drawComplete();  
-        addShapeToCanvas(getShape());
+        complete();
     }
 
     @Override

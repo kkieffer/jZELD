@@ -30,7 +30,7 @@ public class OrthogonalLineDraw extends BoundaryDraw {
     }
 
     @Override
-    public void drawClientMouseClicked(Point mouse, int clickCount) {
+    public void drawClientMouseClicked(Point mouse, int clickCount, int button) {
         
         if (mousePoints.isEmpty()) { //first point
             this.addPoint(mouse);
@@ -48,8 +48,7 @@ public class OrthogonalLineDraw extends BoundaryDraw {
             this.addPoint(p);
            
             
-            this.drawComplete();
-            addShapeToCanvas(getShape());
+            complete();
         
         } else {
             

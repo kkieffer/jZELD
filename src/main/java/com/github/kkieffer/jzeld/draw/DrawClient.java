@@ -14,6 +14,13 @@ import java.awt.Point;
  */
 public interface DrawClient {
 
+ 
+    
+     /**
+      * Stop drawing
+      */
+     public void drawStop();
+    
     /**
      * The ZCanvas is repainting, so repaint the shape the client is drawing.
      * @param g the graphics context to paint on
@@ -25,8 +32,9 @@ public interface DrawClient {
      * The mouse was clicked on the cnavas.
      * @param mouse mouse location
      * @param clickCount number of clicks
+     * @param button the mouse button number
      */
-    public void drawClientMouseClicked(Point mouse, int clickCount);
+    public void drawClientMouseClicked(Point mouse, int clickCount, int button);
 
     /**
      * The mouse was pressed down on the canvas

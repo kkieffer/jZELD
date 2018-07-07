@@ -97,7 +97,7 @@ public class PaintAttributes {
                         radiusVal = w * radius;
                         break;
                     case HEIGHT:
-                        radiusVal = w * radius;
+                        radiusVal = h * radius;
                         break;
                     case LONGEST:
                         radiusVal = radius * (width > height ? width : height);

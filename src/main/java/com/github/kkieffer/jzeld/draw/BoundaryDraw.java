@@ -9,6 +9,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
@@ -22,7 +24,7 @@ import java.util.List;
  * mouse points to the shape, and then create the shape and add it to the ZCanvas.  Points are connected by straight lines.
  * @author kkieffer
  */
-public abstract class BoundaryDraw implements DrawClient {
+public abstract class BoundaryDraw implements DrawClient, KeyListener {
 
     
     
@@ -71,6 +73,7 @@ public abstract class BoundaryDraw implements DrawClient {
     protected BoundaryDraw(ZCanvas canvas, boolean close) {
         this.canvas = canvas;
         this.close = close;
+        this.canvas.addKeyListener(this);
     }
 
     /**
@@ -98,7 +101,9 @@ public abstract class BoundaryDraw implements DrawClient {
         }
         
         Path2D path = getPath();
-  
+        if (path == null)
+            return null;
+        
         Rectangle2D bounds2D = path.getBounds2D();  //get the bounds to find the x and y location on the canvas
         
         Shape shape = path.createTransformedShape(AffineTransform.getTranslateInstance(-bounds2D.getX(), -bounds2D.getY()));
@@ -161,8 +166,46 @@ public abstract class BoundaryDraw implements DrawClient {
         
     }
 
+    /**
+     * Complete drawing, add shape to canvas, clean up
+     */
+    public void complete() {
+        drawStop();
+        addShapeToCanvas(getShape());
+    }
     
+    /**
+     * Stop drawing, don't add shape to canvas, clean up
+     */
+    @Override
+    public void drawStop() {
+        this.drawComplete();  
+        this.canvas.removeKeyListener(this);
+    }
+
     
+     @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_ENTER:
+                complete();
+                break;
+            case KeyEvent.VK_DELETE:
+            case KeyEvent.VK_BACK_SPACE:
+                drawStop();
+                break;
+        }
+        
+            
+    }
    
     
 }

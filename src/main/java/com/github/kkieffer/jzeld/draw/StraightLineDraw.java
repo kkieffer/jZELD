@@ -18,13 +18,11 @@ public class StraightLineDraw extends BoundaryDraw {
     }
 
     @Override
-    public void drawClientMouseClicked(Point mouse, int clickCount) {
+    public void drawClientMouseClicked(Point mouse, int clickCount, int button) {
         this.addPoint(mouse);
         
-        if (clickCount > 1) {
-            this.drawComplete();
-            addShapeToCanvas(getShape());
-        }
+        if (clickCount > 1) 
+            complete();
     }
 
     @Override

@@ -215,7 +215,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private Point2D selectedMousePress;
     private ZCanvasContextMenu contextMenu;
     
-    private final ArrayList<SelectListener> selectListeners = new ArrayList<>();
+    private final ArrayList<ZCanvasEventListener> selectListeners = new ArrayList<>();
 
     //For restoration by JAXB
     private ZCanvas() {
@@ -347,7 +347,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         });
         
         
-        
+             
         updatePreferredSize();
         repaint();
 
@@ -409,7 +409,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         return fields.unit;
     }
     
-    public void registerSelectListener(SelectListener l) {
+    public void registerSelectListener(ZCanvasEventListener l) {
         if (!selectListeners.contains(l))
             selectListeners.add(l);
     }
@@ -505,6 +505,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         contextMenu = m;
     }
     
+    /**
+     * If the canvas is being drawn usign a draw client, return true, else false
+     * @return 
+     */
+    public boolean usingDrawClient() {
+        return drawClient != null;
+    }
     
     /**
      * Starts drawing using the specified draw client.
@@ -516,6 +523,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return false;
         
         drawClient = c;
+        for (ZCanvasEventListener l : selectListeners)
+            l.canvasHasDrawClient(true);
+        
         return true;
     }
     
@@ -524,6 +534,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void drawOff() {
         drawClient = null;
+        for (ZCanvasEventListener l : selectListeners)
+            l.canvasHasDrawClient(false);
     }
     
     /**
@@ -1258,7 +1270,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 if (!selectedElements.contains(e)) {  // not selected, add it
                     selectedElements.add(e);  
                     lastSelectedElement = e;   
-                    for (SelectListener l : selectListeners)
+                    for (ZCanvasEventListener l : selectListeners)
                         l.elementSelected(e);
         
                     if (passThru) {
@@ -1335,7 +1347,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZElement e : fields.zElements) {
             if (e.isSelectable()) {
                 selectedElements.add(e);
-                for (SelectListener l : selectListeners)
+                for (ZCanvasEventListener l : selectListeners)
                     l.elementSelected(e);   
             }
         }
@@ -1356,7 +1368,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         selectedResizeElement = null;
         lastSelectedElement = null;
-        for (SelectListener l : selectListeners)
+        for (ZCanvasEventListener l : selectListeners)
             l.noneSelected();
         lastMethod = null;        
         selectedElements.clear();
@@ -1536,7 +1548,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 if (contextMenu != null)
                     contextMenu.newSelections(lastSelectedElement, selectedElements);
                
-                for (SelectListener l : selectListeners)
+                for (ZCanvasEventListener l : selectListeners)
                     l.elementSelected(o);
        
                 Point location = o.getPosition(SCALE);  //get the upper left, find the mouse offset from the upper left
@@ -1586,7 +1598,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public void mouseClicked(MouseEvent e) {
                         
         if (drawClient != null) {
-            drawClient.drawClientMouseClicked(getScaledMouse(e), e.getClickCount());
+            drawClient.drawClientMouseClicked(getScaledMouse(e), e.getClickCount(), e.getButton());
             repaint();
             return;
         }
