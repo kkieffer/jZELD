@@ -54,8 +54,8 @@ public class ZArc extends ZRectangle {
     
     @XmlTransient
     private ArcDialog dialog;
-    @XmlTransient    
     
+    @XmlTransient     
     private Shape shape;
 
     protected ZArc() {}
@@ -87,6 +87,9 @@ public class ZArc extends ZRectangle {
     
     public ZArc(ZArc copy) {
         super(copy);
+        this.startAngle = copy.startAngle;
+        this.arcAngle = copy.arcAngle;
+        this.type = copy.type;
     }
     
     @Override
