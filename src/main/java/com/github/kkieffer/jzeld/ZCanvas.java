@@ -25,6 +25,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -2091,11 +2092,50 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         //Create Buffered Image
         BufferedImage bi = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         print(g, null, 0);
         g.dispose();
         return bi;   
     }
 
+    
+    public BufferedImage printElementToImage(ZElement e) {
+        
+        e = e.copyOf();  //make a copy
+        int pixelsOut = (int)((e.getOutlineWidth()/2 + 1) * pixScale);
+        
+        e.reposition(0, 0); //no offset (not on canvas, painting to image
+        
+        Rectangle2D bounds = e.getBounds2D(SCALE*zoom);
+        AffineTransform t = e.getElementTransform(SCALE*zoom, false);
+        Shape s = t.createTransformedShape(bounds);
+      
+        bounds = s.getBounds2D();  //make bounds something that can hold the transformed shape
+                
+        int imgWidth = (int)Math.round(bounds.getWidth() - bounds.getX() + 2*pixelsOut);
+        int imgHeight = (int)Math.round(bounds.getHeight() - bounds.getY() + 2*pixelsOut);
+        
+        //Create Buffered Image
+        BufferedImage bi = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = bi.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        g.translate(-bounds.getX()+pixelsOut, -bounds.getY()+pixelsOut);
+        g.scale(1/pixScale, 1/pixScale);
+        g.scale(zoom, zoom);
+        
+        this.paintElement(g, e, false);
+
+        g.dispose();
+        return bi; 
+    }
 
     
 }

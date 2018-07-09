@@ -14,6 +14,7 @@ import com.github.kkieffer.jzeld.element.TextAttributes.HorizontalJustify;
 import com.github.kkieffer.jzeld.element.TextAttributes;
 import com.github.kkieffer.jzeld.element.ZArc;
 import com.github.kkieffer.jzeld.element.ZArc.ArcType;
+import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZEquilateralPolygon;
 import com.github.kkieffer.jzeld.element.ZGrid;
 import com.github.kkieffer.jzeld.element.ZImage;
@@ -258,6 +259,25 @@ public class Demo extends javax.swing.JFrame {
                 printCanvas(c, null);
             }
         });
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.META_DOWN_MASK), "SaveElementImage");
+        am.put("SaveElementImage", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ZElement el = c.getSelectedElements()[0];
+                BufferedImage i = c.printElementToImage(el);
+                File f = new File("test.png");
+                try {
+                    ImageIO.write(i, "png", f);
+                    System.out.println("Wrote element to " + f.getAbsolutePath());
+                } catch (IOException ex) {
+                    System.err.println(ex);
+                }   
+            }
+        });
+        
+        
+        
+        
     }
 
     /**

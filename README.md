@@ -88,6 +88,7 @@ additional hotkeys.
 3.  Create a freeform drawing (Ctrl-F)
 4.  Create a straight-line drawing (Ctrl-D)
 5.  Create a orthogonal-line drawing (Ctrl-O)
+6.  Copy the selected element as an image to the clipboard (Ctrl-E)
 
 When starting the demo, if a previous instance was saved with Ctrl-S, it can be loaded.  If the user chooses not to load, a default ZCanvas is loaded with a collection
 of demo ZElements.  The default Demo is shown below.
