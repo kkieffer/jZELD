@@ -27,7 +27,7 @@ public class LineBorderMenu extends JMenu {
     
     
     
-    private static final float[] WIDTHS = {0.0f, 0.5f, 1.0f, 1.5f, 2.0f, 3.0f, 4.0f, 6.0f, 8.0f};
+    private static final float[] WIDTHS = {0.0f, 0.25f, 0.5f, 1.0f, 1.5f, 2.0f, 3.0f, 4.0f, 6.0f, 8.0f};
     private static final Float[][] DASHES = {new Float[0],
                                         new Float[]{.05f, .05f},
                                         new Float[]{.1f, .1f},

@@ -20,8 +20,12 @@ public class UnitMeasure {
     //Define a standard unit of Inch, with a 1:1 ratio
     public static UnitMeasure inchUnit = new UnitMeasure("in", 1.0, 1, 4);
     
-    //Define a standard unit of Cm, with a 1:1 ratio
+    //Define a standard unit of Cm, with a 1:2.54 ratio
     public static UnitMeasure cmUnit = new UnitMeasure("cm", 2.54, 2, 4);
+ 
+     //Define a standard unit of MM, with a 1:25.4 ratio
+    public static UnitMeasure mmUnit = new UnitMeasure("mm", 25.4, 20, 40);
+ 
     
     //Define a standard unit of Pixel, with a 1:1 ratio
     public static UnitMeasure pixUnit = new UnitMeasure("px", 72.0, 100, 10);

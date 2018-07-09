@@ -169,6 +169,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         @XmlElement(name="Grid")
         private ZGrid grid;
         
+        @XmlElement(name="PageSize")
+        @XmlJavaTypeAdapter(DimensionAdapter.class)
+        private Dimension pageSize;
+        
         
     }
     /*----------------------------------------------------------------------*/
@@ -232,9 +236,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param undoStackCount the amount of history to keep in undo (the higher the count, the more memory used
      * @param origin the desired coordinate origin of the top left corner. If null, origin = 0,0
      * @param bounds the maximum bounds of the canvas (width and height).  If null, unlimited
-     * @param o the page orientation, for printing
      */
-    public ZCanvas(Color background, Font mouseCoordFont, UnitMeasure unitType, Color mouseCursorColor, int undoStackCount, Point origin, Dimension bounds, Orientation o) {
+    public ZCanvas(Color background, Font mouseCoordFont, UnitMeasure unitType, Color mouseCursorColor, int undoStackCount, Point origin, Dimension bounds) {
         super();
         fields.backgroundColor = background;
         fields.unit = unitType;
@@ -246,7 +249,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         else
             fields.origin = new Point(origin);
         
-        setCanvasBounds(bounds, o);
+        setCanvasBounds(bounds);
         init();
     }
     
@@ -375,11 +378,31 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
+     * Set the page size and orientation for printing.  The page is colored to the canvas background color
+     * @param pageSize the page size for printing purposes
+     * @param o the orientation, for printing purposes
+     */
+    public void setPageSize(Dimension pageSize, Orientation o) {
+        fields.pageSize = new Dimension(pageSize);
+        fields.orientation = o;
+        
+        if (fields.grid != null)
+            fields.grid.changeSize(pageSize.width, pageSize.height, .0001, SCALE);
+             
+        canvasModified = true;
+        repaint();
+    }
+    
+    /**
      * Set the grid to use
      * @param g the grid to use, or null to remove
      */
     public void setGrid(ZGrid g) {
         fields.grid = g;
+         if (fields.grid != null && fields.pageSize != null)
+            fields.grid.changeSize(fields.pageSize.width, fields.pageSize.height, .0001, SCALE);
+       
+        
         canvasModified = true;
         repaint();
     }
@@ -439,26 +462,26 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
 
     /**
-     * Provides the drawing area of the canvas, in units 
+     * Provides the page drawing area of the canvas, in units 
      * @return a Rectangle2D where x,y are the origin and width,height are the bounds, returns null if unbounded
      */
     public Rectangle2D getCanvasBounds() {
-        if (fields.bounds == null)
+        if (fields.pageSize == null)
             return null;
         else
-            return new Rectangle2D.Double(fields.origin.getX()/SCALE, fields.origin.getY()/SCALE, fields.bounds.width/SCALE, fields.bounds.height/SCALE);
+            return new Rectangle2D.Double(fields.origin.getX()/SCALE, fields.origin.getY()/SCALE, fields.pageSize.width/SCALE, fields.pageSize.height/SCALE);
     }
     
     
     /**
-     * Provides the drawing area of the canvas, in pixels 
+     * Provides the page drawing area of the canvas, in pixels 
      * @return a Rectangle2D where x,y are the origin and width,height are the bounds, returns null if unbounded
      */
     public Rectangle getCanvasPixelBounds() {
-        if (fields.bounds == null)
+        if (fields.pageSize == null)
             return null;
         else
-            return new Rectangle((int)fields.origin.getX(), (int)fields.origin.getY(), fields.bounds.width, fields.bounds.height);
+            return new Rectangle((int)fields.origin.getX(), (int)fields.origin.getY(), fields.pageSize.width, fields.pageSize.height);
     }
     
     
@@ -469,13 +492,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     /**
      * Sets the drawing area of the canvas, in pixels 
      * @param bounds the drawing area dimension
-     * @param o the orientation, for printing purposes
      */
-    public final void setCanvasBounds(Dimension bounds, Orientation o) {
+    public final void setCanvasBounds(Dimension bounds) {
         if (bounds != null) { 
             fields.bounds = new Dimension(bounds.width, bounds.height);
         }
-        fields.orientation = o;
         
         canvasModified = true;
         updatePreferredSize();
@@ -1403,7 +1424,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                
         if (fields.backgroundColor != null) {
             g2d.setBackground(fields.backgroundColor);
-            g2d.clearRect(0, 0, getScaledWidth(), getScaledHeight());
+            if (fields.pageSize != null)
+                g2d.clearRect(0, 0, (int)(fields.pageSize.width * pixScale), (int)(fields.pageSize.height * pixScale));
+            else
+                g2d.clearRect(0, 0, getScaledWidth(), getScaledHeight());
         }
         
         if (fields.grid != null)
@@ -2088,6 +2112,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @return the image
      */
     public BufferedImage printToImage() {
+        
+        if (fields.pageSize == null)
+            return null;
         
         //Create Buffered Image
         BufferedImage bi = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);

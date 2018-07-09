@@ -172,8 +172,9 @@ public class Demo extends javax.swing.JFrame {
         } else {
             
             //Create our ZCanvas with a dark grey background, label font, centimeter scale, dark grey cursor lines, 10 undo stack
-            c = new ZCanvas(Color.WHITE, LABEL_FONT, UnitMeasure.cmUnit, Color.DARK_GRAY, 10, new Point(36, 36), new Dimension(1400, 800), Orientation.LANDSCAPE);
-        
+            c = new ZCanvas(Color.WHITE, LABEL_FONT, UnitMeasure.cmUnit, Color.DARK_GRAY, 10, new Point(36, 36), new Dimension(1400, 800));
+            c.setPageSize(new Dimension(1200, 600), Orientation.LANDSCAPE);
+
             //Create two rulers, 20 pixels thick, with different minor tick spacing
              ZCanvasRuler hRule = new ZCanvasRuler(20, true, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, UnitMeasure.cmUnit, 4, 2);
              c.setHorizontalRuler(hRule);
