@@ -34,6 +34,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
@@ -174,6 +175,7 @@ public class Demo extends javax.swing.JFrame {
             //Create our ZCanvas with a dark grey background, label font, centimeter scale, dark grey cursor lines, 10 undo stack
             c = new ZCanvas(Color.WHITE, LABEL_FONT, UnitMeasure.cmUnit, Color.DARK_GRAY, 10, new Point(36, 36), new Dimension(1400, 800));
             c.setPageSize(new Dimension(1200, 600), Orientation.LANDSCAPE);
+            c.setPageMargins(new Rectangle2D.Double(50, 50, 1100, 500));
 
             //Create two rulers, 20 pixels thick, with different minor tick spacing
              ZCanvasRuler hRule = new ZCanvasRuler(20, true, 1, Color.BLACK, Color.LIGHT_GRAY, LABEL_FONT, UnitMeasure.cmUnit, 4, 2);

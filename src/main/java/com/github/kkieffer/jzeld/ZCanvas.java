@@ -5,6 +5,7 @@ import com.github.kkieffer.jzeld.JAXBAdapter.ColorAdapter;
 import com.github.kkieffer.jzeld.JAXBAdapter.DimensionAdapter;
 import com.github.kkieffer.jzeld.JAXBAdapter.FontAdapter;
 import com.github.kkieffer.jzeld.JAXBAdapter.PointAdapter;
+import com.github.kkieffer.jzeld.JAXBAdapter.Rectangle2DAdapter;
 import com.github.kkieffer.jzeld.draw.DrawClient;
 import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZAbstractShape;
@@ -173,6 +174,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         @XmlJavaTypeAdapter(DimensionAdapter.class)
         private Dimension pageSize;
         
+        @XmlElement(name="Margins")
+        @XmlJavaTypeAdapter(Rectangle2DAdapter.class)
+        private Rectangle2D margins;
+        
+        private boolean marginsOn;
         
     }
     /*----------------------------------------------------------------------*/
@@ -391,6 +397,31 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
              
         canvasModified = true;
         repaint();
+    }
+    
+    
+    /**
+     * Set the page margins (the rectangle defines the interior area). 
+     * @param margins the margin rectangle, or null to remove the margins
+     */
+    public void setPageMargins(Rectangle2D margins) {
+        fields.margins = margins == null ? null : new Rectangle2D.Double(margins.getX(), margins.getY(), margins.getWidth(), margins.getHeight());
+    }
+    
+    /**
+     * Returns true if the margins are set to on. Regardless of the setting, they are not shown until they have been defined with setPageMargins()
+     * @return 
+     */
+    public boolean areMarginsOn() {
+        return fields.marginsOn;
+    }
+    
+    /**
+     * Set the margins on or off.  Regardless of the setting, they are not shown until they have been defined with setPageMargins()
+     * @param on 
+     */
+    public void marginsOn(boolean on) {
+        fields.marginsOn = on;
     }
     
     /**
@@ -1132,6 +1163,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
+     * Returns the lat selected element
+     * @return last selected element, null if nothing is selected
+     */
+    public ZElement getLastSelectedElement() {
+        return lastSelectedElement;
+    }
+    
+    
+    /**
      * Makes a deep copy of the selected elements and stores it for later.  Does nothing if the control is currently with an element.
      * @return a copy of the copied elements, or null if none was copied
      */
@@ -1237,7 +1277,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
           
         canvasModified = true;
-      
+        selectNone();
+        lastSelectedElement = null;
         lastMethod = null;            
         repaint();
      }
@@ -1391,7 +1432,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         selectedResizeElement = null;
         lastSelectedElement = null;
         for (ZCanvasEventListener l : selectListeners)
-            l.noneSelected();
+            l.elementSelected(null);
         lastMethod = null;        
         selectedElements.clear();
     }
@@ -1432,6 +1473,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         if (fields.grid != null)
             paintElement(g2d, fields.grid, false);
+        
+        if (fields.margins != null && fields.marginsOn) {
+            g2d.setColor(Color.LIGHT_GRAY);
+            g2d.setStroke(new BasicStroke(0.5f));
+            g2d.draw(fields.margins);
+        }
         
         //Start from the deepest point in the stack, drawing elements up to the top z layer
         Iterator<ZElement> it = fields.zElements.descendingIterator();  
