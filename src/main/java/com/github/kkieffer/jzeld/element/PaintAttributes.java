@@ -13,6 +13,11 @@ import java.awt.TexturePaint;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import javax.imageio.ImageIO;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -21,7 +26,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlRootElement(name = "PaintAttributes")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PaintAttributes {
+public class PaintAttributes implements Serializable {
 
     public enum RadiusRelative {WIDTH, HEIGHT, LONGEST, SHORTEST};
     
@@ -43,7 +48,7 @@ public class PaintAttributes {
     private Color[] colors;
     
   
-    private Image patternImage;
+    transient private Image patternImage; //marked transient for Serializable - custom read/write object will restore it from bytess
     private float imgWidth;
     private float imgHeight;
     
@@ -76,6 +81,20 @@ public class PaintAttributes {
             colors = src.colors.clone();
             cycleMethod = src.cycleMethod;
         }
+    }
+    
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        out.writeBoolean(patternImage != null);
+        if (patternImage != null)
+            ImageIO.write((BufferedImage)patternImage, "png", out); 
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        boolean imageExists = in.readBoolean();
+        if (imageExists)
+            patternImage = ImageIO.read(in);
     }
 
     

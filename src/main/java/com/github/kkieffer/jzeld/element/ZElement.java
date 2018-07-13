@@ -54,7 +54,7 @@ public abstract class ZElement implements Serializable {
     private String className;  //needed to reload subclasses by classname
     
     @XmlTransient
-    protected boolean hasChanges = false;  //marks any changes to the Element prior to saving
+    transient protected boolean hasChanges = false;  //marks any changes to the Element prior to saving
   
     
   

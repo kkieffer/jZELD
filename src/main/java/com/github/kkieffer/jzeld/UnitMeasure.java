@@ -1,6 +1,7 @@
 
 package com.github.kkieffer.jzeld;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,7 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "UnitMeasure")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class UnitMeasure {
+public class UnitMeasure implements Serializable {
     
     //Define a standard unit of Inch, with a 1:1 ratio
     public static UnitMeasure inchUnit = new UnitMeasure("in", 1.0, 1, 4);

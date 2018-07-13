@@ -53,10 +53,10 @@ public class ZArc extends ZRectangle {
     private ArcType type;
     
     @XmlTransient
-    private ArcDialog dialog;
+    transient private ArcDialog dialog;
     
     @XmlTransient     
-    private Shape shape;
+    transient private Shape shape;
 
     protected ZArc() {}
     

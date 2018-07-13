@@ -31,10 +31,10 @@ public class ZQuadrilateral extends ZPolygon {
     protected int percent;
 
     @XmlTransient
-    double[] x = new double[4];  //x verticies
+    transient double[] x = new double[4];  //x verticies
     
     @XmlTransient
-    double[] y = new double[4];  //y verticies
+    transient double[] y = new double[4];  //y verticies
     
     protected ZQuadrilateral(){}
     

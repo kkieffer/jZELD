@@ -17,6 +17,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
@@ -51,10 +52,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZEditableText extends ZElement implements TextAttributes.TextInterface {
 
-        
-    @XmlTransient
-    private ZCanvas canvas;
-
 
     /* ----- JAXB FIELDS ---------*/
     protected TextAttributes textAttributes;
@@ -88,16 +85,21 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
      }
     
     
-    /*-----------------------------*/
+    /*---------Transient Fields --------------------*/
+    
+            
+    @XmlTransient
+    transient private ZCanvas canvas;
+
+
+    @XmlTransient
+    transient private JPanel textPanel;
     
     @XmlTransient
-    private JPanel textPanel;
+    transient private boolean isSelected;
     
     @XmlTransient
-    private boolean isSelected;
-    
-    @XmlTransient
-    private Timer timer;
+    transient private Timer timer;
     
 
     private void setup() {
@@ -141,6 +143,12 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         setAttributes(borderThickness, borderColor, null, backgroundColor);
         setup();
         hasChanges = false;
+    }
+    
+    //Custom deserialize
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        afterUnmarshal(null, null);
     }
     
     /**

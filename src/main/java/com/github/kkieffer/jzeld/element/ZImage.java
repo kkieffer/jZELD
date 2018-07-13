@@ -8,6 +8,10 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import javax.imageio.ImageIO;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -33,7 +37,7 @@ public class ZImage extends ZRectangle {
     }
     
     
-    protected Image image;
+    transient protected Image image; //marked transient for Serializable - custom read/write object will restore it from bytes
 
     protected ZImage() {}
     
@@ -73,6 +77,21 @@ public class ZImage extends ZRectangle {
     @Override
     public ZImage copyOf() {
         return new ZImage(this);
+    }
+    
+    
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        out.writeBoolean(image != null);
+        if (image != null)
+            ImageIO.write((BufferedImage)image, "png", out); 
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        boolean imageExists = in.readBoolean();
+        if (imageExists)
+            image = ImageIO.read(in);
     }
     
     /**

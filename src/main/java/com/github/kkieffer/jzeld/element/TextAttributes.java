@@ -4,6 +4,7 @@ package com.github.kkieffer.jzeld.element;
 import com.github.kkieffer.jzeld.JAXBAdapter;
 import java.awt.Color;
 import java.awt.Font;
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -13,7 +14,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlRootElement(name = "TextAttributes")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TextAttributes {
+public class TextAttributes implements Serializable {
     
     public enum HorizontalJustify {LEFT, CENTER, RIGHT};
     

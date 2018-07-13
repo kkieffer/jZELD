@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlTransient;
 public abstract class ZPolygon extends ZAbstractShape {
     
     @XmlTransient
-    private Path2D polygon; 
+    transient private Path2D polygon; 
   
     protected ZPolygon(){}
     
