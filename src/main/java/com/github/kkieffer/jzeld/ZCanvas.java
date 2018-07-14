@@ -274,12 +274,18 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         Timer timer = new Timer(200, new ActionListener() {  //timer to animate the selected dashed line border, draw coordinates
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectedAlternateBorder = !selectedAlternateBorder;
-                if (selectedMousePress != null && System.nanoTime() - mouseFirstPressed > 500000000)
+                boolean repaint = false;
+                if (!selectedElements.isEmpty()) {
+                    selectedAlternateBorder = !selectedAlternateBorder;
+                    repaint = true;
+                }
+                if (selectedMousePress != null && System.nanoTime() - mouseFirstPressed > 500000000) {
                     selectedMouseDrag = selectedMousePress;
+                    repaint = true;
+                }
                     
-                    
-                repaint();
+                if (repaint)
+                    repaint();
             }
         });
         timer.start();
@@ -2136,10 +2142,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
    
     @Override
-    public int print(Graphics g, PageFormat pageFormat, int pageIndex) {
+    public int print(Graphics g, PageFormat pageFormat, int pageIndex) {   
         if (pageIndex > 0) 
             return(NO_SUCH_PAGE);
 
+        //Hide margins and grid
+        boolean marginsOn = areMarginsOn();
+        marginsOn(false);
+        ZGrid savedGrid = fields.grid; //save grid
+        setGrid(null);
+
+        
         resetView();
         selectNone();
 
@@ -2150,6 +2163,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         currentManager.setDoubleBufferingEnabled(false);
         this.paint(g2d);
         currentManager.setDoubleBufferingEnabled(true);
+        
+        //Restore margins and grid
+        marginsOn(marginsOn);
+        setGrid(savedGrid);
+        
+        
         return(PAGE_EXISTS);
       
     }
@@ -2163,8 +2182,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (fields.pageSize == null)
             return null;
         
+        //Hide margins and grid
+        boolean marginsOn = areMarginsOn();
+        marginsOn(false);
+        ZGrid savedGrid = fields.grid; //save grid
+        setGrid(null);
+        
         //Create Buffered Image
-        BufferedImage bi = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new BufferedImage(fields.pageSize.width, fields.pageSize.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
@@ -2173,6 +2198,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         print(g, null, 0);
         g.dispose();
+        
+        //Restore margins and grid
+        marginsOn(marginsOn);
+        setGrid(savedGrid);
+        
+        
         return bi;   
     }
 
