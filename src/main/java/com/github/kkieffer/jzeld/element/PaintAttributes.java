@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.JAXBAdapter;
+import com.github.kkieffer.jzeld.SerializableImage;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -47,8 +48,7 @@ public class PaintAttributes implements Serializable {
     @XmlJavaTypeAdapter(JAXBAdapter.ColorAdapter.class)
     private Color[] colors;
     
-  
-    transient private Image patternImage; //marked transient for Serializable - custom read/write object will restore it from bytess
+    SerializableImage patternImage;
     private float imgWidth;
     private float imgHeight;
     
@@ -70,7 +70,7 @@ public class PaintAttributes implements Serializable {
                 radiusRelative = src.radiusRelative;
                 break;
             case PATTERN:
-                patternImage = ZImage.copyImage((BufferedImage)src.patternImage);
+                patternImage = new SerializableImage(src.patternImage);
                 imgWidth = src.imgWidth;
                 imgHeight = src.imgHeight;
                 break;
@@ -82,21 +82,6 @@ public class PaintAttributes implements Serializable {
             cycleMethod = src.cycleMethod;
         }
     }
-    
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
-        out.writeBoolean(patternImage != null);
-        if (patternImage != null)
-            ImageIO.write((BufferedImage)patternImage, "png", out); 
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        boolean imageExists = in.readBoolean();
-        if (imageExists)
-            patternImage = ImageIO.read(in);
-    }
-
     
     public void applyPaintAttribute(Graphics2D g2d, int width, int height, int unitSize) {
         
@@ -130,7 +115,7 @@ public class PaintAttributes implements Serializable {
                 break;
 
             case PATTERN:
-                p = new TexturePaint((BufferedImage)patternImage, new Rectangle2D.Double(0, 0, imgWidth * unitSize, imgHeight * unitSize));
+                p = new TexturePaint((BufferedImage)patternImage.getImage(), new Rectangle2D.Double(0, 0, imgWidth * unitSize, imgHeight * unitSize));
                 break;
                 
         }
@@ -205,7 +190,7 @@ public class PaintAttributes implements Serializable {
         PaintAttributes a = new PaintAttributes();
         
         a.type = PaintType.PATTERN;
-        a.patternImage = ZImage.copyImage(img);
+        a.patternImage = new SerializableImage(img);
         a.imgWidth = width;
         a.imgHeight = height;
         

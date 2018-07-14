@@ -17,7 +17,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
@@ -53,7 +52,6 @@ public abstract class ZElement implements Serializable {
     @XmlAttribute(name = "class")
     private String className;  //needed to reload subclasses by classname
     
-    @XmlTransient
     transient protected boolean hasChanges = false;  //marks any changes to the Element prior to saving
   
     
@@ -256,6 +254,9 @@ public abstract class ZElement implements Serializable {
      */
     public void setRotation(double r) {
         rotation = r;
+        rotation = rotation % 360.0;
+        if (rotation < 0)
+            rotation = 360.0 + rotation;
         hasChanges = true;
     }
     
@@ -281,6 +282,9 @@ public abstract class ZElement implements Serializable {
      */
     public void rotate(double angle) {
         rotation += angle;
+        rotation = rotation % 360.0;
+        if (rotation < 0)
+            rotation = 360.0 + rotation;
         hasChanges = true;
     }
     

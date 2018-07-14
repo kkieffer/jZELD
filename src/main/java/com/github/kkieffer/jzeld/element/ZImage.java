@@ -1,17 +1,12 @@
 
 package com.github.kkieffer.jzeld.element;
 
+import com.github.kkieffer.jzeld.SerializableImage;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import javax.imageio.ImageIO;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -27,18 +22,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZImage extends ZRectangle {
     
-    public static BufferedImage copyImage(BufferedImage i) {
-        if (i == null)
-            return null;
-        ColorModel cm = i.getColorModel();
-        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-        WritableRaster raster = i.copyData(i.getRaster().createCompatibleWritableRaster());
-        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-    }
+    protected SerializableImage image;
     
-    
-    transient protected Image image; //marked transient for Serializable - custom read/write object will restore it from bytes
-
     protected ZImage() {}
     
     /**
@@ -62,7 +47,7 @@ public class ZImage extends ZRectangle {
         if (width <= 0 || height <= 0)
             throw new IllegalArgumentException("Width and height must be positive value");
 
-        image = img;
+        image = new SerializableImage(img);
     }
     
     public ZImage(ZImage copy) {
@@ -71,7 +56,7 @@ public class ZImage extends ZRectangle {
         this.flipVert = copy.flipVert;
         
         //Copy image
-        this.image = copyImage((BufferedImage)copy.image);
+        this.image = new SerializableImage(copy.image);
     }
     
     @Override
@@ -80,26 +65,12 @@ public class ZImage extends ZRectangle {
     }
     
     
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
-        out.writeBoolean(image != null);
-        if (image != null)
-            ImageIO.write((BufferedImage)image, "png", out); 
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        boolean imageExists = in.readBoolean();
-        if (imageExists)
-            image = ImageIO.read(in);
-    }
-    
     /**
      * Set the image to use
      * @param i 
      */
     public void setImage(BufferedImage i) {
-        image = i;
+        image.setImage(i);
         hasChanges = true;
     }
     
@@ -108,7 +79,7 @@ public class ZImage extends ZRectangle {
      * @return a copy of the image
      */
     public Image getImage() {
-        return copyImage((BufferedImage)image);
+        return image.getImageCopy();
     }
     
 
@@ -163,7 +134,7 @@ public class ZImage extends ZRectangle {
             int y = flipVert ? height : 0;
             int h = flipVert ? -height : height;
             
-            paintImage(g, image, x, y, w, h);
+            paintImage(g, image.getImage(), x, y, w, h);
         }
         super.paint(g, unitSize, width, height);       
     }

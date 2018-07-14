@@ -31,7 +31,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -88,17 +87,12 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     /*---------Transient Fields --------------------*/
     
             
-    @XmlTransient
     transient private ZCanvas canvas;
 
-
-    @XmlTransient
     transient private JPanel textPanel;
     
-    @XmlTransient
     transient private boolean isSelected;
     
-    @XmlTransient
     transient private Timer timer;
     
 

@@ -9,7 +9,6 @@ import java.awt.geom.Rectangle2D;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * A ZPolygon is a abstract closed polygon
@@ -20,7 +19,6 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ZPolygon extends ZAbstractShape {
     
-    @XmlTransient
     transient private Path2D polygon; 
   
     protected ZPolygon(){}

@@ -176,7 +176,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         @XmlElement(name="Margins")
         @XmlJavaTypeAdapter(Rectangle2DAdapter.class)
-        private Rectangle2D margins;
+        private Rectangle2D.Double margins;
         
         private boolean marginsOn;
         

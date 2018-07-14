@@ -15,7 +15,6 @@ import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -61,7 +60,6 @@ public class ZShape extends ZAbstractShape {
     @XmlJavaTypeAdapter(ShapeAdapter.class)
     protected Shape shape;  //holds the original, unaltered shape
     
-    @XmlTransient
     transient private Shape scaledShape;  //holds a resized version of the shape for painting
     
     protected ZShape() {}
