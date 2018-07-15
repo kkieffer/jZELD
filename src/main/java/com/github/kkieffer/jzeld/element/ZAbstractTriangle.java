@@ -45,6 +45,17 @@ public abstract class ZAbstractTriangle extends ZPolygon {
     
     
     @Override
+    protected String getShapeSummary() {       
+        return "A 3-sided polygon.";
+    }
+    
+    @Override
+    protected String getShapeDescription() {
+        return "";     
+    }
+    
+    
+    @Override
     public boolean supportsFlip() {
         return true;
     }

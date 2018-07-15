@@ -23,7 +23,6 @@ import javax.swing.event.ChangeListener;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * A ZArc is an object that defines a arc (pie) shape with a border (that has color and thickness) and an interior color.  The arc is  
@@ -88,6 +87,16 @@ public class ZArc extends ZRectangle {
         this.startAngle = copy.startAngle;
         this.arcAngle = copy.arcAngle;
         this.type = copy.type;
+    }
+    
+    @Override
+    protected String getShapeSummary() {       
+        return "A section of an ellispe.";
+    }
+    
+    @Override
+    protected String getShapeDescription() {
+        return "Double click on the arc to set its start angle and extent angle, and its type.";   
     }
     
     @Override

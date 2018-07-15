@@ -64,6 +64,15 @@ public class ZImage extends ZRectangle {
         return new ZImage(this);
     }
     
+    @Override
+    protected String getShapeSummary() {       
+        return "An image.";
+    }
+    
+    @Override
+    protected String getShapeDescription() {
+        return "";
+    }
     
     /**
      * Set the image to use

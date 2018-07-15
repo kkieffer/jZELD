@@ -102,6 +102,17 @@ public class ZShape extends ZAbstractShape {
     }
     
     
+     @Override
+    protected String getShapeSummary() {       
+        return "A general shape created by drawing or merging other elements.";
+    }
+    
+    @Override
+    protected String getShapeDescription() {
+        return "";     
+    }
+    
+    
     @Override
     protected Shape getAbstractShape() {
         ZShape copy = copyOf();

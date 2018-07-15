@@ -98,7 +98,16 @@ public abstract class ZElement implements Serializable {
         className = src.className;
     } 
     
-    
+    public String getHtmlHelp() {
+        return (resizable ? "Resize the element by clicking and dragging the resize box in the lower right corner.<br><br>" : "") +
+               (canMove ? "Move the element by selecting it and dragging it to the new position.<br><br>" : "") +
+               (resizable ? "Resize the element, maintaining its aspect ratio, by selecting it and using the mouse wheel.<br><br>" : "") +
+               "Rotate the element by selecting it and using the mouse wheel while holding Shift. Rotations to 90 degree positions are available in the right-click context menu.<br><br>" +
+               (flipHoriz || flipVert ? "Flip the element horizontally or vertically by right-clicking and selecting from the context menu.<br><br>" : "") +
+               "Adjust element attributes by by right-clicking and selecting from the context menu.<br><br>" +
+               "The Z-plane order can be adjusted by right-clicking and selecting from the context menu.<br><br>";
+        
+    }
     
     public abstract ZElement copyOf();
    

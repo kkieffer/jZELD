@@ -51,6 +51,17 @@ public class ZRectangle extends ZAbstractShape {
         super(src);
     }
     
+    
+    @Override
+    protected String getShapeSummary() {       
+        return "A 4-sided polygon with right angles";
+    }
+    
+    @Override
+    protected String getShapeDescription() {
+        return "";
+    }
+    
     @Override
     public boolean supportsFlip() {
         return false;

@@ -86,6 +86,19 @@ public final class ZGroupedElement extends ZElement {
         return new ZGroupedElement(this);
     }
     
+    
+    @Override
+    public String getHtmlHelp() {
+        
+        String group = "";
+        for (ZElement e : elements)
+            group += e.getClass().getSimpleName() + "<br>";
+        
+        return "<html><b>ZGroupedElement: </b>This is a group of multiple elements that can be moved and rotated together.<br><br>" +
+                "This group contains the following elements: <br>" + group + "</html>";
+   
+    }
+    
     /**
      * Removes all elements from this group and returns them.  The elements are repositioned to their position outside of the group.
      * This group will have zero elements in it and should be removed from any canvas it is on.

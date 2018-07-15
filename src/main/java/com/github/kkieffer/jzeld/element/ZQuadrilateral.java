@@ -68,6 +68,17 @@ public class ZQuadrilateral extends ZPolygon {
     }
     
     @Override
+    protected String getShapeSummary() {       
+        return "A 4-sided polygon that is a " + type.name().toLowerCase() + ".";
+    }
+    
+    @Override
+    protected String getShapeDescription() {
+        return "Double click on the polygon to select the skew from 0 to 100 percent.";     
+    }
+ 
+    
+    @Override
     public ZQuadrilateral copyOf() {
         return new ZQuadrilateral(this);
     }

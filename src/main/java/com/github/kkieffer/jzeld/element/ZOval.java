@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  * @author kkieffer
  */
-@XmlRootElement(name = "ZRoundedRectangle")
+@XmlRootElement(name = "ZOval")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZOval extends ZRectangle {
 
@@ -53,6 +53,16 @@ public class ZOval extends ZRectangle {
     @Override
     public ZOval copyOf() {
         return new ZOval(this);
+    }
+    
+    @Override
+    protected String getShapeSummary() {       
+        return "An oval.";
+    }
+    
+    @Override
+    protected String getShapeDescription() {
+        return "";     
     }
     
     @Override

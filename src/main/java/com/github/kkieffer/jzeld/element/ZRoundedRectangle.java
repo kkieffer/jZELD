@@ -57,6 +57,16 @@ public class ZRoundedRectangle extends ZRectangle {
     }
     
     @Override
+    protected String getShapeSummary() {       
+        return "A rectangle with rounded corners.";
+    }
+    
+    @Override
+    protected String getShapeDescription() {
+        return "Double click on the rectangle to select the radius of the corners. The radius unit is the same as the canvas measurement unit.";   
+    }
+    
+    @Override
     public ZRoundedRectangle copyOf() {
         return new ZRoundedRectangle(this);
     }

@@ -62,6 +62,16 @@ public class ZEquilateralPolygon extends ZPolygon {
         return new ZEquilateralPolygon(this);
     }
     
+    @Override
+    protected String getShapeSummary() {       
+        return "A polygon with equal length sides.";
+    }
+    
+    @Override
+    protected String getShapeDescription() {
+        return "Double click on the polygon to select the number of sides.";     
+    }
+    
     /**
      * Adjust the number of sides (edges)
      * @param s the number of edges

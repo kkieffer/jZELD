@@ -60,6 +60,15 @@ public class ZLine extends ZAbstractShape {
         return new ZLine(this);
     }
     
+    @Override
+    protected String getShapeSummary() {       
+        return "A straight line.";
+    }
+    
+    @Override
+    protected String getShapeDescription() {
+        return "";     
+    }
 
     
     @Override

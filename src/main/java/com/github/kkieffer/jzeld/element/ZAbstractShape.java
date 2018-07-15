@@ -55,13 +55,25 @@ public abstract class ZAbstractShape extends ZElement {
     
     protected ZAbstractShape() {}
     
+    
+    
+    protected abstract String getShapeSummary();
+    protected abstract String getShapeDescription();
+    
+    
+    @Override
+    public String getHtmlHelp() {
+        String className = this.getClass().getSimpleName();
+        return "<html><b>" + className + ": " + getShapeSummary() + "</b><br>" + getShapeDescription() + "<br><br>" + 
+                "Right-click on this element to set its attributes: line color and width, line dash pattern, and fill color.<br><br>" + super.getHtmlHelp() + "</html>";
+    }
+    
     /**
      * Change the attributes
      * @param outlineWidth unit width of the border, use zero for no border
      * @param outlineColor color of the border, which can be null for a transparent border
      * @param dashPattern the dash pattern for the border, if null, solid line 
      * @param fillColor color of the rectangle area, which can be null for transparent 
-
      */
     @Override
     public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
