@@ -31,6 +31,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.MultipleGradientPaint;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
@@ -205,7 +206,7 @@ public class Demo extends javax.swing.JFrame {
         ActionMap am = c.getActionMap();
 
         //Add some shortcuts to add line or free drawings to the canvas
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK), "OrthoDraw");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "OrthoDraw");
         am.put("OrthoDraw", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -214,28 +215,28 @@ public class Demo extends javax.swing.JFrame {
         });
         
         
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK), "LineDrawNoClose");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "LineDrawNoClose");
         am.put("LineDrawNoClose", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 c.drawOn(new StraightLineDraw(c, false));
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_DOWN_MASK), "LineDraw");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "LineDraw");
         am.put("LineDraw", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 c.drawOn(new StraightLineDraw(c, true));
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK), "FreeDraw");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "FreeDraw");
         am.put("FreeDraw", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 c.drawOn(new FreeformDraw(c, true));
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), "Save");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "Save");
         am.put("Save", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -248,21 +249,21 @@ public class Demo extends javax.swing.JFrame {
                 }
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK), "SelectAll");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "SelectAll");
         am.put("SelectAll", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 c.selectAll();
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK), "Print");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "Print");
         am.put("Print", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 printCanvas(c, null);
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK), "SaveElementImage");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "SaveElementImage");
         am.put("SaveElementImage", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
