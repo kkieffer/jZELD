@@ -378,7 +378,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             @Override
             public void actionPerformed(ActionEvent e) {
                 moveSelected(1/SCALE, 0);
-                System.out.println("rgith");
             }
         });
         am.put("MoveUp", new AbstractAction(){
@@ -1946,7 +1945,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 //Find the amount to move in order to keep the drag box co-located with the mouse point
                 double xMove = mouseLoc.getX() - lowerRightT.getX() + selectedObj_xOffset_toRightCorner;
                 double yMove = mouseLoc.getY() - lowerRightT.getY() + selectedObj_yOffset_toRightCorner;
-                                System.out.println(xMove + ", " + yMove);
 
                 //move the shape 
                 selectedResizeElement.move(xMove/SCALE, yMove/SCALE, this.getScaledWidth()/SCALE, this.getScaledHeight()/SCALE);

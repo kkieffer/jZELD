@@ -205,7 +205,7 @@ public class Demo extends javax.swing.JFrame {
         ActionMap am = c.getActionMap();
 
         //Add some shortcuts to add line or free drawings to the canvas
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK), "OrthoDraw");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK), "OrthoDraw");
         am.put("OrthoDraw", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -214,28 +214,28 @@ public class Demo extends javax.swing.JFrame {
         });
         
         
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.META_DOWN_MASK), "LineDrawNoClose");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK), "LineDrawNoClose");
         am.put("LineDrawNoClose", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 c.drawOn(new StraightLineDraw(c, false));
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.META_DOWN_MASK), "LineDraw");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_DOWN_MASK), "LineDraw");
         am.put("LineDraw", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 c.drawOn(new StraightLineDraw(c, true));
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.META_DOWN_MASK), "FreeDraw");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK), "FreeDraw");
         am.put("FreeDraw", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 c.drawOn(new FreeformDraw(c, true));
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.META_DOWN_MASK), "Save");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), "Save");
         am.put("Save", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -248,21 +248,21 @@ public class Demo extends javax.swing.JFrame {
                 }
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.META_DOWN_MASK), "SelectAll");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK), "SelectAll");
         am.put("SelectAll", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 c.selectAll();
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.META_DOWN_MASK), "Print");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK), "Print");
         am.put("Print", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 printCanvas(c, null);
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.META_DOWN_MASK), "SaveElementImage");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK), "SaveElementImage");
         am.put("SaveElementImage", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
