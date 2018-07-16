@@ -5,6 +5,7 @@ import com.github.kkieffer.jzeld.ZCanvas.CombineOperation;
 import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.PopupMenu;
 import java.util.ArrayList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -41,6 +42,9 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
     protected JMenu alignMenu;
     protected JPopupMenu contextPopupMenu;
     private final JMenu combineMenu;
+    private JMenuItem resetVerticalShearMenuItem;
+    private JMenuItem resetHorizontalShearMenuItem;
+    private final JMenu shearMenu;
     
     
     public ZDefaultContextMenu(ZCanvas c) {
@@ -64,6 +68,12 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         rotateCCWMenuItem = new JMenuItem("Snap Counter CW");
         rotateMenu.add(rotateCWMenuItem);
         rotateMenu.add(rotateCCWMenuItem);
+        
+        shearMenu = new JMenu("Shear");
+        resetHorizontalShearMenuItem = new JMenuItem("Reset Horizontal Shear");
+        resetVerticalShearMenuItem = new JMenuItem("Reset Vertical Shear");
+        shearMenu.add(resetHorizontalShearMenuItem);
+        shearMenu.add(resetVerticalShearMenuItem);
         
         arrangeMenu = new JMenu("Arrange");
         sendToBackMenuItem = new JMenuItem("Send to Back");
@@ -124,6 +134,7 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         
         contextPopupMenu.add(editMenu);
         contextPopupMenu.add(rotateMenu);
+        contextPopupMenu.add(shearMenu);
         contextPopupMenu.add(arrangeMenu);
         contextPopupMenu.add(attributesMenu);
         contextPopupMenu.add(combineMenu);
@@ -203,6 +214,19 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
                 c.flip(false);
             }
         }); 
+        
+        resetHorizontalShearMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                c.resetShear(true);
+            }
+        });
+        resetVerticalShearMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                c.resetShear(false);
+            }
+        });
         
         
                 

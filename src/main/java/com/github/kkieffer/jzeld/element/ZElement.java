@@ -314,6 +314,15 @@ public abstract class ZElement implements Serializable {
         hasChanges = true;
     }
 
+    public void setShearX(double s) {
+        shearX = s;
+        hasChanges = true;
+    }
+    public void setShearY(double s) {
+        shearY = s;
+        hasChanges = true;
+    }
+    
     public double getShearX() {
         return shearX;
     }

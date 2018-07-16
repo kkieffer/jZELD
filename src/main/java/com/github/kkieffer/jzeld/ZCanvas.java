@@ -717,6 +717,23 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
     }
     
+    public void resetShear(Boolean horiz) {
+        if (selectedElements.isEmpty() || passThruElement != null) 
+            return;
+                       
+        undoStack.saveContext(fields.zElements);
+
+        for (ZElement e : selectedElements) {
+            if (horiz)
+                e.setShearX(0.0);
+            else
+                e.setShearY(0.0);
+        }
+        
+        setLastMethod("resetShear", horiz);
+
+    }
+    
     /**
      * Flips the selected elements.
      * @param horiz if true, flips horizontal, else vertical
