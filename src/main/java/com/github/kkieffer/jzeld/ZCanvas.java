@@ -37,6 +37,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -121,6 +122,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
   
     
     private static final double ROTATION_MULTIPLIER = 1.0;
+    private static final double SHEAR_MULTIPLIER = 0.1;
     private static final double SIZE_INCREASE_MULTIPLIER = 0.5;
     private final static float SCALE = 72.0f;
 
@@ -202,10 +204,16 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private Cursor currentCursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
     
     private ZElement passThruElement = null;
+
+    private Point selectedObj_mousePoint;
     private int selectedObj_yOffset;
     private int selectedObj_xOffset;
+    private double selectedObj_xOffset_toRightCorner;
+    private double selectedObj_yOffset_toRightCorner;
+
     private Point mouseIn;
     private boolean selectedElementResizeOn = false;
+    private Rectangle2D selectedResizeElementOrigDim;
     private ZElement selectedResizeElement = null;
     private ZElement lastSelectedElement;
 
@@ -220,6 +228,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private DrawClient drawClient = null;
     
     private boolean shiftPressed = false;
+    private boolean shearXPressed = false;
+    private boolean shearYPressed = false;
     private Point2D selectedMouseDrag;
     private Point mouseDrag;
     private Point mousePress;
@@ -301,6 +311,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "Minus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, KeyEvent.SHIFT_DOWN_MASK), "ShiftPressed");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 0, true), "ShiftReleased");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.ALT_DOWN_MASK), "A_AltPressed");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ALT, 0, true), "AltReleased");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.ALT_DOWN_MASK), "S_AltPressed");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), "MoveLeft");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK), "MoveRight");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK), "MoveUp");
@@ -334,6 +347,25 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             @Override
             public void actionPerformed(ActionEvent e) {
                 shiftPressed = false;
+            }
+        });
+        am.put("A_AltPressed", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                shearXPressed = true;
+            }
+        });
+        am.put("S_AltPressed", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                shearYPressed = true;
+            }
+        });
+        am.put("AltReleased", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                shearYPressed = false;
+                shearXPressed = false;
             }
         });
         am.put("MoveLeft", new AbstractAction(){
@@ -1298,8 +1330,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             AffineTransform t = g2d.getTransform();
             g2d.translate(r.x + r.width/2, r.y + r.height/2);  //translate to the center of the element
             g2d.rotate(Math.toRadians(o.getRotation()));  //rotate
+            g2d.shear(o.getShearX(), o.getShearY());
             g2d.translate(-r.width/2, -r.height/2);  //translate so that 0,0 is the top left corner
-            
+                        
             if (!highlightSelectedOnly) {  //paint the element
                 o.paint(g2d, (int)SCALE, r.width<0 ? getScaledWidth() : r.width, r.height<0 ? getScaledHeight() : r.height);      
             }
@@ -1506,7 +1539,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
             Rectangle r = selectedElement.getBounds(SCALE);  //find the location and bounds of the selected element
 
-            AffineTransform t = AffineTransform.getRotateInstance(Math.toRadians(selectedElement.getRotation()), r.x + r.width/2, r.y + r.height/2);
+            //AffineTransform t = AffineTransform.getRotateInstance(Math.toRadians(selectedElement.getRotation()), r.x + r.width/2, r.y + r.height/2);
+            AffineTransform t = selectedElement.getElementTransform(SCALE, false);
             Point2D tMouse = t.transform(selectedMouseDrag, null);   
             
             //Draw crosshair
@@ -1604,10 +1638,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                           
             Rectangle boundsBox = o.getBounds(SCALE);
 
+            Point upperLeftCorner = new Point(boundsBox.x, boundsBox.y);
             Point lowerRightCorner = new Point(boundsBox.x + boundsBox.width, boundsBox.y + boundsBox.height);
             AffineTransform t = o.getElementTransform(SCALE, false);
             Shape s = t.createTransformedShape(boundsBox);
             Point2D lowerRightTransformed = t.transform(lowerRightCorner, null);  //also transform the lower right corner
+            Point2D upperLeftTransformed = t.transform(upperLeftCorner, null);  //also transform the upper left corner
       
             if (s.contains(mouseLoc)) {  //see if the mouse point is in the shape
                 
@@ -1630,13 +1666,20 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                     l.elementSelected(o);
        
                 Point location = o.getPosition(SCALE);  //get the upper left, find the mouse offset from the upper left
+                
+                selectedObj_mousePoint = mouseLoc;
+                
                 selectedObj_xOffset = mouseLoc.x - location.x;
                 selectedObj_yOffset = mouseLoc.y - location.y;
-    
+                
+                selectedObj_xOffset_toRightCorner = lowerRightTransformed.getX() - mouseLoc.x;
+                selectedObj_yOffset_toRightCorner = lowerRightTransformed.getY() - mouseLoc.y;
+                
                 //Check if the mouse was within the drag box
                 if (o.isResizable() && lowerRightTransformed.distance(mouseLoc)/pixScale < DRAG_BOX_SIZE) { 
                     selectedElementResizeOn = true;
                     selectedResizeElement = o;
+                    selectedResizeElementOrigDim = selectedResizeElement.getBounds2D(SCALE);
                 }
                 else {
                     selectedElementResizeOn = false;         
@@ -1879,39 +1922,35 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                     selectedMouseDrag = new Point2D.Double((mouseLoc.x - selectedObj_xOffset), (mouseLoc.y - selectedObj_yOffset));  
                 }
             } else { //Resize the object
+                    
                 
-                
-                double theta = Math.toRadians(selectedResizeElement.getRotation());
+                //move mouse and originally selected point to base coordinates
+                AffineTransform t = selectedResizeElement.getElementTransform(1, true);  //pix scale
+                Point2D mouseT = t.transform(mouseLoc, null);
+                Point2D selectT = t.transform(selectedObj_mousePoint, null);
 
-                Rectangle boundsBox = selectedResizeElement.getBounds(SCALE);
-                                
-                //Create a transform that will rotate the shape to the coordinates where it lies
-                AffineTransform t = AffineTransform.getRotateInstance(theta, boundsBox.x + boundsBox.width/2, boundsBox.y + boundsBox.height/2);
+                //calculate difference
+                double xDiff = mouseT.getX() - selectT.getX();
+                double yDiff = mouseT.getY() - selectT.getY();
+                  
+                //apply difference to find new width/height, and resize
+                double newWidth = selectedResizeElementOrigDim.getWidth() + xDiff;
+                double newHeight = selectedResizeElementOrigDim.getHeight() + yDiff;
+                selectedResizeElement.changeSize(newWidth, newHeight, DRAG_BOX_SIZE, SCALE);
 
-                //Find the upper left corner
-                Point2D upperleftCorner = t.transform(new Point(boundsBox.x, boundsBox.y), null);
-                 
-                //Find the new center, based on the new width and height (from mouse)
-                double centerX = upperleftCorner.getX() + ((mouseLoc.getX()-upperleftCorner.getX())/2);
-                double centerY = upperleftCorner.getY() + ((mouseLoc.getY()-upperleftCorner.getY())/2);
+                //Get the transformed position of the lower right coordinate
+                t = selectedResizeElement.getElementTransform(SCALE, false);
+                Rectangle2D bounds = selectedResizeElement.getBounds(SCALE);
+                Point2D lowerRightT = t.transform(new Point2D.Double(bounds.getX() + bounds.getWidth(), bounds.getY() + bounds.getHeight()), null);
                 
-                                
-                //Now transform back to zero rotation
-                t = AffineTransform.getRotateInstance(-theta, centerX, centerY);
+                //Find the amount to move in order to keep the drag box co-located with the mouse point
+                double xMove = mouseLoc.getX() - lowerRightT.getX() + selectedObj_xOffset_toRightCorner;
+                double yMove = mouseLoc.getY() - lowerRightT.getY() + selectedObj_yOffset_toRightCorner;
+                                System.out.println(xMove + ", " + yMove);
 
-                //Find the new upper left corner
-                Point2D newLeftCorner = t.transform(upperleftCorner, null);
-                
-                //Find the new lower right corner
-                Point2D newMouse = t.transform(mouseLoc, null);
-                Point2D newLowerRight = new Point2D.Double(newMouse.getX() - newLeftCorner.getX(), newMouse.getY() - newLeftCorner.getY());
-                
-                     
-                
-                //Set the new bounds box
-                selectedResizeElement.reposition(newLeftCorner.getX()/SCALE, newLeftCorner.getY()/SCALE);
-                selectedResizeElement.changeSize(newLowerRight.getX(), newLowerRight.getY(), DRAG_BOX_SIZE, SCALE);
-               
+                //move the shape 
+                selectedResizeElement.move(xMove/SCALE, yMove/SCALE, this.getScaledWidth()/SCALE, this.getScaledHeight()/SCALE);
+
             }
                         
             lastMethod = null;                 
@@ -1947,12 +1986,18 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             }
             
             for (ZElement selectedElement : selectedElements) {
-                if (!shiftPressed) {
+                if (!shiftPressed && !shearXPressed && !shearYPressed) {
                     double increase = e.getPreciseWheelRotation() * SIZE_INCREASE_MULTIPLIER;
                     selectedElement.increaseSize(increase, increase, DRAG_BOX_SIZE, SCALE);
                 }
-                else {       
+                else if (shiftPressed && !shearXPressed && !shearYPressed) {       
                     selectedElement.rotate(e.getPreciseWheelRotation() * ROTATION_MULTIPLIER);
+                }
+                else if (shearXPressed) {
+                    selectedElement.shearX(e.getPreciseWheelRotation() * SHEAR_MULTIPLIER);
+                }
+                else if (shearYPressed) {
+                    selectedElement.shearY(e.getPreciseWheelRotation() * SHEAR_MULTIPLIER);
                 }
             }
             

@@ -42,6 +42,8 @@ public abstract class ZElement implements Serializable {
     private Rectangle2D.Double bounds; 
     private Point2D.Double position;
     private double rotation;  //degrees
+    private double shearX; //ratio
+    private double shearY; 
     private boolean canSelect;
     private boolean resizable;
     private boolean canMove;
@@ -89,6 +91,8 @@ public abstract class ZElement implements Serializable {
         this.bounds = new Rectangle2D.Double(src.bounds.x, src.bounds.y, src.bounds.width, src.bounds.height);
         this.position = new Point2D.Double(src.position.x, src.position.y);
         this.rotation = src.rotation;
+        this.shearX = src.shearX;
+        this.shearY = src.shearY;
         this.canSelect = src.canSelect;
         this.resizable = src.resizable;
         this.canMove = src.canMove;
@@ -103,6 +107,8 @@ public abstract class ZElement implements Serializable {
                (canMove ? "Move the element by selecting it and dragging it to the new position.<br><br>" : "") +
                (resizable ? "Resize the element, maintaining its aspect ratio, by selecting it and using the mouse wheel.<br><br>" : "") +
                "Rotate the element by selecting it and using the mouse wheel while holding Shift. Rotations to 90 degree positions are available in the right-click context menu.<br><br>" +
+               "Shear the element horizontally by selecting it and using the mouse wheel while pressing keys Alt-A.<br><br>" +
+               "Shear the element vertically by selecting it and using the mouse wheel while pressing keys Alt-S.<br><br>" +
                (flipHoriz || flipVert ? "Flip the element horizontally or vertically by right-clicking and selecting from the context menu.<br><br>" : "") +
                "Adjust element attributes by by right-clicking and selecting from the context menu.<br><br>" +
                "The Z-plane order can be adjusted by right-clicking and selecting from the context menu.<br><br>";
@@ -297,6 +303,26 @@ public abstract class ZElement implements Serializable {
         hasChanges = true;
     }
     
+    public void shearX(double s) {
+        shearX += s;
+        hasChanges = true;
+    }
+    
+    
+    public void shearY(double d) {
+        shearY += d;
+        hasChanges = true;
+    }
+
+    public double getShearX() {
+        return shearX;
+    }
+    
+    public double getShearY() {
+        return shearY;
+    }
+    
+    
     /**
      * Reposition top left corner of the element 
      * @param x position in units
@@ -439,8 +465,15 @@ public abstract class ZElement implements Serializable {
     public final AffineTransform getElementTransform(double scale, boolean toBase) {
         Rectangle2D boundsBox = getBounds(scale);
 
-        //Rotate the shape if needed
-        AffineTransform t = AffineTransform.getRotateInstance((toBase ? -1 : 1) * Math.toRadians(getRotation()), boundsBox.getX() + boundsBox.getWidth()/2, boundsBox.getY() + boundsBox.getHeight()/2);
+        double x = boundsBox.getX() + boundsBox.getWidth()/2; 
+        double y = boundsBox.getY() + boundsBox.getHeight()/2;
+        
+        //Translate to center
+        AffineTransform t = AffineTransform.getTranslateInstance(x, y);
+        t.rotate((toBase ? -1 : 1) * Math.toRadians(getRotation()));        
+        t.shear((toBase ? -1 : 1) * shearX, (toBase ? -1 : 1) * shearY);
+        t.translate(-x, -y);
+                
         return t;
     }
     
@@ -520,7 +553,7 @@ public abstract class ZElement implements Serializable {
     public void mouseEvent(ZCanvas canvas, MouseEvent e) {}
 
 
+
     
-        
-    
+          
 }
