@@ -83,8 +83,8 @@ public class ZShape extends ZAbstractShape {
         this.shape = s;
     }
     
-    protected ZShape(ZShape src) {
-        super(src);
+    protected ZShape(ZShape src, boolean forNew) {
+        super(src, forNew);
         
         try {
             //Make a copy of the shape
@@ -97,8 +97,8 @@ public class ZShape extends ZAbstractShape {
     
 
     @Override
-    public ZShape copyOf() {
-        return new ZShape(this);
+    public ZShape copyOf(boolean forNew) {
+        return new ZShape(this, forNew);
     }
     
     
@@ -115,7 +115,7 @@ public class ZShape extends ZAbstractShape {
     
     @Override
     protected Shape getAbstractShape() {
-        ZShape copy = copyOf();
+        ZShape copy = copyOf(false);
         return copy.shape;
     }
     

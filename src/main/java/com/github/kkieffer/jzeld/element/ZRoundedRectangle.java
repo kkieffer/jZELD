@@ -51,8 +51,8 @@ public class ZRoundedRectangle extends ZRectangle {
     }
     
     
-    public ZRoundedRectangle(ZRoundedRectangle copy) {
-        super(copy);
+    public ZRoundedRectangle(ZRoundedRectangle copy, boolean forNew) {
+        super(copy, forNew);
         this.radius = copy.radius;
     }
     
@@ -67,8 +67,8 @@ public class ZRoundedRectangle extends ZRectangle {
     }
     
     @Override
-    public ZRoundedRectangle copyOf() {
-        return new ZRoundedRectangle(this);
+    public ZRoundedRectangle copyOf(boolean forNew) {
+        return new ZRoundedRectangle(this, forNew);
     }
     
     /**

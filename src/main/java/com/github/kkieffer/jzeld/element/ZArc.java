@@ -82,8 +82,8 @@ public class ZArc extends ZRectangle {
         this.type = arcType;
     }
     
-    public ZArc(ZArc copy) {
-        super(copy);
+    public ZArc(ZArc copy, boolean forNew) {
+        super(copy, forNew);
         this.startAngle = copy.startAngle;
         this.arcAngle = copy.arcAngle;
         this.type = copy.type;
@@ -100,8 +100,8 @@ public class ZArc extends ZRectangle {
     }
     
     @Override
-    public ZRectangle copyOf() {
-        return new ZArc(this);
+    public ZRectangle copyOf(boolean forNew) {
+        return new ZArc(this, forNew);
     }
     
     @Override

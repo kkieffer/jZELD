@@ -13,6 +13,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
+import java.util.UUID;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -51,6 +52,8 @@ public abstract class ZElement implements Serializable {
     protected boolean flipHoriz = false;
     protected boolean flipVert = false;
     
+    private UUID uuid;  //immutable
+    
     @XmlAttribute(name = "class")
     private String className;  //needed to reload subclasses by classname
     
@@ -78,6 +81,9 @@ public abstract class ZElement implements Serializable {
         this.canMove = moveable;
         this.className = this.getClass().getName();
         this.name = this.getClass().getSimpleName();
+        
+        this.uuid = UUID.randomUUID();
+        
     }
     
     protected ZElement() {
@@ -85,8 +91,12 @@ public abstract class ZElement implements Serializable {
     }
     
     
-    
-    protected ZElement(ZElement src) {
+    /**
+     * Create a copy of the element from another.
+     * @param src the source of the copy    
+     * @param forNew true if the element is for a true copy, false if it is for saving for later restoration (such as undo, grouping)
+     */
+    protected ZElement(ZElement src, boolean forNew) {
         
         this.bounds = new Rectangle2D.Double(src.bounds.x, src.bounds.y, src.bounds.width, src.bounds.height);
         this.position = new Point2D.Double(src.position.x, src.position.y);
@@ -100,7 +110,16 @@ public abstract class ZElement implements Serializable {
         flipHoriz = src.flipHoriz;
         flipVert = src.flipVert;
         className = src.className;
+        
+        if (forNew)
+            this.uuid = UUID.randomUUID();  //new one 
+        else
+            this.uuid = src.uuid;
     } 
+    
+    public UUID getUUID() {
+        return this.uuid;
+    }
     
     public String getHtmlHelp() {
         return (resizable ? "Resize the element by clicking and dragging the resize box in the lower right corner.<br><br>" : "") +
@@ -115,7 +134,7 @@ public abstract class ZElement implements Serializable {
         
     }
     
-    public abstract ZElement copyOf();
+    public abstract ZElement copyOf(boolean forNew);
    
     /**
      * Call this after saving an element to permanent storage. This marks the "hasChanges" flag to false, and hasChanges() will return false
@@ -464,6 +483,18 @@ public abstract class ZElement implements Serializable {
     public final Point2D getPosition() {
         return new Point2D.Double(position.x, position.y);
     }
+    
+    /**
+     * Return the transformed center point of the element
+     * @param scale the scale of pixels per unit
+     * @return 
+     */
+    public final Point2D getCenterPosition(double scale) {
+        Rectangle2D bounds = getBounds2D(scale);
+        Point2D.Double center = new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
+        return getElementTransform(scale, false).transform(center, null);
+    }
+    
     
     /**
      * Get the transform that describes how this element is rotated

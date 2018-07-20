@@ -50,8 +50,8 @@ public class ZImage extends ZRectangle {
         image = new SerializableImage(img);
     }
     
-    public ZImage(ZImage copy) {
-        super(copy);
+    public ZImage(ZImage copy, boolean forNew) {
+        super(copy, forNew);
         this.flipHoriz = copy.flipHoriz;
         this.flipVert = copy.flipVert;
         
@@ -60,8 +60,8 @@ public class ZImage extends ZRectangle {
     }
     
     @Override
-    public ZImage copyOf() {
-        return new ZImage(this);
+    public ZImage copyOf(boolean forNew) {
+        return new ZImage(this, forNew);
     }
     
     @Override

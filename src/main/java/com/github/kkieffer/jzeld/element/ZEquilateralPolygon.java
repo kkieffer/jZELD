@@ -52,14 +52,14 @@ public class ZEquilateralPolygon extends ZPolygon {
     }
     
     
-    public ZEquilateralPolygon(ZEquilateralPolygon copy) {
-        super(copy);
+    public ZEquilateralPolygon(ZEquilateralPolygon copy, boolean forNew) {
+        super(copy, forNew);
         this.sides = copy.sides;
     }
     
     @Override
-    public ZEquilateralPolygon copyOf() {
-        return new ZEquilateralPolygon(this);
+    public ZEquilateralPolygon copyOf(boolean forNew) {
+        return new ZEquilateralPolygon(this, forNew);
     }
     
     @Override

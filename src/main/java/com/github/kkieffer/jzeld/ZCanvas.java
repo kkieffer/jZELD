@@ -37,7 +37,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -53,6 +52,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.UUID;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
@@ -501,9 +501,21 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         return fields.unit;
     }
     
+    /**
+     * Register an event listener with the canvas.  When an element is selected or other actions occur, the listener is notified.
+     * @param l the listener to register, if already registered, fails silently
+     */
     public void registerSelectListener(ZCanvasEventListener l) {
         if (!selectListeners.contains(l))
             selectListeners.add(l);
+    }
+    
+    /**
+     * Deregisters an event listener 
+     * @param l the listener to deregister, if not registered, fails silently
+     */
+    public void deRegisterSelectListener(ZCanvasEventListener l) {
+        selectListeners.remove(l);
     }
     
     
@@ -1207,6 +1219,38 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
+     * Search all the elements on the canvas for the matching UUID
+     * @param id the UUID of the element to find
+     * @return the found element, or null if not found
+     */
+    public ZElement getElementByUUID(UUID id) {
+        for (ZElement e : fields.zElements) {
+            if (e.getUUID().compareTo(id) == 0) //match
+                return e;
+        }
+        return null;
+    }
+    
+    
+    /**
+     * Return all the elements that are instances of the classType.
+     * @param classType the classType to match, elements must be equal, subclasses of, or implement the classType
+     * @return 
+     */
+    public ZElement[] getElementsByClass(Class<? extends ZElement> classType) {
+        
+        ArrayList<ZElement> list = new ArrayList<>();
+        for (ZElement e : fields.zElements) {
+            if (classType.isAssignableFrom(e.getClass())) {
+                list.add(e);
+            }
+        }
+        ZElement[] array = new ZElement[list.size()];
+        list.toArray(array);
+        return array;
+    }
+    
+    /**
      * Returns the currently selected elements
      * @return the selected elements, or null if nothing is currently selected
      */
@@ -1235,8 +1279,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             clipboard = new ZElement[selectedElements.size()];
             ZElement[] externalCopy = new ZElement[selectedElements.size()];
             for (int i=0; i<clipboard.length; i++) {
-                clipboard[i] = selectedElements.get(i).copyOf();
-                externalCopy[i] = selectedElements.get(i).copyOf();
+                clipboard[i] = selectedElements.get(i).copyOf(true);
+                externalCopy[i] = selectedElements.get(i).copyOf(true);
             }
             
             lastMethod = null;
@@ -1288,7 +1332,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         e.move(0.2, 0.2, this.getScaledWidth()/SCALE, this.getScaledHeight()/SCALE);  //move slighty down to distinguish from original
         
-        ZElement toPaste = e.copyOf();  //make a copy to paste, for multiple pastes
+        ZElement toPaste = e.copyOf(true);  //make a copy to paste, for multiple pastes
         
         addElement(toPaste);
         selectedElements.add(toPaste);  //select the pasted element
@@ -2270,7 +2314,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     public BufferedImage printElementToImage(ZElement e) {
         
-        e = e.copyOf();  //make a copy
+        e = e.copyOf(true);  //make a copy
         int pixelsOut = (int)((e.getOutlineWidth()/2 + 1) * pixScale);
         
         e.reposition(0, 0); //no offset (not on canvas, painting to image

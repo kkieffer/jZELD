@@ -51,13 +51,13 @@ public class ZLine extends ZAbstractShape {
   
     }
     
-    public ZLine(ZLine copy) {
-        super(copy);
+    public ZLine(ZLine copy, boolean forNew) {
+        super(copy, forNew);
     }
     
     @Override
-    public ZElement copyOf() {
-        return new ZLine(this);
+    public ZElement copyOf(boolean forNew) {
+        return new ZLine(this, forNew);
     }
     
     @Override

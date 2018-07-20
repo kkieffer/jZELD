@@ -40,7 +40,7 @@ public final class ZGrid extends ZLine {
     }
     
     @Override
-    public ZElement copyOf() {
+    public ZElement copyOf(boolean forNew) {
         return this;
     }
     

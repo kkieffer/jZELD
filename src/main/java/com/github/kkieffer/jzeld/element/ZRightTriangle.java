@@ -22,13 +22,13 @@ public class ZRightTriangle extends ZAbstractTriangle {
         super(TriType.RIGHT, x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);
     }
     
-    protected ZRightTriangle(ZRightTriangle copy) {
-        super(copy);    
+    protected ZRightTriangle(ZRightTriangle copy, boolean forNew) {
+        super(copy, forNew);    
     }
     
     @Override
-    public ZRightTriangle copyOf() {
-        return new ZRightTriangle(this);
+    public ZRightTriangle copyOf(boolean forNew) {
+        return new ZRightTriangle(this, forNew);
     }
     
 }

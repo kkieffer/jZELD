@@ -47,8 +47,8 @@ public class ZRectangle extends ZAbstractShape {
         super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);        
     }
     
-    protected ZRectangle(ZRectangle src) {
-        super(src);
+    protected ZRectangle(ZRectangle src, boolean forNew) {
+        super(src, forNew);
     }
     
     
@@ -69,8 +69,8 @@ public class ZRectangle extends ZAbstractShape {
 
     
     @Override
-    public ZRectangle copyOf() {
-        return new ZRectangle(this);
+    public ZRectangle copyOf(boolean forNew) {
+        return new ZRectangle(this, forNew);
     }
     
     

@@ -46,8 +46,8 @@ public abstract class ZAbstractShape extends ZElement {
         hasChanges = false;
     }
     
-    protected ZAbstractShape(ZAbstractShape src) {
-        super(src);
+    protected ZAbstractShape(ZAbstractShape src, boolean forNew) {
+        super(src, forNew);
         setAttributes(src.borderThickness, src.borderColor, src.dashPattern, src.backgroundColor);
         paintAttr = src.paintAttr == null ? null : new PaintAttributes(src.paintAttr);
         hasChanges = false;

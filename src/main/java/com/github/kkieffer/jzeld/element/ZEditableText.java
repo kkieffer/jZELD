@@ -176,8 +176,8 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
 
     }
     
-    protected ZEditableText(ZEditableText copy) {
-        super(copy);
+    protected ZEditableText(ZEditableText copy, boolean forNew) {
+        super(copy, forNew);
         
         textPanel = new JPanel();
         textWidget = new JTextPane();
@@ -192,9 +192,9 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
 
     }
     
-     @Override
-    public ZEditableText copyOf() {
-        return new ZEditableText(this);
+    @Override
+    public ZEditableText copyOf(boolean forNew) {
+        return new ZEditableText(this, forNew);
     }
     
     

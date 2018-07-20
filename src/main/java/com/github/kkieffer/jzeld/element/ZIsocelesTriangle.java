@@ -22,13 +22,13 @@ public class ZIsocelesTriangle extends ZAbstractTriangle {
         super(TriType.ISOCELES, x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);
     }
     
-    protected ZIsocelesTriangle(ZIsocelesTriangle copy) {
-        super(copy);    
+    protected ZIsocelesTriangle(ZIsocelesTriangle copy, boolean forNew) {
+        super(copy, forNew);    
     }
     
     @Override
-    public ZIsocelesTriangle copyOf() {
-        return new ZIsocelesTriangle(this);
+    public ZIsocelesTriangle copyOf(boolean forNew) {
+        return new ZIsocelesTriangle(this, forNew);
     }
     
 }

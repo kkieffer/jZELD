@@ -38,8 +38,8 @@ public abstract class ZAbstractTriangle extends ZPolygon {
         type = t;
     }
     
-    protected ZAbstractTriangle(ZAbstractTriangle copy) {
-        super(copy);
+    protected ZAbstractTriangle(ZAbstractTriangle copy, boolean forNew) {
+        super(copy, forNew);
         this.type = copy.type;
     }
     

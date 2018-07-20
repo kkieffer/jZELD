@@ -44,7 +44,7 @@ public class UndoStack {
         LinkedList<ZElement> copy = new LinkedList<>();
         Iterator<ZElement> it = ctx.iterator();
         while (it.hasNext()) 
-            copy.addLast(it.next().copyOf());
+            copy.addLast(it.next().copyOf(false));
         
         undoHistory.addFirst(copy);  //push a copy to the stack
         

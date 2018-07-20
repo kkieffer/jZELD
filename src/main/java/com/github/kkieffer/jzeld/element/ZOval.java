@@ -46,13 +46,13 @@ public class ZOval extends ZRectangle {
         super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);
     }
     
-    public ZOval(ZOval copy) {
-        super(copy);
+    public ZOval(ZOval copy, boolean forNew) {
+        super(copy, forNew);
     }
     
     @Override
-    public ZOval copyOf() {
-        return new ZOval(this);
+    public ZOval copyOf(boolean forNew) {
+        return new ZOval(this, forNew);
     }
     
     @Override

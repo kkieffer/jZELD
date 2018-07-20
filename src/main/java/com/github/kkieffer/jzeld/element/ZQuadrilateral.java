@@ -61,8 +61,8 @@ public class ZQuadrilateral extends ZPolygon {
     }
     
     
-    public ZQuadrilateral(ZQuadrilateral copy) {
-        super(copy);
+    public ZQuadrilateral(ZQuadrilateral copy, boolean forNew) {
+        super(copy, forNew);
         this.type = copy.type;
         this.percent = copy.percent;
     }
@@ -79,8 +79,8 @@ public class ZQuadrilateral extends ZPolygon {
  
     
     @Override
-    public ZQuadrilateral copyOf() {
-        return new ZQuadrilateral(this);
+    public ZQuadrilateral copyOf(boolean forNew) {
+        return new ZQuadrilateral(this, forNew);
     }
     
     /**

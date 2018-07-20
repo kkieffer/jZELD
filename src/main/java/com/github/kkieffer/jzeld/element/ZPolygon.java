@@ -24,8 +24,8 @@ public abstract class ZPolygon extends ZAbstractShape {
     protected ZPolygon(){}
     
 
-    public ZPolygon(ZPolygon copy) {
-        super(copy);
+    public ZPolygon(ZPolygon copy, boolean forNew) {
+        super(copy, forNew);
     }
     
     public ZPolygon(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {

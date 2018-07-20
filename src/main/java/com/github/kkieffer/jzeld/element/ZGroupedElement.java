@@ -27,7 +27,7 @@ public final class ZGroupedElement extends ZElement {
      private static ArrayList<ZElement> copyElements(ArrayList<ZElement> src) {
         ArrayList<ZElement> copy = new ArrayList<>(src.size());
         for (int i=0; i<src.size(); i++) {
-            copy.add(src.get(i).copyOf());
+            copy.add(src.get(i).copyOf(false));  //not for copy - for grouping
         }
         return copy;
     }
@@ -75,15 +75,15 @@ public final class ZGroupedElement extends ZElement {
     
     private ZGroupedElement() {}
     
-    private ZGroupedElement(ZGroupedElement src) {
-        super(src);
+    private ZGroupedElement(ZGroupedElement src, boolean forNew) {
+        super(src, forNew);
         this.elements = copyElements(src.elements);
     }
     
     
     @Override
-    public ZGroupedElement copyOf() {
-        return new ZGroupedElement(this);
+    public ZGroupedElement copyOf(boolean forNew) {
+        return new ZGroupedElement(this, forNew);
     }
     
     
