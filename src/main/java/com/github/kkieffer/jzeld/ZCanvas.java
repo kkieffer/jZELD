@@ -50,6 +50,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.UUID;
@@ -107,13 +108,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     public enum Orientation {PORTRAIT, LANDSCAPE, REVERSE_LANDSCAPE}  //The ordinals conform to the PageFormat integer defines
    
-    public enum Alignment {Left_Edge, Top_Edge, Right_Edge, Bottom_Edge, Centered_Vertically, Centered_Horizontally;
+    public enum Alignment {Auto, Left_Edge, Top_Edge, Right_Edge, Bottom_Edge, Centered_Vertically, Centered_Horizontally;
         
         @Override
         public String toString() {
             String[] split = this.name().split("_");
           
-            return split[0] + " " + split[1];
+            return split[0] + " " + (split.length > 1 ? split[1] : "");
         }
     
     }
@@ -236,6 +237,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private Point2D selectedMousePress;
     private ZCanvasContextMenu contextMenu;
     
+    private final HashMap<UUID, ZElement> uuidMap = new HashMap<>();  //quick lookup of UUID 
+    
     private final ArrayList<ZCanvasEventListener> selectListeners = new ArrayList<>();
 
     //For restoration by JAXB
@@ -276,6 +279,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         undoStack = new UndoStack(fields.undoStackCount);
         canvasModified = false;
         
+        uuidMap.clear();
+        for (ZElement e : fields.zElements)  //add all the elements to the hash map
+            uuidMap.put(e.getUUID(), e);
+        
+        
         addMouseListener(this);	
         addMouseMotionListener(this);    
         addMouseWheelListener(this);
@@ -311,9 +319,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "Minus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, KeyEvent.SHIFT_DOWN_MASK), "ShiftPressed");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 0, true), "ShiftReleased");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.ALT_DOWN_MASK), "A_AltPressed");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ALT, 0, true), "AltReleased");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.ALT_DOWN_MASK), "S_AltPressed");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.ALT_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK), "S_AltShiftPressed");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), "MoveLeft");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK), "MoveRight");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK), "MoveUp");
@@ -349,13 +357,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 shiftPressed = false;
             }
         });
-        am.put("A_AltPressed", new AbstractAction(){
+        am.put("S_AltPressed", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 shearXPressed = true;
             }
         });
-        am.put("S_AltPressed", new AbstractAction(){
+        am.put("S_AltShiftPressed", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 shearYPressed = true;
@@ -837,10 +845,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         undoStack.saveContext(fields.zElements);
         
         ZElement key = selectedElements.get(0);
+        ZElement key2 = key;
         for (ZElement e : selectedElements) {  //loop through elements, looking for the key - closest to the edge
             
             Rectangle p = e.getBounds(SCALE);
             Rectangle k = key.getBounds(SCALE);
+            Rectangle k2 = key2.getBounds(SCALE);
             
             switch (atype) {
                 case Left_Edge:
@@ -861,11 +871,39 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                     if (p.getY() + p.getHeight() > k.getY() + k.getHeight())
                         key = e;
                     break;
+                case Auto:
+                    if (p.getX() < k.getX())  //vert
+                        key = e;
+                    if (p.getY() < k.getY())  //horiz
+                        key2 = e;
+                    break;
             }  
         }
+        
+        double minVert = 0;
+        double minHoriz = 0;
+        Rectangle k = key.getBounds(SCALE);  //vertical key
+        Rectangle k2 = key2.getBounds(SCALE); //horizontal key
+
+        if (atype == Alignment.Auto) {  //find the minimum
             
-        Rectangle k = key.getBounds(SCALE);  //must align all selected with this element
- 
+            for (ZElement e : selectedElements) {
+                Rectangle p = e.getBounds(SCALE);
+                minVert += Math.abs(k.getX() - p.getX());   //vert delta
+                minHoriz += Math.abs(k2.getY() - p.getY());  //horiz delta
+            }
+            
+            if (minVert < minHoriz) {
+                atype = Alignment.Centered_Vertically;  //already using this key
+            }
+            else {
+                atype = Alignment.Centered_Horizontally;
+                key = key2;
+            }
+        }
+            
+            
+             
         for (ZElement e : selectedElements) {
                     
             Rectangle p = e.getBounds(SCALE);
@@ -1101,13 +1139,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     /**
      * Adds an object to the canvas, on the top layer
-     * @param o object to add
+     * @param e object to add
      */
-    public void addElement(ZElement o) {
-        if (fields.zElements.contains(o))
+    public void addElement(ZElement e) {
+        if (fields.zElements.contains(e))
             throw new RuntimeException("Already contains object");
-        fields.zElements.addFirst(o);
-        o.addedTo(this);
+        fields.zElements.addFirst(e);
+        uuidMap.put(e.getUUID(), e);
+
+        e.addedTo(this);
 
         lastMethod = null;
         canvasModified = true;
@@ -1116,11 +1156,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     /**
      * Removes an object from the canvas
-     * @param o the object to remove, fails silently if not found
+     * @param e the object to remove, fails silently if not found
      */
-    public void removeElement(ZElement o) {
-        fields.zElements.remove(o);
-        o.removedFrom(this);
+    public void removeElement(ZElement e) {
+        if (!fields.zElements.remove(e))
+            return;
+            
+        uuidMap.remove(e.getUUID());
+        e.removedFrom(this);
     
         canvasModified = true;
 
@@ -1224,11 +1267,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @return the found element, or null if not found
      */
     public ZElement getElementByUUID(UUID id) {
-        for (ZElement e : fields.zElements) {
-            if (e.getUUID().compareTo(id) == 0) //match
-                return e;
-        }
-        return null;
+        return uuidMap.get(id);
     }
     
     
@@ -1351,6 +1390,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             e.removedFrom(this);
         
         fields.zElements.clear();
+        uuidMap.clear();
         repaint();
  
     }
@@ -1370,6 +1410,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         while (it.hasNext()) {
             ZElement s = it.next();
             fields.zElements.remove(s);
+            uuidMap.remove(s);
             s.removedFrom(this);
             it.remove();
         }
@@ -1392,12 +1433,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             g2d.rotate(Math.toRadians(o.getRotation()));  //rotate
             g2d.shear(o.getShearX(), o.getShearY());
             g2d.translate(-r.width/2, -r.height/2);  //translate so that 0,0 is the top left corner
-                        
+            
             if (!highlightSelectedOnly) {  //paint the element
                 o.paint(g2d, (int)SCALE, r.width<0 ? getScaledWidth() : r.width, r.height<0 ? getScaledHeight() : r.height);      
             }
                       
-            if (selectedElements.contains(o) && highlightSelectedOnly) {  //highlight selected element, just outside its boundaries
+            if (selectedElements.contains(o) && highlightSelectedOnly && r.width > 0 && r.height > 0) {  //highlight selected element, just outside its boundaries
                 g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke((int)(1.0f * pixScale), CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
                 int pixelsOut = (int)((o.getOutlineWidth()/2 + 1) * pixScale);

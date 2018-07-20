@@ -20,7 +20,9 @@ to become familiar with the operations of a ZCanvas is to run the included Demo 
 5.  Resize selected ZElements using the mouse wheel
 6.  Move the selected ZElements with the arrow keys while holding Shift down
 7.  Rotate selected ZElements using the mouse wheel while holding Shift down
-8.  Zoom in/out the ZCanvas with the +/- keys
+8.  Shear selected ZElements in the x-direction using the mouse wheel while holding ALT-S down
+9.  Shear selected ZElements in the y-direction using the mouse wheel while holding ALT-SHIFT-S down
+10.  Zoom in/out the ZCanvas with the +/- keys
 
 The ZCanvas supports other operations that can be invoked by shortcut keys, menu items, or programmatically.  The 
 Demo illustrates these using keys and right-click context menus.  The framework provides a default set of hotkeys and an optional

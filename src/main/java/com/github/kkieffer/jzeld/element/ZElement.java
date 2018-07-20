@@ -126,8 +126,8 @@ public abstract class ZElement implements Serializable {
                (canMove ? "Move the element by selecting it and dragging it to the new position, or hold Shift while using the arrow keys.<br><br>" : "") +
                (resizable ? "Resize the element, maintaining its aspect ratio, by selecting it and using the mouse wheel.<br><br>" : "") +
                "Rotate the element by selecting it and using the mouse wheel while holding Shift. Rotations to 90 degree positions are available in the right-click context menu.<br><br>" +
-               "Shear the element horizontally by selecting it and using the mouse wheel while pressing keys Alt-A.<br><br>" +
-               "Shear the element vertically by selecting it and using the mouse wheel while pressing keys Alt-S.<br><br>" +
+               "Shear the element horizontally by selecting it and using the mouse wheel while pressing keys Alt-S.<br><br>" +
+               "Shear the element vertically by selecting it and using the mouse wheel while pressing keys Alt-Shift-S.<br><br>" +
                (flipHoriz || flipVert ? "Flip the element horizontally or vertically by right-clicking and selecting from the context menu.<br><br>" : "") +
                "Adjust element attributes by by right-clicking and selecting from the context menu.<br><br>" +
                "The Z-plane order can be adjusted by right-clicking and selecting from the context menu.<br><br>";
