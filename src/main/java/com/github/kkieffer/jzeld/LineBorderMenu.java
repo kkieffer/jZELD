@@ -114,7 +114,7 @@ public class LineBorderMenu extends JMenu {
     
     private final ZCanvas canvas;
     
-    LineBorderMenu(String text, ZCanvas canvas, Type type) {
+    public LineBorderMenu(String text, ZCanvas canvas, Type type) {
         super(text);
         this.canvas = canvas;
 

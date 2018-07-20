@@ -19,7 +19,7 @@ import javax.swing.JMenuItem;
  */
 public class ColorMenuItem extends JMenuItem {
      
-    static enum Type {LINE, FILL}
+    public static enum Type {LINE, FILL}
     
     private static final ImageIcon colorIcon;
     

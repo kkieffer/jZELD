@@ -5,7 +5,6 @@ import com.github.kkieffer.jzeld.ZCanvas.CombineOperation;
 import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.PopupMenu;
 import java.util.ArrayList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -42,8 +41,8 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
     protected JMenu alignMenu;
     protected JPopupMenu contextPopupMenu;
     private final JMenu combineMenu;
-    private JMenuItem resetVerticalShearMenuItem;
-    private JMenuItem resetHorizontalShearMenuItem;
+    private final JMenuItem resetVerticalShearMenuItem;
+    private final JMenuItem resetHorizontalShearMenuItem;
     private final JMenu shearMenu;
     
     
