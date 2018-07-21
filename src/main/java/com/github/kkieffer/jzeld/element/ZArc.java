@@ -146,9 +146,14 @@ public class ZArc extends ZRectangle {
     public ArcType getArcType() {
         return type;
     }
+    
+     @Override
+    public boolean supportsEdit() {
+        return true;
+    };
 
     @Override
-    public boolean selected(ZCanvas canvas) {
+    public boolean selectedForEdit(ZCanvas canvas) {
         
         dialog = new ArcDialog(this);
         dialog.setLocationRelativeTo(canvas);
@@ -158,7 +163,7 @@ public class ZArc extends ZRectangle {
     }
     
       @Override
-    public void deselected() {
+    public void deselectedForEdit() {
         
         if (dialog != null) {
             dialog.dispose();
@@ -168,7 +173,7 @@ public class ZArc extends ZRectangle {
     
     @Override
     public void removedFrom(ZCanvas canvas) {
-        deselected();
+        deselectedForEdit();
     }
 
      @Override

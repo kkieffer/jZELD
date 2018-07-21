@@ -80,9 +80,6 @@ public class ZOval extends ZRectangle {
     protected void drawShape(Graphics2D g, int unitSize, int width, int height) {
         g.drawOval(0, 0, width, height);
     }
-    
-  
-
-
+   
     
 }

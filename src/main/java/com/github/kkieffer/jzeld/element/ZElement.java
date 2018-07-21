@@ -121,6 +121,10 @@ public abstract class ZElement implements Serializable {
         return this.uuid;
     }
     
+    /**
+     * Return html formatted help about the Element.  Note: do not use <html> and </html> tags, as this will interfere with including superclass help.
+     * @return 
+     */
     public String getHtmlHelp() {
         return (resizable ? "Resize the element by clicking and dragging the resize box in the lower right corner.<br><br>" : "") +
                (canMove ? "Move the element by selecting it and dragging it to the new position, or hold Shift while using the arrow keys.<br><br>" : "") +
@@ -550,20 +554,25 @@ public abstract class ZElement implements Serializable {
      */
     public abstract boolean supportsFlip();
     
+    /**
+     * True if the element has properties than can be edited by double-clicking
+     * @return 
+     */
+    public abstract boolean supportsEdit();
     
     /**
      * When the element is double-click selected by the cursor, this method is called
      * @param canvas canvas where the click is coming from
      * @return true if the element has special functions when selected, false otherwise
      */
-    public boolean selected(ZCanvas canvas) {
+    public boolean selectedForEdit(ZCanvas canvas) {
         return false;
     }
 
     /**
      * When the element is deselected by the cursor, this method is called
      */
-    public void deselected() {}
+    public void deselectedForEdit() {}
 
     /**
      * When the element is added to a canvas, this method is called

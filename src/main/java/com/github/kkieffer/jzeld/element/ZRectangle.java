@@ -73,6 +73,10 @@ public class ZRectangle extends ZAbstractShape {
         return new ZRectangle(this, forNew);
     }
     
+    @Override
+    public boolean supportsEdit() {
+        return false;
+    };
     
     @Override
     protected Shape getAbstractShape() {

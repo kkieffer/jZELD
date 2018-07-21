@@ -117,6 +117,10 @@ public class ZImage extends ZRectangle {
         return false;     
     }
 
+    @Override
+    public boolean supportsEdit() {
+        return false;
+    };
   
     /**
      * Draw the image on the graphics. This allows subclass overriding to modify the image or change rendering

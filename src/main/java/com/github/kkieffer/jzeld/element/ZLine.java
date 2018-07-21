@@ -82,6 +82,10 @@ public class ZLine extends ZAbstractShape {
         return false;
     }
     
+    @Override
+    public boolean supportsEdit() {
+        return false;
+    };
 
     @Override
     protected void fillShape(Graphics2D g, int unitSize, int width, int height) {

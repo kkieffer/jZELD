@@ -1440,14 +1440,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                       
             if (selectedElements.contains(o) && highlightSelectedOnly && r.width > 0 && r.height > 0) {  //highlight selected element, just outside its boundaries
                 g2d.setColor(Color.BLACK);
-                g2d.setStroke(new BasicStroke((int)(1.0f * pixScale), CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
-                int pixelsOut = (int)((o.getOutlineWidth()/2 + 1) * pixScale);
+                g2d.setStroke(new BasicStroke(1.0f * (float)(pixScale/zoom), CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
+                int pixelsOut = (int)((o.getOutlineWidth()/2 + 1) * pixScale/zoom);
                 g2d.drawRect(-pixelsOut, -pixelsOut, r.width+pixelsOut*2, r.height+pixelsOut*2); 
                    
                 //draw drag box in the corner
                 if (o.isResizable()) {  
                     g2d.setColor(Color.BLACK);  
-                    g2d.fillRect(r.width-DRAG_BOX_SIZE, r.height-DRAG_BOX_SIZE, DRAG_BOX_SIZE, DRAG_BOX_SIZE);
+                    g2d.fillRect(r.width-(int)(DRAG_BOX_SIZE * pixScale/zoom), r.height-(int)(DRAG_BOX_SIZE * pixScale/zoom), (int)(DRAG_BOX_SIZE * pixScale/zoom), (int)(DRAG_BOX_SIZE * pixScale/zoom));
                 }
                                
             }
@@ -1477,7 +1477,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                         l.elementSelected(e);
         
                     if (passThru) {
-                        if (lastSelectedElement.selected(this))  //tell the element it was selected
+                        if (lastSelectedElement.selectedForEdit(this))  //tell the element it was selected
                             passThruElement = lastSelectedElement; 
                     }
                     
@@ -1566,7 +1566,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public void selectNone() {
         if (!selectedElements.isEmpty()) {
             for (ZElement s : selectedElements)
-                s.deselected();
+                s.deselectedForEdit();
             passThruElement = null;
         }
         selectedResizeElement = null;
@@ -1723,6 +1723,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
 
  
+    public void editElement() {
+        if (lastSelectedElement.selectedForEdit(this))  //tell the element it was selected
+           passThruElement = lastSelectedElement;  
+
+       undoStack.saveContext(fields.zElements);
+
+       lastMethod = null; 
+        selectedElementResizeOn = false;    
+
+    }
+    
     
     //Determine the selected object, if any, from the mouse pick.  If the object is selected, the upper left corner (transformed) is returned
     private void selectElement(MouseEvent e) {
@@ -1833,13 +1844,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         selectElement(e); //check to select an object
                          
         if (e.getClickCount() > 1 && lastSelectedElement != null) {  //Transfer control to the selected element
-
-            if (lastSelectedElement.selected(this))  //tell the element it was selected
-                passThruElement = lastSelectedElement;  
-
-            undoStack.saveContext(fields.zElements);
-
-            lastMethod = null;            
+            editElement();
         }
        
         selectedElementResizeOn = false;    

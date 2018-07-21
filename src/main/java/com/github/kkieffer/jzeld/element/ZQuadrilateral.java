@@ -94,9 +94,13 @@ public class ZQuadrilateral extends ZPolygon {
         hasChanges = true;
     }
      
+    @Override
+    public boolean supportsEdit() {
+        return true;
+    };
     
     @Override
-    public boolean selected(ZCanvas canvas) {
+    public boolean selectedForEdit(ZCanvas canvas) {
         
         if (type == QuadType.SQUARE) //square has no skew
             return false;

@@ -31,4 +31,9 @@ public class ZIsocelesTriangle extends ZAbstractTriangle {
         return new ZIsocelesTriangle(this, forNew);
     }
     
+    @Override
+    public boolean supportsEdit() {
+        return false;
+    };
+    
 }

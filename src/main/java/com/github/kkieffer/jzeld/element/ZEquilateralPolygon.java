@@ -83,9 +83,13 @@ public class ZEquilateralPolygon extends ZPolygon {
         hasChanges = true;
     }
      
+    @Override
+    public boolean supportsEdit() {
+        return true;
+    };
     
     @Override
-    public boolean selected(ZCanvas canvas) {
+    public boolean selectedForEdit(ZCanvas canvas) {
         
   
         String rc = (String)JOptionPane.showInputDialog(canvas, "Update Number of Sides", "Modify Equilateral Polygon", JOptionPane.QUESTION_MESSAGE, radiusIcon,

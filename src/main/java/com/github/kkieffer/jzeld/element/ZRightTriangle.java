@@ -27,6 +27,11 @@ public class ZRightTriangle extends ZAbstractTriangle {
     }
     
     @Override
+    public boolean supportsEdit() {
+        return false;
+    };
+    
+    @Override
     public ZRightTriangle copyOf(boolean forNew) {
         return new ZRightTriangle(this, forNew);
     }

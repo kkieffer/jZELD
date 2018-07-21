@@ -201,9 +201,9 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     @Override
     public String getHtmlHelp() {
         
-        return "<html><b>ZEditableText: </b>An editable text box.<br><br>Double click on the text box to show the cursor and edit text. If the size of the text box " +
+        return "<b>ZEditableText: </b>An editable text box.<br><br>Double click on the text box to show the cursor and edit text. If the size of the text box " +
                 "is too small to hold the text, it will be resized to fit. " + TextAttributes.getHtmlHelp() + "<br><br>" + 
-                "The text box background color can be set, along with the border color and thickness. A dashed border is not supported.<br><br>" + super.getHtmlHelp() + "</html>";
+                "The text box background color can be set, along with the border color and thickness. A dashed border is not supported.<br><br>" + super.getHtmlHelp();
         
     }
 
@@ -397,6 +397,12 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         return false;
     }
     
+    @Override
+    public boolean supportsEdit() {
+        return true;
+    };
+
+    
     /**
      * Determine if the user is actively editing this text (has focus and caret flashing)
      * @return true if the text is being edited, false otherwise
@@ -406,7 +412,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     }
     
     @Override
-    public boolean selected(ZCanvas canvas) {
+    public boolean selectedForEdit(ZCanvas canvas) {
         isSelected = true;
         canvas.setCurrentCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR)); 
         textWidget.requestFocusInWindow();  //show the caret, receive key presses
@@ -415,7 +421,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     }
     
     @Override
-    public void deselected() {
+    public void deselectedForEdit() {
         isSelected = false;
         textWidget.getParent().requestFocusInWindow(); //give away focus to remove caret
         timer.stop();

@@ -94,8 +94,8 @@ public final class ZGroupedElement extends ZElement {
         for (ZElement e : elements)
             group += e.getClass().getSimpleName() + "<br>";
         
-        return "<html><b>ZGroupedElement: </b>This is a group of multiple elements that can be moved and rotated together.<br><br>" +
-                "This group contains the following elements: <br>" + group + "</html>";
+        return "<b>ZGroupedElement: </b>This is a group of multiple elements that can be moved and rotated together.<br><br>" +
+                "This group contains the following elements: <br>" + group;
    
     }
     
@@ -119,6 +119,10 @@ public final class ZGroupedElement extends ZElement {
         return copy;
     }
     
+    @Override
+    public boolean supportsEdit() {
+        return false;
+    };
 
     @Override
     public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {

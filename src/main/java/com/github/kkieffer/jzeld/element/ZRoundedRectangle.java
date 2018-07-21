@@ -87,8 +87,13 @@ public class ZRoundedRectangle extends ZRectangle {
         return new RoundRectangle2D.Double(0, 0, r.getWidth(), r.getHeight(), radius*2, radius*2);
     }
     
+     @Override
+    public boolean supportsEdit() {
+        return true;
+    };
+    
     @Override
-    public boolean selected(ZCanvas canvas) {
+    public boolean selectedForEdit(ZCanvas canvas) {
         
         
         

@@ -169,6 +169,11 @@ public class ZShape extends ZAbstractShape {
     }
     
     @Override
+    public boolean supportsEdit() {
+        return false;
+    };
+    
+    @Override
     public void flipHorizontal() {
         Rectangle2D bounds = getBounds2D();
         AffineTransform scaleInstance = AffineTransform.getScaleInstance(-1.0, 1.0);  //scaling negative creates a mirror image the other direction
