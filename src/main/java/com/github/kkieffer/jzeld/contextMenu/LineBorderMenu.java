@@ -1,6 +1,7 @@
 
-package com.github.kkieffer.jzeld;
+package com.github.kkieffer.jzeld.contextMenu;
 
+import com.github.kkieffer.jzeld.ZCanvas;
 import java.awt.BasicStroke;
 import static java.awt.BasicStroke.CAP_SQUARE;
 import static java.awt.BasicStroke.JOIN_MITER;
@@ -13,7 +14,6 @@ import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 
 /**
  * LineBorderMenu class provides a JMenu with two sub menu items for line weight and line dash pattern.  When an menu item is selected,
@@ -22,8 +22,8 @@ import javax.swing.JMenuItem;
  * @author kkieffer
  */
 public class LineBorderMenu extends JMenu {
-    
-    public enum Type {WEIGHT, DASH}
+
+   public enum Type {WEIGHT, DASH}
     
     
     
@@ -39,12 +39,12 @@ public class LineBorderMenu extends JMenu {
         
     };
     
-    private class WeightMenuItem extends JMenuItem {
+    private static class WeightMenuItem extends AbstractContextMenu {
         
         
-        public WeightMenuItem(GraphicsConfiguration gC, float thickStep) {
+        public WeightMenuItem(ZCanvas c, GraphicsConfiguration gC, float thickStep) {
             
-            super();
+            super(c);
             DecimalFormat fmt = new DecimalFormat("0.0");
             BufferedImage bimg = gC.createCompatibleImage(100, 16, Transparency.BITMASK);
             Graphics2D g = (Graphics2D)bimg.getGraphics();
@@ -64,7 +64,10 @@ public class LineBorderMenu extends JMenu {
             addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    if (canvas == null)
+                        return;
                     canvas.setOutlineWidth(thickStep);
+                    lineWidthChanged(thickStep);
                 }
             });
         }
@@ -73,12 +76,12 @@ public class LineBorderMenu extends JMenu {
     
    
     
-    private class DashMenuItem extends JMenuItem {
+    private static class DashMenuItem extends AbstractContextMenu {
         
         
-        public DashMenuItem(GraphicsConfiguration gC, Float[] dash) {
+        public DashMenuItem(ZCanvas c, GraphicsConfiguration gC, Float[] dash) {
             
-            super();
+            super(c);
 
             BufferedImage bimg = gC.createCompatibleImage(100, 16, Transparency.BITMASK);
             Graphics2D g = (Graphics2D)bimg.getGraphics();
@@ -90,7 +93,7 @@ public class LineBorderMenu extends JMenu {
                 
                 float[] d = new float[dash.length];
                 for (int i=0; i<dash.length; i++)
-                    d[i] = dash[i] * (float)canvas.getScale();
+                    d[i] = dash[i] * 72;
                  
                 g.setStroke(new BasicStroke(1, CAP_SQUARE, JOIN_MITER, 10.0f, d, 0.0f));
             }
@@ -101,7 +104,10 @@ public class LineBorderMenu extends JMenu {
             addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {  
+                    if (canvas == null)
+                        return;
                     
+                    lineDashChanged(dash);
                     canvas.setDashPattern(dash);
 
                 }
@@ -112,11 +118,11 @@ public class LineBorderMenu extends JMenu {
     
     
     
-    private final ZCanvas canvas;
+    private AbstractContextMenu menuItem;
     
-    public LineBorderMenu(String text, ZCanvas canvas, Type type) {
+  
+    public LineBorderMenu(String text, ZCanvas c, Type type) {
         super(text);
-        this.canvas = canvas;
 
         GraphicsConfiguration gC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
             
@@ -124,20 +130,34 @@ public class LineBorderMenu extends JMenu {
         
             case WEIGHT: //Solid lines
                 for (float i : WIDTHS) {
-                    WeightMenuItem b = new WeightMenuItem(gC, i);
-                    this.add(b);   
+                    menuItem = new WeightMenuItem(c, gC, i);
+                    this.add(menuItem);   
                 }
                 break;
             
             case DASH: //Dashed lines
                 for (Float[] d : DASHES) {
-                    DashMenuItem b = new DashMenuItem(gC, d);
-                    this.add(b);   
+                    menuItem = new DashMenuItem(c, gC, d);
+                    this.add(menuItem);   
                 }
                 break;
+                
+            default:
+                throw new RuntimeException("Unhandled Line Border Type");
         }
                     
     }
     
+    public void addListener(ContextMenuListener l) {
+        menuItem.addListener(l);
+    }
+    
+    public void removeListener(ContextMenuListener l) {
+        menuItem.removeListener(l);
+    }
+    
+    public void setCanvas(ZCanvas c) {
+        menuItem.setCanvas(c);
+    }
     
 }

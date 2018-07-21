@@ -1,6 +1,7 @@
 
 package com.github.kkieffer.jzeld;
 
+import com.github.kkieffer.jzeld.contextMenu.ZCanvasContextMenu;
 import com.github.kkieffer.jzeld.JAXBAdapter.ColorAdapter;
 import com.github.kkieffer.jzeld.JAXBAdapter.DimensionAdapter;
 import com.github.kkieffer.jzeld.JAXBAdapter.FontAdapter;

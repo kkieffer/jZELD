@@ -1,6 +1,7 @@
 
-package com.github.kkieffer.jzeld;
+package com.github.kkieffer.jzeld.contextMenu;
 
+import com.github.kkieffer.jzeld.ZCanvas;
 import com.github.kkieffer.jzeld.ZCanvas.CombineOperation;
 import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.Component;
