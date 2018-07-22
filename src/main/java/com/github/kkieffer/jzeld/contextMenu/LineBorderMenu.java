@@ -12,6 +12,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 
@@ -118,7 +119,7 @@ public class LineBorderMenu extends JMenu {
     
     
     
-    private AbstractContextMenu menuItem;
+    private final ArrayList<AbstractContextMenu> menuItemList = new ArrayList<>();
     
   
     public LineBorderMenu(String text, ZCanvas c, Type type) {
@@ -130,15 +131,17 @@ public class LineBorderMenu extends JMenu {
         
             case WEIGHT: //Solid lines
                 for (float i : WIDTHS) {
-                    menuItem = new WeightMenuItem(c, gC, i);
-                    this.add(menuItem);   
+                    WeightMenuItem weightMenuItem = new WeightMenuItem(c, gC, i);
+                    menuItemList.add(weightMenuItem);
+                    this.add(weightMenuItem);   
                 }
                 break;
             
             case DASH: //Dashed lines
                 for (Float[] d : DASHES) {
-                    menuItem = new DashMenuItem(c, gC, d);
-                    this.add(menuItem);   
+                    DashMenuItem dashMenuItem = new DashMenuItem(c, gC, d);
+                    menuItemList.add(dashMenuItem);
+                    this.add(dashMenuItem);   
                 }
                 break;
                 
@@ -149,15 +152,18 @@ public class LineBorderMenu extends JMenu {
     }
     
     public void addListener(ContextMenuListener l) {
-        menuItem.addListener(l);
+        for (AbstractContextMenu m : menuItemList)
+            m.addListener(l);
     }
     
     public void removeListener(ContextMenuListener l) {
-        menuItem.removeListener(l);
+        for (AbstractContextMenu m : menuItemList)
+            m.removeListener(l);
     }
     
     public void setCanvas(ZCanvas c) {
-        menuItem.setCanvas(c);
+        for (AbstractContextMenu m : menuItemList)
+            m.setCanvas(c);
     }
     
 }

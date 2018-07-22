@@ -665,6 +665,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             zoom += .25;
         
         updatePreferredSize();
+        repaint();
     }
     
     /**
@@ -675,6 +676,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             zoom -= .25;
         
         updatePreferredSize();
+        repaint();
     }
     
     private Rectangle getDragSelectRectangle() {
