@@ -45,7 +45,7 @@ public class ColorMenuItem extends AbstractContextMenu {
                 if (canvas == null)
                     return;
                 
-                ZElement[] selectedElements = canvas.getSelectedElements();
+                ZElement[] selectedElements = canvas.getSelectedElementsArray();
                 
                 Color oldColor = Color.BLACK;
                 if (selectedElements.length > 0)

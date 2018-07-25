@@ -59,6 +59,7 @@ public abstract class ZElement implements Serializable {
     
     transient protected boolean hasChanges = false;  //marks any changes to the Element prior to saving
   
+    transient private boolean selected = false;
     
   
     /**
@@ -165,6 +166,18 @@ public abstract class ZElement implements Serializable {
         hasChanges = true;
     }
     
+    
+    public boolean isSelected() {
+        return selected;
+    }
+    
+    public void select() {
+        selected = true;
+    }
+    
+    public void deselect() {
+        selected = false;
+    }
     
     /**
      * Sets the attributes of an element.  An Element does not need to support all or any of these fields.

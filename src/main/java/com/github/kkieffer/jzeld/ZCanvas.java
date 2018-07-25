@@ -51,6 +51,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -198,8 +199,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     private double zoom = 1.0;
     
-    private final ArrayList<ZElement> selectedElements = new ArrayList<>();
-    private ZElement[] clipboard;
+    //private final ArrayList<ZElement> selectedElements = new ArrayList<>();
+    private LinkedList<ZElement> clipboard;
 
     private UndoStack undoStack;
 
@@ -294,7 +295,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             @Override
             public void actionPerformed(ActionEvent e) {
                 boolean repaint = false;
-                if (!selectedElements.isEmpty()) {
+                if (hasSelectedElements()) {
                     selectedAlternateBorder = !selectedAlternateBorder;
                     repaint = true;
                 }
@@ -408,6 +409,25 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         repaint();
 
     }
+    
+    
+    private boolean hasSelectedElements() {  //A little faster than getSelectedElements, because it returns on first one found
+        for (ZElement e : fields.zElements) {
+            if (e.isSelected())
+                return true;
+        }
+        return false;
+    }
+    
+    private ArrayList<ZElement> getSelectedElements() {
+        ArrayList<ZElement> selected = new ArrayList<>();
+        for (ZElement e : fields.zElements) {
+            if (e.isSelected())
+                selected.add(e);
+        }
+        return selected;
+    }
+    
     
     /**
      * Set the horizontal ruler
@@ -730,7 +750,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Repeats the previous change 
      */
     public void repeat() {
-        if (selectedElements.isEmpty() || passThruElement != null || lastMethod == null) 
+        if (!hasSelectedElements() || passThruElement != null || lastMethod == null) 
             return;
         
         try {
@@ -741,6 +761,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     public void resetShear(Boolean horiz) {
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+        
         if (selectedElements.isEmpty() || passThruElement != null) 
             return;
                        
@@ -761,7 +783,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Flips the selected elements.
      * @param horiz if true, flips horizontal, else vertical
      */
-    public void flip(Boolean horiz) {
+    public void flip(Boolean horiz) {       
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
         if (selectedElements.isEmpty() || passThruElement != null) 
             return;
                        
@@ -799,6 +823,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param clockwise true to rotate clockwise, false to rotate counterclockwise
      */
     private void rotate90(boolean clockwise) {
+        
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+       
         if (selectedElements.isEmpty() || passThruElement != null) 
             return;
  
@@ -828,9 +855,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     public void moveSelected(double x, double y) {
          
-        Iterator<ZElement> it = selectedElements.iterator();
-        while (it.hasNext()) {
-           ZElement e =  it.next();
+        for (ZElement e : getSelectedElements()) {
            e.move(x, y, this.getScaledWidth()/SCALE, this.getScaledHeight()/SCALE);
         }
         repaint();
@@ -841,6 +866,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param atype the desired alignment type
      */
     public void align(Alignment atype) {
+        
+        ArrayList<ZElement> selectedElements = getSelectedElements();
         
         if (selectedElements.size() <= 1 || passThruElement != null) 
             return;
@@ -948,12 +975,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * canvas, and selects it.
      */
     public void groupSelectedElements() {
+        
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
         if (selectedElements.size() <= 1 || passThruElement != null) 
             return;
 
         undoStack.saveContext(fields.zElements);
 
-         
+        Collections.reverse(selectedElements); //the selected elements are ordered with top z plane first.  But the Grouped Element draws grouped elements in the order provided, so we need to reverse the list
         ZGroupedElement group = ZGroupedElement.createGroup(selectedElements);  //create the group of elements
         
         for (ZElement e: selectedElements) //remove all selected
@@ -969,6 +999,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * and deletes the ZGroupedElement
      */
     public void ungroup() {
+
+        ArrayList<ZElement> selectedElements = getSelectedElements();
         
         if (selectedElements.isEmpty() || passThruElement != null) 
             return;
@@ -988,7 +1020,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 ArrayList<ZElement> ungroup = g.ungroup();
                 
                 for (ZElement u : ungroup)
-                    restoredElements.add(u);
+                    restoredElements.add(u); 
                 
                 it.remove();
                 this.removeElement(g);
@@ -998,7 +1030,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
         }
         
-        for (ZElement e : restoredElements) {
+        for (ZElement e : restoredElements) {  //added back in the z-plane order such that the top zplane is last in list
             this.addElement(e);
             selectedElements.add(e);
         }
@@ -1013,6 +1045,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param operation the operation to apply
      */
     public void combineSelectedElements(CombineOperation operation) {
+        
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
         if (selectedElements.size() <= 1 || passThruElement != null) 
             return;
 
@@ -1070,6 +1105,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param width the desired width, 0 for no outline
      */
     public void setOutlineWidth(Float width) {
+        
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
         if (selectedElements.isEmpty() || passThruElement != null) 
             return;
         
@@ -1088,6 +1126,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param dash the desired pattern, or null to use a solid line
      */
     public void setDashPattern(Float[] dash) {
+
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
         if (selectedElements.isEmpty() || passThruElement != null) 
             return;
         
@@ -1110,6 +1151,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param c 
      */
     public void setOutlineColor(Color c) {
+
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
         if (selectedElements.isEmpty() || passThruElement != null) 
             return;
         
@@ -1127,6 +1171,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param c color to fill, null to remove color
      */
     public void setFillColor(Color c) {
+
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
         if (selectedElements.isEmpty() || passThruElement != null) 
             return;
 
@@ -1177,6 +1224,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Sends the selected elements to the lowest Z plane layer, fails silently if nothing selected
      */
     public void moveToBack() {
+ 
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
         if (selectedElements.isEmpty())
             return;
 
@@ -1196,7 +1246,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Moves the selected elements to the top Z plane layer, fails silently if nothing selected
      */
     public void moveToFront() {
-         if (selectedElements.isEmpty())
+
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
+        if (selectedElements.isEmpty())
             return;
 
         undoStack.saveContext(fields.zElements);
@@ -1217,7 +1270,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void moveBackward() {
                 
-         if (selectedElements.isEmpty())
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
+        if (selectedElements.isEmpty())
             return;
 
         undoStack.saveContext(fields.zElements);
@@ -1243,6 +1298,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void moveForward() {
         
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
         if (selectedElements.isEmpty())
             return;
 
@@ -1296,7 +1353,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Returns the currently selected elements
      * @return the selected elements, or null if nothing is currently selected
      */
-    public ZElement[] getSelectedElements() {
+    public ZElement[] getSelectedElementsArray() {
+        ArrayList<ZElement> selectedElements = getSelectedElements();
         ZElement[] e = new ZElement[selectedElements.size()];
         selectedElements.toArray(e);
         return e;
@@ -1316,13 +1374,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @return a copy of the copied elements, or null if none was copied
      */
     public ZElement[] copy() {
+
+        ArrayList<ZElement> selectedElements = getSelectedElements();
         if (selectedElements.size() > 0) {
             
-            clipboard = new ZElement[selectedElements.size()];
+            clipboard = new LinkedList<>();
             ZElement[] externalCopy = new ZElement[selectedElements.size()];
-            for (int i=0; i<clipboard.length; i++) {
-                clipboard[i] = selectedElements.get(i).copyOf(true);
-                externalCopy[i] = selectedElements.get(i).copyOf(true);
+            int i=0;
+            for (ZElement e : selectedElements) {
+                clipboard.add(e.copyOf(true));
+                externalCopy[i] = e.copyOf(true);
+                i++;
             }
             
             lastMethod = null;
@@ -1357,8 +1419,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             selectNone();
 
             undoStack.saveContext(fields.zElements);
-            for (ZElement e : clipboard)
-                paste(e);          
+            
+            //Since elements are stored top z plane to bottom, use a descending iterator so the first element is the last one pasted
+            Iterator<ZElement> it = clipboard.descendingIterator();
+            while (it.hasNext())
+                paste(it.next());   
+            
             return true;
         }
         else
@@ -1367,7 +1433,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
-     * Pastes an external ZElement and selects it
+     * Pastes an external ZElement to the top Z-plane and selects it
      * @param e the element to paste 
      */
     public void paste(ZElement e) {
@@ -1377,7 +1443,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         ZElement toPaste = e.copyOf(true);  //make a copy to paste, for multiple pastes
         
         addElement(toPaste);
-        selectedElements.add(toPaste);  //select the pasted element
+        toPaste.select();
         lastMethod = null;            
 
         repaint();  
@@ -1404,6 +1470,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * currently with an element.
      */
      public void delete() {
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
         if (selectedElements.isEmpty() && passThruElement != null)
             return;
 
@@ -1411,10 +1479,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         Iterator<ZElement> it = selectedElements.iterator();
         while (it.hasNext()) {
-            ZElement s = it.next();
-            fields.zElements.remove(s);
-            uuidMap.remove(s);
-            s.removedFrom(this);
+            ZElement e = it.next();
+            fields.zElements.remove(e);
+            uuidMap.remove(e.getUUID());
+            e.removedFrom(this);
             it.remove();
         }
           
@@ -1440,8 +1508,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (!highlightSelectedOnly) {  //paint the element
                 o.paint(g2d, (int)SCALE, r.width<0 ? getScaledWidth() : r.width, r.height<0 ? getScaledHeight() : r.height);      
             }
-                      
-            if (selectedElements.contains(o) && highlightSelectedOnly && r.width > 0 && r.height > 0) {  //highlight selected element, just outside its boundaries
+                                  
+            if (o.isSelected() && highlightSelectedOnly && r.width > 0 && r.height > 0) {  //highlight selected element, just outside its boundaries
                 g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke(1.0f * (float)(pixScale/zoom), CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
                 int pixelsOut = (int)((o.getOutlineWidth()/2 + 1) * pixScale/zoom);
@@ -1473,18 +1541,18 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                     
         for (ZElement e : fields.zElements) {
             if (e.equals(toSel)) {
-                if (!selectedElements.contains(e)) {  // not selected, add it
-                    selectedElements.add(e);  
-                    lastSelectedElement = e;   
-                    for (ZCanvasEventListener l : selectListeners)
-                        l.elementSelected(e);
-        
-                    if (passThru) {
-                        if (lastSelectedElement.selectedForEdit(this))  //tell the element it was selected
-                            passThruElement = lastSelectedElement; 
-                    }
-                    
+                
+                e.select();
+                lastSelectedElement = e;   
+                for (ZCanvasEventListener l : selectListeners)
+                    l.elementSelected(e);
+
+                if (passThru) {
+                    if (lastSelectedElement.selectedForEdit(this))  //tell the element it was selected
+                        passThruElement = lastSelectedElement; 
                 }
+
+
                 
                 repaint();
                 return true;
@@ -1549,17 +1617,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void selectAll() {
         
-        selectedElements.clear();
         for (ZElement e : fields.zElements) {
             if (e.isSelectable()) {
-                selectedElements.add(e);
+                e.select();
+                lastSelectedElement = e;
                 for (ZCanvasEventListener l : selectListeners)
                     l.elementSelected(e);   
             }
         }
-        if (lastSelectedElement == null)
-            lastSelectedElement = selectedElements.get(0);
-     
+        
         repaint();
     }
     
@@ -1567,9 +1633,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Remove selection for all elements
      */
     public void selectNone() {
+
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
         if (!selectedElements.isEmpty()) {
-            for (ZElement s : selectedElements)
-                s.deselectedForEdit();
+            for (ZElement e : selectedElements) {
+                e.deselectedForEdit();
+                e.deselect();
+            }
             passThruElement = null;
         }
         selectedResizeElement = null;
@@ -1623,12 +1694,16 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             g2d.draw(fields.margins);
         }
         
+        ArrayList<ZElement> selectedElements = new ArrayList<>();  //for speed - so we don't need to iterate twice
         //Start from the deepest point in the stack, drawing elements up to the top z layer
         Iterator<ZElement> it = fields.zElements.descendingIterator();  
         while (it.hasNext()) {
-            paintElement(g2d, it.next(), false); 
+            ZElement o = it.next();
+            if (o.isSelected())
+                selectedElements.add(o);
+            paintElement(g2d, o, false); 
         }
-        
+     
         for (ZElement s : selectedElements)
             paintElement(g2d, s, true); //apply highlights to selected elements
         
@@ -1758,16 +1833,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             AffineTransform t = o.getElementTransform(SCALE, false);
             Shape s = t.createTransformedShape(boundsBox);
             Point2D lowerRightTransformed = t.transform(lowerRightCorner, null);  //also transform the lower right corner
-            Point2D upperLeftTransformed = t.transform(upperLeftCorner, null);  //also transform the upper left corner
       
             if (s.contains(mouseLoc)) {  //see if the mouse point is in the shape
                 
-                if (!selectedElements.contains(o)) {  //newly selected element
+                if (!o.isSelected()) {  //newly selected element
                     
                     if (!shiftPressed)
                         selectNone();  //no shift, so clear all others
                         
-                    selectedElements.add(o);  //add it
+                    o.select();
                     repaint();
                         
                 }
@@ -1775,7 +1849,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 lastSelectedElement = o;
                 
                 if (contextMenu != null)
-                    contextMenu.newSelections(lastSelectedElement, selectedElements);
+                    contextMenu.newSelections(lastSelectedElement, getSelectedElements());
                
                 for (ZCanvasEventListener l : selectListeners)
                     l.elementSelected(o);
@@ -1916,7 +1990,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         } 
 
 
-        if (!selectedElements.isEmpty()) {
+        if (hasSelectedElements()) {
             
             setCurrentCursor(Cursor.getDefaultCursor());
 
@@ -2021,7 +2095,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         
         //If element selected and mouse is within the canvas
-        if (!selectedElements.isEmpty() && mouseLoc.x < getScaledWidth() && mouseLoc.y < getScaledHeight())  {      
+        if (lastSelectedElement != null && mouseLoc.x < getScaledWidth() && mouseLoc.y < getScaledHeight())  {      
                 
             
             if (!selectedElementResizeOn) { //Reposition the object to the mouse, only when it won't take the object off the component
@@ -2030,7 +2104,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                     lastSelectedElement.reposition((mouseLoc.x - selectedObj_xOffset)/SCALE, (mouseLoc.y - selectedObj_yOffset)/SCALE);  
                     selectedMouseDrag = new Point2D.Double((mouseLoc.x - selectedObj_xOffset), (mouseLoc.y - selectedObj_yOffset));  
                 }
-            } else { //Resize the object
+            } else if (selectedResizeElement != null) { //Resize the object
                     
                 
                 //move mouse and originally selected point to base coordinates
@@ -2087,7 +2161,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             passThroughMouse(e);
             return;
         } 
-        
+            
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+    
         if (!selectedElements.isEmpty()) {
             if (System.nanoTime() - mouseWheelLastMoved > 1000000000) {
                 undoStack.saveContext(fields.zElements);

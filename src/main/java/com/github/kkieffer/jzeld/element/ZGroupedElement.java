@@ -14,7 +14,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
+ * A ZGroupedElement holds a collection of elements that are drawn together and treated as a single element. The elements in the group are arranged
+ * such that the last one in the element list is the top z-plane (last drawn).
  * @author kkieffer
  */
 @XmlRootElement(name = "ZGroupedElement")
