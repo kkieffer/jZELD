@@ -3,13 +3,16 @@ package com.github.kkieffer.jzeld.contextMenu;
 
 import com.github.kkieffer.jzeld.ZCanvas;
 import com.github.kkieffer.jzeld.ZCanvas.CombineOperation;
+import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
 import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.Component;
 import java.awt.Font;
 import java.util.ArrayList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.UIManager;
 
 /**
@@ -41,10 +44,10 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
     protected ColorMenuItem lineColorMenuItem;
     protected JMenu alignMenu;
     protected JPopupMenu contextPopupMenu;
-    private final JMenu combineMenu;
-    private final JMenuItem resetVerticalShearMenuItem;
-    private final JMenuItem resetHorizontalShearMenuItem;
-    private final JMenu shearMenu;
+    protected final JMenu combineMenu;
+    protected final JMenuItem resetVerticalShearMenuItem;
+    protected final JMenuItem resetHorizontalShearMenuItem;
+    protected final JMenu shearMenu;
     
     
     public ZDefaultContextMenu(ZCanvas c) {
@@ -107,10 +110,17 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         combineMenu = new JMenu("Combine");
         for (CombineOperation g : CombineOperation.values()) {
             JMenuItem m = new JMenuItem(g.toString());
+            m.setName(g.name());
             m.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                   c.combineSelectedElements(g);
+                    int numSel = c.getSelectedElementsArray().length;
+                    int combined = c.combineSelectedElements(g);
+                
+                    if (numSel != combined)
+                        JOptionPane.showMessageDialog(c, "Only " + combined + " element" + (combined != 1 ? "s" : "") + " combined.\nOther selected elements are not shapes and cannot be combined. ", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);
+
+                
                 }
             });
             combineMenu.add(m);
@@ -137,6 +147,7 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         contextPopupMenu.add(shearMenu);
         contextPopupMenu.add(arrangeMenu);
         contextPopupMenu.add(attributesMenu);
+        contextPopupMenu.add(new JSeparator());
         contextPopupMenu.add(combineMenu);
         contextPopupMenu.add(alignMenu);
         

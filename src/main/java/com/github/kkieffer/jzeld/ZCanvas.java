@@ -106,6 +106,24 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         public String toString() {
             return this.name().replace("_", " ");
         }
+        
+        public String getHtmlHelp() {
+            switch (this) {
+                case Join:
+                    return "Joins multiple shapes into a single shape.  All parts of the shapes are included, both overlapping and non-overlapping.";
+                case Subtract:
+                    return "Subtracts from the first selected shape the overlapping areas in the other selected shapes";
+                case Intersect:
+                    return "Creates a shape from only the overlapping parts of the selected shapes.";
+                case Exclusive_Join:
+                    return "Joins multiple shapes into a single shape.  All parts of the shapes are included except the ones that overlap with each other.";
+                default:
+                    throw new RuntimeException("Unhandled CombineOperation case");
+            }
+        }
+        
+        
+        
     }
     
     public enum Orientation {PORTRAIT, LANDSCAPE, REVERSE_LANDSCAPE}  //The ordinals conform to the PageFormat integer defines
@@ -699,6 +717,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         repaint();
     }
     
+    /**
+     * Gets the current pixel scaling of the canvas, 1.0 is normal view, higher values are zoomed in view
+     * @return 
+     */
+    public double getPixScale() {
+        return zoom * pixScale;
+    }
+    
+    
     private Rectangle getDragSelectRectangle() {
     
         if (mouseDrag == null)
@@ -1040,16 +1067,21 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     
     /**
-     * Merge the selected elements, starting with the first selected and applying the operation to each selected one
-     * The attributes of the newly combined shape are those of the first selected element
+     * Merge the selected elements, starting with the first selected and applying the operation to each selected one.  Only elements that
+     * extend ZAbstractShape can be combined.
+     * The attributes of the newly combined shape are those of the first selected ZAbstractShape.  
      * @param operation the operation to apply
+     * @return the number of shapes combined including the first selected one. If there are no selected ZAbstractShape
+     * elements, 0 is returned.
      */
-    public void combineSelectedElements(CombineOperation operation) {
+    public int combineSelectedElements(CombineOperation operation) {
+        
+        int combinedCount = 0;
         
         ArrayList<ZElement> selectedElements = getSelectedElements();
 
         if (selectedElements.size() <= 1 || passThruElement != null) 
-            return;
+            return 0;
 
         undoStack.saveContext(fields.zElements);
 
@@ -1070,20 +1102,21 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                         removeElement(e);  //remove the merged element
                         ref = shape;  //assign to the new reference
                     }
-                    
                 }
+                combinedCount++;
 
             }
         }
         
         if (ref == null)  //nothing merged
-            return;
+            return 0;
         
         
         addElement(ref);  //add the merged shape
         lastMethod = null;
         selectNone();
         selectedElements.add(ref);  //make the reference the selected one
+        return combinedCount;
     }
    
     
@@ -1512,7 +1545,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (o.isSelected() && highlightSelectedOnly && r.width > 0 && r.height > 0) {  //highlight selected element, just outside its boundaries
                 g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke(1.0f * (float)(pixScale/zoom), CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
-                int pixelsOut = (int)((o.getOutlineWidth()/2 + 1) * pixScale/zoom);
+                int pixelsOut = (int)Math.ceil((o.getOutlineWidth()/2 + 1) * pixScale/zoom);
                 g2d.drawRect(-pixelsOut, -pixelsOut, r.width+pixelsOut*2, r.height+pixelsOut*2); 
                    
                 //draw drag box in the corner
@@ -2210,7 +2243,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
    
     /**
      * Retrieves an array of required classes for storing a ZCanvas using a JAXB context.  Includes required classes plus all element classes for elements
-     * that have been added to the canvas
+     * that have been added to the canvas, and for any ZGroupedElements, the classes that it contains
      * @return 
      */
     public Class[] getContextClasses() {
@@ -2219,6 +2252,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZElement e : fields.zElements) {         
             if (!elementTypes.contains(e.getClass()))  //Add this class type to our list of types
                  elementTypes.add(e.getClass());
+            
+            if (e instanceof ZGroupedElement) {  //find classes contained within
+                for (Class<? extends ZElement> c : ((ZGroupedElement)e).getGroupedClasses()) {
+                    if (!elementTypes.contains(c))  //Add this class type to our list of types
+                        elementTypes.add(c);
+                }
+            }
+            
         }
         
         Class[] contextClasses = new Class[elementTypes.size() + 5]; 

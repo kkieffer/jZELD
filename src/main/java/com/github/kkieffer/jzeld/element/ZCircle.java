@@ -23,7 +23,7 @@ public class ZCircle extends ZOval {
     protected ZCircle() {}
     
     /**
-     * Create a ZOval
+     * Create a ZCircle
      * @param x the x coordinate, upper left x, in units
      * @param y the y coordinate, upper left y, in units
      * @param width the width of the object in units, or -1 for unlimited width

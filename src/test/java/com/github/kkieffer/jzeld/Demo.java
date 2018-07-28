@@ -15,6 +15,7 @@ import com.github.kkieffer.jzeld.element.TextAttributes.HorizontalJustify;
 import com.github.kkieffer.jzeld.element.TextAttributes;
 import com.github.kkieffer.jzeld.element.ZArc;
 import com.github.kkieffer.jzeld.element.ZArc.ArcType;
+import com.github.kkieffer.jzeld.element.ZCircle;
 import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZEquilateralPolygon;
 import com.github.kkieffer.jzeld.element.ZGrid;
@@ -83,9 +84,13 @@ public class Demo extends javax.swing.JFrame {
         ZRectangle r3 = new ZRoundedRectangle(4.0, 1.0, 1.0, 1.0, 0.0, true, true, true, 1, Color.BLACK, new Float[]{.1f, .1f}, null, 0.1);
         c.addElement(r3);
         
-        //Create a semi-transparent circle
+        //Create a semi-transparent oval
         ZOval o = new ZOval(1.0, 3.0, 1.0, 1.0, 0.0, true, true, true, 0, Color.BLACK, null, new Color(0, 0, 255, 128));
         c.addElement(o);
+        
+        //Create a semi-transparent circle
+        ZCircle cr = new ZCircle(1.0, 3.5, 1.0, 1.0, 0.0, true, true, true, 0, Color.BLACK, null, new Color(0, 0, 255, 128));
+        c.addElement(cr);
         
          //Create a semi-transparent circle
         ZOval o2 = new ZOval(2.5, 3.0, 1.0, 1.0, 0.0, true, true, true, 1, Color.BLACK, null, null);

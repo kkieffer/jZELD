@@ -23,9 +23,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 public final class ZGroupedElement extends ZElement {
 
     @XmlElement(name="ZElement")        
-    ArrayList<ZElement> elements;
+    private ArrayList<ZElement> elements;
     
-     private static ArrayList<ZElement> copyElements(ArrayList<ZElement> src) {
+    private static ArrayList<ZElement> copyElements(ArrayList<ZElement> src) {
         ArrayList<ZElement> copy = new ArrayList<>(src.size());
         for (int i=0; i<src.size(); i++) {
             copy.add(src.get(i).copyOf(false));  //not for copy - for grouping
@@ -212,6 +212,14 @@ public final class ZGroupedElement extends ZElement {
 
 
 
+    }
+
+    public Iterable<Class<? extends ZElement>> getGroupedClasses() {
+        ArrayList<Class<? extends ZElement>> classes = new ArrayList<>(elements.size());
+        for (ZElement e : elements)
+            classes.add(e.getClass());
+        
+        return classes;
     }
 
     
