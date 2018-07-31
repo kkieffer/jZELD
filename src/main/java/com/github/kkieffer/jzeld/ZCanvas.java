@@ -1018,7 +1018,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         addElement(group);  //add the group element
         selectNone();
-        selectedElements.add(group);  //make the group the selected one
+        group.select();
     }
     
     /**
@@ -1057,9 +1057,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
         }
         
+        selectNone();
         for (ZElement e : restoredElements) {  //added back in the z-plane order such that the top zplane is last in list
             this.addElement(e);
-            selectedElements.add(e);
+            e.select();
         }
          
         

@@ -427,6 +427,13 @@ public abstract class ZElement implements Serializable {
          hasChanges = true;
    }
     
+    /**
+     * Change size by the specified width and height in units.
+     * @param w width in units
+     * @param h height in units
+     * @param minSize the minimum size, in pixels
+     * @param scale scale factor
+     */
     public final void changeSize(double w, double h, double minSize, double scale) {
         if (!resizable)
             return;
@@ -436,7 +443,7 @@ public abstract class ZElement implements Serializable {
     
     
     /**
-     * Increase the size of the element by the specified width and height (negative reduces size).
+     * Increase the size of the element by the specified width and height in pixels (negative reduces size).
      * If the element size is reduced negative, the absolute value will be taken.
      * @param w width in pixels
      * @param h height in pixels

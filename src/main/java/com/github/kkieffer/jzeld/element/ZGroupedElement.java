@@ -25,6 +25,9 @@ public final class ZGroupedElement extends ZElement {
     @XmlElement(name="ZElement")        
     private ArrayList<ZElement> elements;
     
+    private double groupedWidth;
+    private double groupedHeight;
+    
     private static ArrayList<ZElement> copyElements(ArrayList<ZElement> src) {
         ArrayList<ZElement> copy = new ArrayList<>(src.size());
         for (int i=0; i<src.size(); i++) {
@@ -65,7 +68,10 @@ public final class ZGroupedElement extends ZElement {
 
     
     private ZGroupedElement(double x, double y, double w, double h, ArrayList<ZElement> srcElements) {
-        super(x, y, w, h, 0.0, true, false, true);
+        super(x, y, w, h, 0.0, true, true, true);
+        groupedWidth = w;  //maintain the original grouped size in case of resize
+        groupedHeight = h;
+        
         elements = copyElements(srcElements);
         
         //Remove the x,y offset from each element's position
@@ -79,6 +85,8 @@ public final class ZGroupedElement extends ZElement {
     private ZGroupedElement(ZGroupedElement src, boolean forNew) {
         super(src, forNew);
         this.elements = copyElements(src.elements);
+        this.groupedWidth = src.groupedWidth;
+        this.groupedHeight = src.groupedHeight;
     }
     
     
@@ -96,7 +104,7 @@ public final class ZGroupedElement extends ZElement {
             group += e.getClass().getSimpleName() + "<br>";
         
         return "<b>ZGroupedElement: </b>This is a group of multiple elements that can be moved and rotated together.<br><br>" +
-                "This group contains the following elements: <br>" + group;
+                "This group contains the following elements: <br>" + group + "<br><br>" + super.getHtmlHelp();
    
     }
     
@@ -127,12 +135,20 @@ public final class ZGroupedElement extends ZElement {
 
     @Override
     public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
-        throw new UnsupportedOperationException("Not supported."); 
+        setFillColor(fillColor);
+        setOutlineWidth(outlineWidth);
+        setDashPattern(dashPattern);
+        setOutlineColor(outlineColor);
     }
 
     @Override
     public void setOutlineWidth(float width) {
-        throw new UnsupportedOperationException("No outline."); 
+        for (ZElement e : elements) {
+            if (e.hasOutline()) {
+                e.setOutlineWidth(width);
+                hasChanges = true;    
+            }
+        }
     }
     
     @Override
@@ -142,12 +158,22 @@ public final class ZGroupedElement extends ZElement {
 
     @Override
     public void setOutlineColor(Color outlineColor) {
-        throw new UnsupportedOperationException("No outline.");
+        for (ZElement e : elements) {
+            if (e.hasOutline()) {
+                e.setOutlineColor(outlineColor);
+                hasChanges = true;
+            }
+        }
     }
 
     @Override
     public void setDashPattern(Float[] dashPattern) {
-        throw new UnsupportedOperationException("No dash."); 
+        for (ZElement e : elements) {
+            if (e.hasDash()) {
+                e.setDashPattern(dashPattern);
+                hasChanges = true;
+            }
+        } 
     }
 
     @Override
@@ -157,7 +183,12 @@ public final class ZGroupedElement extends ZElement {
     
     @Override
     public void setFillColor(Color fillColor) {
-        throw new UnsupportedOperationException("No fill");
+        for (ZElement e : elements) {
+            if (e.hasFill()) {
+                e.setFillColor(fillColor);
+                hasChanges = true;
+            }
+        } 
     }
 
     @Override
@@ -172,17 +203,17 @@ public final class ZGroupedElement extends ZElement {
 
     @Override
     public boolean hasOutline() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean hasDash() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean hasFill() {
-        return false;
+        return true;
     }
 
     @Override
@@ -194,6 +225,11 @@ public final class ZGroupedElement extends ZElement {
     @Override
     public void paint(Graphics2D g, int unitSize, int width, int height) {
                 
+        double scaleX = (double)width / (this.groupedWidth * unitSize);
+        double scaleY = (double)height / (this.groupedHeight * unitSize);
+        
+        g.scale(scaleX, scaleY);
+        
         //Paint each element - each element has been "moved" to its offset within the group already
         for (ZElement e : elements) {    
             AffineTransform orig = g.getTransform();
