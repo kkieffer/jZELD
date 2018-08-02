@@ -103,7 +103,10 @@ public final class ZGroupedElement extends ZElement {
         for (ZElement e : elements)
             group += e.getClass().getSimpleName() + "<br>";
         
-        return "<b>ZGroupedElement: </b>This is a group of multiple elements that can be moved and rotated together.<br><br>" +
+        return "<b>ZGroupedElement: </b>This is a group of multiple elements that can be moved and transformed together. The transformations " +
+                "are applied to the group as a whole, so if they are later ungrouped the elements will revert back to their original transforms. " +
+                "However, a ZGroupedElement has no intrinsic attributes such as fill color and line weight; applying those modifications change " +
+                "the individual elements and are retained after ungrouping.<br><br>" +
                 "This group contains the following elements: <br>" + group + "<br><br>" + super.getHtmlHelp();
    
     }

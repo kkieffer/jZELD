@@ -1682,7 +1682,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZCanvasEventListener l : selectListeners)
             l.elementSelected(null);
         lastMethod = null;        
-        selectedElements.clear();
+
     }
     
     
@@ -1862,7 +1862,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                           
             Rectangle boundsBox = o.getBounds(SCALE);
 
-            Point upperLeftCorner = new Point(boundsBox.x, boundsBox.y);
             Point lowerRightCorner = new Point(boundsBox.x + boundsBox.width, boundsBox.y + boundsBox.height);
             AffineTransform t = o.getElementTransform(SCALE, false);
             Shape s = t.createTransformedShape(boundsBox);
@@ -1878,6 +1877,20 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                     o.select();
                     repaint();
                         
+                } else {  //element was already selected
+                    
+                    if (shiftPressed) {  //deselect this
+                        o.deselect();
+                        
+                        if (passThruElement == o)
+                            passThruElement = null;
+        
+                        selectedResizeElement = null;
+                        lastSelectedElement = null;
+                        return;
+                    }
+                    
+                    
                 }
                 
                 lastSelectedElement = o;
@@ -1952,7 +1965,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return;
         }
 
-        selectElement(e); //check to select an object
                          
         if (e.getClickCount() > 1 && lastSelectedElement != null) {  //Transfer control to the selected element
             editElement();

@@ -251,7 +251,7 @@ public abstract class ZAbstractShape extends ZElement {
 
        if (borderThickness != 0) {
            
-            if (dashPattern == null)
+            if (dashPattern == null || dashPattern.length == 0)
                 g.setStroke(new BasicStroke(borderThickness));
             else {
                 float[] d = new float[dashPattern.length];
