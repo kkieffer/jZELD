@@ -754,6 +754,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
 
     /**
+     * Saves the canvas context to the undo stack.  Useful when modifications to elements occur outside the ZCanvas class
+     */
+    public void saveCanvasContext() {
+        undoStack.saveContext(fields.zElements);
+    }
+    
+    
+    /**
      * Removes the previous change from the canvas
      */
     public void undo() {
@@ -764,6 +772,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             deleteAll();
           
             fields.zElements = restoreContext;  //replace all the elements
+
+            for (ZElement e : fields.zElements)  //restore all the elements to the hash map
+                uuidMap.put(e.getUUID(), e);
+        
             for (ZElement e : fields.zElements)
                 e.addedTo(this); //tell they were added
             
@@ -1489,7 +1501,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Delete all elements on the canvas
      */
     public void deleteAll() {
-                fields.zElements.clear();
 
         //Tell all they were removed (use array to avoid elements deleting other elements (concurrent mod issues)
         ZElement[] elements = new ZElement[fields.zElements.size()];
