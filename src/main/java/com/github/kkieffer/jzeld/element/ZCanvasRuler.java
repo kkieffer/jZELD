@@ -62,7 +62,9 @@ public final class ZCanvasRuler extends ZRectangle {
     
     @Override
     public void paint(Graphics2D g, int unitSize, int width, int height) {
-        
+        if (!isVisible())
+            return;
+                
         width =  isHoriz ? width : fixedWidth;  //horizontal ruler uses the canvas width, vertical uses the fixed width
         height = !isHoriz ? height : fixedWidth;  //horizontal ruler uses the fixedWidth, vertical uses the canvas height
         

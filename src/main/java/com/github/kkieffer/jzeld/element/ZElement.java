@@ -48,6 +48,7 @@ public abstract class ZElement implements Serializable {
     private boolean canSelect;
     private boolean resizable;
     private boolean canMove;
+    private boolean visible;
     
     protected boolean flipHoriz = false;
     protected boolean flipVert = false;
@@ -82,7 +83,7 @@ public abstract class ZElement implements Serializable {
         this.canMove = moveable;
         this.className = this.getClass().getName();
         this.name = this.getClass().getSimpleName();
-        
+        this.visible = true;
         this.uuid = UUID.randomUUID();
         
     }
@@ -107,6 +108,7 @@ public abstract class ZElement implements Serializable {
         this.canSelect = src.canSelect;
         this.resizable = src.resizable;
         this.canMove = src.canMove;
+        this.visible = src.visible;
         this.name = src.name; 
         flipHoriz = src.flipHoriz;
         flipVert = src.flipVert;
@@ -288,6 +290,15 @@ public abstract class ZElement implements Serializable {
     
     public void setMoveable(boolean move) {
         canMove = move;
+    }
+    
+    
+    public boolean isVisible() {
+        return visible;
+    }
+    
+    public void setVisible(boolean vis) {
+        visible = vis;
     }
     
     /**

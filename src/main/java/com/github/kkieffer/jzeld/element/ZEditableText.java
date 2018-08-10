@@ -423,6 +423,8 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     @Override
     public void deselectedForEdit() {
         isSelected = false;
+        textWidget.setSelectionStart(0);
+        textWidget.setSelectionEnd(0);
         textWidget.getParent().requestFocusInWindow(); //give away focus to remove caret
         timer.stop();
     }
@@ -498,7 +500,9 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     @Override
     public void paint(Graphics2D g, int unitSize, int width, int height) {
               
- 
+         if (!isVisible())
+            return;
+         
         textWidget.setBorder(BorderFactory.createLineBorder(this.borderColor, (int)borderThickness));
 
         textWidget.setSize(new Dimension(width, height));

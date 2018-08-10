@@ -140,7 +140,10 @@ public class ZImage extends ZRectangle {
     
     @Override
     public void paint(Graphics2D g, int unitSize, int width, int height) {
-     
+             
+        if (!isVisible())
+            return;
+        
         if (image != null) {
             int x = flipHoriz ? width : 0;
             int w = flipHoriz ? -width : width;

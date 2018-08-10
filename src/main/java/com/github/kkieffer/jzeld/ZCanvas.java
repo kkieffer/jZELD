@@ -1224,10 +1224,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     /**
      * Adds an object to the canvas, on the top layer
      * @param e object to add
+     * @return true if added, false if already exists on canvas
      */
-    public void addElement(ZElement e) {
+    public boolean addElement(ZElement e) {
         if (fields.zElements.contains(e))
-            throw new RuntimeException("Already contains object");
+            return false;
+        
         fields.zElements.addFirst(e);
         uuidMap.put(e.getUUID(), e);
 
@@ -1235,7 +1237,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         lastMethod = null;
         canvasModified = true;
-      
+        return true;
     }
     
     /**
@@ -1487,12 +1489,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Delete all elements on the canvas
      */
     public void deleteAll() {
-        
-        //Tell all they were removed
-        for (ZElement e : fields.zElements) 
-            e.removedFrom(this);
+                fields.zElements.clear();
+
+        //Tell all they were removed (use array to avoid elements deleting other elements (concurrent mod issues)
+        ZElement[] elements = new ZElement[fields.zElements.size()];
+        fields.zElements.toArray(elements);
         
         fields.zElements.clear();
+
+        for (ZElement e : elements) 
+            e.removedFrom(this);
+        
         uuidMap.clear();
         repaint();
  

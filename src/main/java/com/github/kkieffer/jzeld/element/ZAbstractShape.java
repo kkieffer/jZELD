@@ -236,6 +236,9 @@ public abstract class ZAbstractShape extends ZElement {
     @Override
     public void paint(Graphics2D g, int unitSize, int width, int height) {
 
+        if (!isVisible())
+            return;
+        
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 

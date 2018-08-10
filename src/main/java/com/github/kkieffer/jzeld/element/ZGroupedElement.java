@@ -227,7 +227,10 @@ public final class ZGroupedElement extends ZElement {
     
     @Override
     public void paint(Graphics2D g, int unitSize, int width, int height) {
-                
+                       
+        if (!isVisible())
+            return;
+                        
         double scaleX = (double)width / (this.groupedWidth * unitSize);
         double scaleY = (double)height / (this.groupedHeight * unitSize);
         
