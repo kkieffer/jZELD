@@ -4,6 +4,7 @@ package com.github.kkieffer.jzeld.element;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.geom.Line2D;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -88,12 +89,12 @@ public class ZLine extends ZAbstractShape {
     };
 
     @Override
-    protected void fillShape(Graphics2D g, int unitSize, int width, int height) {
+    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
     }
 
     @Override
-    protected void drawShape(Graphics2D g, int unitSize, int width, int height) {
-        g.drawLine(0, height/2, width, height/2);
+    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
+        g.draw(new Line2D.Double(0, height/2, width, height/2));
     }
 
     @Override

@@ -7,11 +7,11 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Shape;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -69,10 +69,14 @@ public abstract class BoundaryDraw implements DrawClient, KeyListener {
     protected ArrayList<Point2D> mousePoints = new ArrayList<>();
     private final ZCanvas canvas;
     protected final boolean close;
+    protected float strokeWidth;
+    protected Color lineColor;
  
-    protected BoundaryDraw(ZCanvas canvas, boolean close) {
+    protected BoundaryDraw(ZCanvas canvas, boolean close, float strokeWidth, Color lineColor) {
         this.canvas = canvas;
         this.close = close;
+        this.strokeWidth = strokeWidth;
+        this.lineColor = lineColor;
         this.canvas.addKeyListener(this);
     }
 
@@ -108,7 +112,7 @@ public abstract class BoundaryDraw implements DrawClient, KeyListener {
         
         Shape shape = path.createTransformedShape(AffineTransform.getTranslateInstance(-bounds2D.getX(), -bounds2D.getY()));
  
-        return new ZShape(bounds2D.getX(), bounds2D.getY(), shape, 0.0, true, true, true, 1, Color.BLACK, null, null);
+        return new ZShape(bounds2D.getX(), bounds2D.getY(), shape, 0.0, true, true, true, strokeWidth, lineColor, null, null);
         
     }
     
@@ -131,25 +135,25 @@ public abstract class BoundaryDraw implements DrawClient, KeyListener {
      * 
      * @param p the new mouse point 
      */
-    protected void addPoint(Point p) {
+    protected void addPoint(Point2D p) {
         mousePoints.add(p);
     }
     
     
-    protected void drawToMouse(Graphics g, Point2D last, Point mouse) {
+    protected void drawToMouse(Graphics2D g, Point2D last, Point2D mouse) {
         //Draw temporary line to the current mouse point
         if (last != null && mouse != null)
-            g.drawLine((int)last.getX(), (int)last.getY(), mouse.x, mouse.y);
+            g.draw(new Line2D.Double(last.getX(), (int)last.getY(), mouse.getX(), mouse.getY()));
         
     }
     
     @Override
-    public void drawClientPaint(Graphics g, Point currentMouse) {
+    public void drawClientPaint(Graphics g, Point2D currentMouse) {
         
         Graphics2D g2d = (Graphics2D)g;
         
-        g2d.setStroke(new BasicStroke(1));
-        g2d.setColor(Color.BLACK);
+        g2d.setStroke(new BasicStroke(strokeWidth));
+        g2d.setColor(lineColor);
         
         //Draw lines interconnecting the first point to the last point
         Point2D previous = null;
@@ -157,11 +161,11 @@ public abstract class BoundaryDraw implements DrawClient, KeyListener {
         while (it.hasNext()) {
             Point2D curr = it.next();
             if (previous != null)
-                g2d.drawLine((int)previous.getX(), (int)previous.getY(), (int)curr.getX(), (int)curr.getY());
+                g2d.draw(new Line2D.Double(previous.getX(), previous.getY(), curr.getX(), curr.getY()));
             previous = curr;
         }
         
-        drawToMouse(g, previous, currentMouse);
+        drawToMouse(g2d, previous, currentMouse);
         
         
     }

@@ -112,13 +112,13 @@ public class ZRoundedRectangle extends ZRectangle {
     
      
     @Override
-    protected void fillShape(Graphics2D g, int unitSize, int width, int height) {
-        g.fillRoundRect(0, 0, width, height, (int)(radius*unitSize*2), (int)(radius*unitSize*2));
+    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
+        g.fill(new RoundRectangle2D.Double(0, 0, width, height, radius*unitSize*2, radius*unitSize*2));
     }
     
     @Override
-    protected void drawShape(Graphics2D g, int unitSize, int width, int height) {
-        g.drawRoundRect(0, 0, width, height, (int)(radius*unitSize*2), (int)(radius*unitSize*2));
+    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
+        g.draw(new RoundRectangle2D.Double(0, 0, width, height, radius*unitSize*2, radius*unitSize*2));
     }
     
    

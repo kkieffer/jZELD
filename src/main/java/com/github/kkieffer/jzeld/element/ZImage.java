@@ -139,16 +139,16 @@ public class ZImage extends ZRectangle {
     
     
     @Override
-    public void paint(Graphics2D g, int unitSize, int width, int height) {
+    public void paint(Graphics2D g, double unitSize, double width, double height) {
              
         if (!isVisible())
             return;
         
         if (image != null) {
-            int x = flipHoriz ? width : 0;
-            int w = flipHoriz ? -width : width;
-            int y = flipVert ? height : 0;
-            int h = flipVert ? -height : height;
+            int x = flipHoriz ? (int)width : 0;
+            int w = flipHoriz ? (int)-width : (int)width;
+            int y = flipVert ? (int)height : 0;
+            int h = flipVert ? (int)-height : (int)height;
             
             paintImage(g, image.getImage(), x, y, w, h);
         }

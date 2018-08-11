@@ -226,7 +226,7 @@ public final class ZGroupedElement extends ZElement {
     
     
     @Override
-    public void paint(Graphics2D g, int unitSize, int width, int height) {
+    public void paint(Graphics2D g, double unitSize, double width, double height) {
                        
         if (!isVisible())
             return;
@@ -239,14 +239,14 @@ public final class ZGroupedElement extends ZElement {
         //Paint each element - each element has been "moved" to its offset within the group already
         for (ZElement e : elements) {    
             AffineTransform orig = g.getTransform();
-            Rectangle bounds = e.getBounds(unitSize);
+            Rectangle2D bounds = e.getBounds2D(unitSize);
             
-            g.translate(bounds.x + bounds.width/2, bounds.y + bounds.height/2);  //translate to the center of the element
+            g.translate(bounds.getX() + bounds.getWidth()/2, bounds.getY() + bounds.getHeight()/2);  //translate to the center of the element
             g.rotate(Math.toRadians(e.getRotation()));  //rotate
-            g.translate(-bounds.width/2, -bounds.height/2);  //translate so that 0,0 is the top left corner
+            g.translate(-bounds.getWidth()/2, -bounds.getHeight()/2);  //translate so that 0,0 is the top left corner
             
 
-            e.paint(g, unitSize, bounds.width, bounds.height);
+            e.paint(g, unitSize, bounds.getWidth(), bounds.getHeight());
             
             g.setTransform(orig);
                     

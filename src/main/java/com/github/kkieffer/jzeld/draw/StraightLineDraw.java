@@ -2,7 +2,8 @@
 package com.github.kkieffer.jzeld.draw;
 
 import com.github.kkieffer.jzeld.ZCanvas;
-import java.awt.Point;
+import java.awt.Color;
+import java.awt.geom.Point2D;
 
 /**
  * A drawing object that creates a straight line drawing. Each time the mouse is clicked a line is drawn from the previous point to
@@ -13,12 +14,12 @@ import java.awt.Point;
  */
 public class StraightLineDraw extends BoundaryDraw {
 
-    public StraightLineDraw(ZCanvas canvas, boolean close) {
-        super(canvas, close);
+    public StraightLineDraw(ZCanvas canvas, boolean close, float strokeWidth, Color lineColor) {
+        super(canvas, close, strokeWidth, lineColor);
     }
 
     @Override
-    public void drawClientMouseClicked(Point mouse, int clickCount, int button) {
+    public void drawClientMouseClicked(Point2D mouse, int clickCount, int button) {
         this.addPoint(mouse);
         
         if (clickCount > 1) 
@@ -26,15 +27,15 @@ public class StraightLineDraw extends BoundaryDraw {
     }
 
     @Override
-    public void drawClientMousePressed(Point mouse) {
+    public void drawClientMousePressed(Point2D mouse) {
     }
 
     @Override
-    public void drawClientMouseReleased(Point mouse) {
+    public void drawClientMouseReleased(Point2D mouse) {
     }
 
     @Override
-    public void drawClientMouseDragged(Point mouse) {
+    public void drawClientMouseDragged(Point2D mouse) {
     }
     
 }

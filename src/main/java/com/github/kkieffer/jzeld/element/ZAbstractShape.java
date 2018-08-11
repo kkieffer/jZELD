@@ -162,8 +162,8 @@ public abstract class ZAbstractShape extends ZElement {
     }
     
     protected abstract Shape getAbstractShape();
-    protected abstract void fillShape(Graphics2D g, int unitSize, int width, int height);
-    protected abstract void drawShape(Graphics2D g, int unitSize, int width, int height);
+    protected abstract void fillShape(Graphics2D g, double unitSize, double width, double height);
+    protected abstract void drawShape(Graphics2D g, double unitSize, double width, double height);
     
     /**
      * Retrieves the abstract shape and then transforms it according to the rotation and position where it lies on the canvas
@@ -234,7 +234,7 @@ public abstract class ZAbstractShape extends ZElement {
     
     
     @Override
-    public void paint(Graphics2D g, int unitSize, int width, int height) {
+    public void paint(Graphics2D g, double unitSize, double width, double height) {
 
         if (!isVisible())
             return;
@@ -259,7 +259,7 @@ public abstract class ZAbstractShape extends ZElement {
             else {
                 float[] d = new float[dashPattern.length];
                 for (int i=0; i<dashPattern.length; i++)
-                    d[i] = dashPattern[i] * unitSize + borderThickness * .75f;
+                    d[i] = dashPattern[i] * (float)unitSize + borderThickness * .75f;
                     
 
                 g.setStroke(new BasicStroke(borderThickness, CAP_SQUARE, JOIN_MITER, 10.0f, d, 0.0f));

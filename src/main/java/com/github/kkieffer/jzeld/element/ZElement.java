@@ -6,8 +6,6 @@ import com.github.kkieffer.jzeld.UnitMeasure;
 import com.github.kkieffer.jzeld.ZCanvas;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -493,22 +491,14 @@ public abstract class ZElement implements Serializable {
     }
     
     
-     /**
-     * Returns the pixel bounds of the object about the top left corner using the scaling unit as a Rectangle - integer
-     * @param scale the scale of pixels per unit
-     * @return a bounding rectangle
-     */
-    public Rectangle getBounds(double scale) {
-        return new Rectangle((int)((position.x + bounds.x) * scale), (int)((position.y + bounds.y) * scale), (int)(bounds.width * scale), (int)(bounds.height * scale));
-    }
     
     /**
      * Returns the position of the top left corner in pixels
      * @param scale the scale of pixels per unit
      * @return 
      */
-    public final Point getPosition(double scale) {
-        return new Point((int)(position.x * scale), (int)(position.y * scale));
+    public final Point2D getPosition(double scale) {
+        return new Point2D.Double(position.x * scale, position.y * scale);
     }
     
     /**
@@ -538,7 +528,7 @@ public abstract class ZElement implements Serializable {
      * @return 
      */
     public final AffineTransform getElementTransform(double scale, boolean toBase) {
-        Rectangle2D boundsBox = getBounds(scale);
+        Rectangle2D boundsBox = getBounds2D(scale);
 
         double x = boundsBox.getX() + boundsBox.getWidth()/2; 
         double y = boundsBox.getY() + boundsBox.getHeight()/2;
@@ -559,7 +549,7 @@ public abstract class ZElement implements Serializable {
      * @param width the width, in pixels.  If the object's bounding width is negative, this will be the canvas width
      * @param height the height, in pixels.  If the object's bounding height is negative, this will be the canvas height
      */
-    public abstract void paint(Graphics2D g, int unitSize, int width, int height);
+    public abstract void paint(Graphics2D g, double unitSize, double width, double height);
 
     
     /**

@@ -78,7 +78,7 @@ public class PaintAttributes implements Serializable {
         }
     }
     
-    public void applyPaintAttribute(Graphics2D g2d, int width, int height, int unitSize) {
+    public void applyPaintAttribute(Graphics2D g2d, double width, double height, double unitSize) {
         
         float w = (float)width;
         float h = (float)height;
@@ -99,10 +99,10 @@ public class PaintAttributes implements Serializable {
                         radiusVal = h * radius;
                         break;
                     case LONGEST:
-                        radiusVal = radius * (width > height ? width : height);
+                        radiusVal = radius * (float)(width > height ? width : height);
                         break;
                     case SHORTEST:
-                        radiusVal = radius * (width < height ? width : height);
+                        radiusVal = radius * (float)(width < height ? width : height);
                         break;
                 }
                 

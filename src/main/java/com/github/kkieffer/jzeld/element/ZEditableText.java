@@ -10,7 +10,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -442,13 +441,6 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         
    
     
-    @Override
-    public Rectangle2D getBounds2D(double scale) {
-        Rectangle r = getBounds(scale);
-        
-        return new Rectangle2D.Double(r.x, r.y, r.width, r.height);
-        
-    }
     
     /**
      * Checks to see if the text string will fit in the bounds of the element without resizing it
@@ -464,7 +456,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         testPane.setText(text);
 
         Dimension d = testPane.getPreferredSize();  //preferred size is the size that it should be based on the amount of characters
-        Rectangle b = super.getBounds(scale);
+        Rectangle2D b = super.getBounds2D(scale);
         
         if (d.width > b.getWidth() || d.height > b.getHeight())
             return false;
@@ -473,39 +465,42 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     }
 
     @Override
-    public Rectangle getBounds(double scale) {
+    public Rectangle2D getBounds2D(double scale) {
         
         Dimension d = textWidget.getPreferredSize();  //preferred size is the size that it should be based on the amount of characters
-        Rectangle b = super.getBounds(scale);
+        Rectangle2D b = super.getBounds2D(scale);
+        
+        double width = b.getWidth();
+        double height = b.getHeight();
         
         //Scale up to fit the characters
         if (d.width > b.getWidth())
-            b.width = d.width;
+            width = d.width;
         
         if (d.height > b.getHeight())
-            b.height = d.height;
+            height = d.height;
         
         
-        super.setSize(b.width, b.height, 1, scale); 
+        super.setSize(width, height, 1, scale); 
         
         //Adjust the font size by the scaling factor to maintain consistency
         Font f = new Font(textAttributes.font.getFontName(), textAttributes.font.getStyle(), (int)(textAttributes.font.getSize2D()*scale/72.0));
         textWidget.setFont(f);
         
-        return super.getBounds(scale);
+        return super.getBounds2D(scale);
     }
        
     
     
     @Override
-    public void paint(Graphics2D g, int unitSize, int width, int height) {
+    public void paint(Graphics2D g, double unitSize, double width, double height) {
               
          if (!isVisible())
             return;
          
         textWidget.setBorder(BorderFactory.createLineBorder(this.borderColor, (int)borderThickness));
 
-        textWidget.setSize(new Dimension(width, height));
+        textWidget.setSize(new Dimension((int)width, (int)height));
 
         textWidget.paint(g);  //paint the widget
             

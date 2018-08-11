@@ -111,12 +111,12 @@ public class ZArc extends ZRectangle {
     }
     
     @Override
-    protected void fillShape(Graphics2D g, int unitSize, int width, int height) {
+    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
         g.fill(shape);
     }
 
     @Override
-    protected void drawShape(Graphics2D g, int unitSize, int width, int height) {
+    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
         g.draw(shape);
     }
     
@@ -176,8 +176,8 @@ public class ZArc extends ZRectangle {
         deselectedForEdit();
     }
 
-     @Override
-    public void paint(Graphics2D g, int unitSize, int width, int height) {
+    @Override
+    public void paint(Graphics2D g, double unitSize, double width, double height) {
         AffineTransform scaleInstance = AffineTransform.getScaleInstance(unitSize, unitSize);
         shape = scaleInstance.createTransformedShape(getAbstractShape());
         

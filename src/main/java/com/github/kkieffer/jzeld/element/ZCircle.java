@@ -72,15 +72,15 @@ public class ZCircle extends ZOval {
     }
     
      @Override
-    protected void fillShape(Graphics2D g, int unitSize, int width, int height) {
-        int radius = width < height ? width : height;
-        g.fillOval(0, 0, radius, radius);
+    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
+        double radius = width < height ? width : height;
+        super.fillShape(g, unitSize, radius, radius);
     }
     
     @Override
-    protected void drawShape(Graphics2D g, int unitSize, int width, int height) {
-        int radius = width < height ? width : height;
-        g.drawOval(0, 0, radius, radius);
+    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
+        double radius = width < height ? width : height;
+        super.drawShape(g, unitSize, radius, radius);
     }
    
     

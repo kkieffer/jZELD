@@ -151,7 +151,7 @@ public class ZShape extends ZAbstractShape {
     
 
     @Override
-    protected void fillShape(Graphics2D g, int unitSize, int width, int height) {
+    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
         g.fill(scaledShape);
         hasChanges = true;
     }
@@ -159,7 +159,7 @@ public class ZShape extends ZAbstractShape {
    
     
     @Override
-    protected void drawShape(Graphics2D g, int unitSize, int width, int height) {        
+    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {        
         g.draw(scaledShape);
     }
 
@@ -195,7 +195,7 @@ public class ZShape extends ZAbstractShape {
     
     
     @Override
-    public void paint(Graphics2D g, int unitSize, int width, int height) {
+    public void paint(Graphics2D g, double unitSize, double width, double height) {
         AffineTransform scaleInstance = AffineTransform.getScaleInstance(unitSize, unitSize);
         scaledShape = scaleInstance.createTransformedShape(shape);
         

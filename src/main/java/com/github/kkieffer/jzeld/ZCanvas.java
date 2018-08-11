@@ -38,6 +38,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -226,13 +227,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     private ZElement passThruElement = null;
 
-    private Point selectedObj_mousePoint;
-    private int selectedObj_yOffset;
-    private int selectedObj_xOffset;
+    private Point2D selectedObj_mousePoint;
+    private double selectedObj_yOffset;
+    private double selectedObj_xOffset;
     private double selectedObj_xOffset_toRightCorner;
     private double selectedObj_yOffset_toRightCorner;
 
-    private Point mouseIn;
+    private Point2D mouseIn;
     private boolean selectedElementResizeOn = false;
     private Rectangle2D selectedResizeElementOrigDim;
     private ZElement selectedResizeElement = null;
@@ -252,8 +253,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private boolean shearXPressed = false;
     private boolean shearYPressed = false;
     private Point2D selectedMouseDrag;
-    private Point mouseDrag;
-    private Point mousePress;
+    private Point2D mouseDrag;
+    private Point2D mousePress;
     private Point2D selectedMousePress;
     private ZCanvasContextMenu contextMenu;
     
@@ -695,6 +696,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         repaint();
     }
     
+    
+    public double getZoomFactor() {
+        return zoom;
+    }
+    
     /**
      * Zoom in, to 4:1
      */
@@ -726,17 +732,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     
-    private Rectangle getDragSelectRectangle() {
+    private Rectangle2D getDragSelectRectangle() {
     
         if (mouseDrag == null)
             return null;
         
-        int x = mousePress.x < mouseDrag.x ? mousePress.x : mouseDrag.x;
-        int y = mousePress.y < mouseDrag.y ? mousePress.y : mouseDrag.y;
-        int w = mousePress.x < mouseDrag.x ? mouseDrag.x - mousePress.x : mousePress.x - mouseDrag.x;
-        int h = mousePress.y < mouseDrag.y ? mouseDrag.y - mousePress.y : mousePress.y - mouseDrag.y;
+        double x = mousePress.getX() < mouseDrag.getX() ? mousePress.getX() : mouseDrag.getX();
+        double y = mousePress.getY() < mouseDrag.getY() ? mousePress.getY() : mouseDrag.getY();
+        double w = mousePress.getX() < mouseDrag.getX() ? mouseDrag.getX() - mousePress.getX() : mousePress.getX() - mouseDrag.getX();
+        double h = mousePress.getY() < mouseDrag.getY() ? mouseDrag.getY() - mousePress.getY() : mousePress.getY() - mouseDrag.getY();
         
-        return new Rectangle(x, y, w, h);
+        return new Rectangle2D.Double(x, y, w, h);
     }
     
    
@@ -917,9 +923,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         ZElement key2 = key;
         for (ZElement e : selectedElements) {  //loop through elements, looking for the key - closest to the edge
             
-            Rectangle p = e.getBounds(SCALE);
-            Rectangle k = key.getBounds(SCALE);
-            Rectangle k2 = key2.getBounds(SCALE);
+            Rectangle2D p = e.getBounds2D(SCALE);
+            Rectangle2D k = key.getBounds2D(SCALE);
             
             switch (atype) {
                 case Left_Edge:
@@ -951,13 +956,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         double minVert = 0;
         double minHoriz = 0;
-        Rectangle k = key.getBounds(SCALE);  //vertical key
-        Rectangle k2 = key2.getBounds(SCALE); //horizontal key
+        Rectangle2D k = key.getBounds2D(SCALE);  //vertical key
+        Rectangle2D k2 = key2.getBounds2D(SCALE); //horizontal key
 
         if (atype == Alignment.Auto) {  //find the minimum
             
             for (ZElement e : selectedElements) {
-                Rectangle p = e.getBounds(SCALE);
+                Rectangle2D p = e.getBounds2D(SCALE);
                 minVert += Math.abs(k.getX() - p.getX());   //vert delta
                 minHoriz += Math.abs(k2.getY() - p.getY());  //horiz delta
             }
@@ -975,7 +980,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
              
         for (ZElement e : selectedElements) {
                     
-            Rectangle p = e.getBounds(SCALE);
+            Rectangle2D p = e.getBounds2D(SCALE);
 
              switch (atype) {
                 case Left_Edge:
@@ -1550,27 +1555,27 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private void paintElement(Graphics2D g2d, ZElement o, boolean highlightSelectedOnly) {
         if (o != null) {
             
-            Rectangle r = o.getBounds(SCALE);  //find the location and bounds of the element to paint
+            Rectangle2D r = o.getBounds2D(SCALE);  //find the location and bounds of the element to paint
             AffineTransform t = g2d.getTransform();
-            g2d.translate(r.x + r.width/2, r.y + r.height/2);  //translate to the center of the element
+            g2d.translate(r.getX() + r.getWidth()/2, r.getY() + r.getHeight()/2);  //translate to the center of the element
             g2d.rotate(Math.toRadians(o.getRotation()));  //rotate
             g2d.shear(o.getShearX(), o.getShearY());
-            g2d.translate(-r.width/2, -r.height/2);  //translate so that 0,0 is the top left corner
+            g2d.translate(-r.getWidth()/2, -r.getHeight()/2);  //translate so that 0,0 is the top left corner
             
             if (!highlightSelectedOnly) {  //paint the element
-                o.paint(g2d, (int)SCALE, r.width<0 ? getScaledWidth() : r.width, r.height<0 ? getScaledHeight() : r.height);      
+                o.paint(g2d, SCALE, r.getWidth()<0 ? getScaledWidth() : r.getWidth(), r.getHeight()<0 ? getScaledHeight() : r.getHeight());      
             }
                                   
-            if (o.isSelected() && highlightSelectedOnly && r.width > 0 && r.height > 0) {  //highlight selected element, just outside its boundaries
+            if (o.isSelected() && highlightSelectedOnly && r.getWidth() > 0 && r.getHeight() > 0) {  //highlight selected element, just outside its boundaries
                 g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke(1.0f * (float)(pixScale/zoom), CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
                 int pixelsOut = (int)Math.ceil((o.getOutlineWidth()/2 + 1) * pixScale/zoom);
-                g2d.drawRect(-pixelsOut, -pixelsOut, r.width+pixelsOut*2, r.height+pixelsOut*2); 
+                g2d.draw(new Rectangle2D.Double(-pixelsOut, -pixelsOut, r.getWidth()+pixelsOut*2, r.getHeight()+pixelsOut*2)); 
                    
                 //draw drag box in the corner
                 if (o.isResizable()) {  
                     g2d.setColor(Color.BLACK);  
-                    g2d.fillRect(r.width-(int)(DRAG_BOX_SIZE * pixScale/zoom), r.height-(int)(DRAG_BOX_SIZE * pixScale/zoom), (int)(DRAG_BOX_SIZE * pixScale/zoom), (int)(DRAG_BOX_SIZE * pixScale/zoom));
+                    g2d.fill(new Rectangle2D.Double(r.getWidth()-(DRAG_BOX_SIZE * pixScale/zoom), r.getHeight()-(DRAG_BOX_SIZE * pixScale/zoom), DRAG_BOX_SIZE * pixScale/zoom, DRAG_BOX_SIZE * pixScale/zoom));
                 }
                                
             }
@@ -1704,6 +1709,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     
+    private void paintString(Graphics2D g2d, String s, double x, double y) {
+        g2d.drawString(s, (int)Math.round(x), (int)Math.round(y));
+
+    }
+    
     @Override
     public synchronized void paintComponent(Graphics g) {
 
@@ -1768,7 +1778,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                         
             ZElement selectedElement = lastSelectedElement;
             
-            Rectangle r = selectedElement.getBounds(SCALE);  //find the location and bounds of the selected element
+            Rectangle2D r = selectedElement.getBounds2D(SCALE);  //find the location and bounds of the selected element
 
             //AffineTransform t = AffineTransform.getRotateInstance(Math.toRadians(selectedElement.getRotation()), r.x + r.width/2, r.y + r.height/2);
             AffineTransform t = selectedElement.getElementTransform(SCALE, false);
@@ -1806,23 +1816,24 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             g2d.setColor(Color.BLACK);
             Rectangle2D bounds = lastSelectedElement.getBounds2D();
             String mouseCoord = fields.unit.format(bounds.getWidth()) + ", " + fields.unit.format(bounds.getHeight());
-            g2d.drawString(mouseCoord, mouseIn.x + DRAG_BOX_SIZE*2*pixScale/(float)zoom, mouseIn.y + DRAG_BOX_SIZE*2*pixScale/(float)zoom);
+            
+            paintString(g2d, mouseCoord, mouseIn.getX() + DRAG_BOX_SIZE*2*pixScale/(float)zoom, mouseIn.getY() + DRAG_BOX_SIZE*2*pixScale/(float)zoom);
             
         }
         
         
         //When nothing selected, draw the mouse
-        if (mouseIn != null && selectedElements.isEmpty() && mouseIn.x >= 0 && mouseIn.y >= 0) {  
+        if (mouseIn != null && selectedElements.isEmpty() && mouseIn.getX() >= 0 && mouseIn.getY() >= 0) {  
                         
             //Draw crosshair
             if (fields.mouseCursorColor != null) {
                 g2d.setColor(fields.mouseCursorColor);
                 g2d.setStroke(new BasicStroke(1.0f * pixScale / (float)zoom));
-                g2d.drawLine(-fields.origin.x, mouseIn.y, getScaledWidth(), mouseIn.y); //horiz crosshair
-                g2d.drawLine(mouseIn.x, -fields.origin.y, mouseIn.x, getScaledHeight()); //vert crosshair
+                g2d.draw(new Line2D.Double(-fields.origin.x, mouseIn.getY(), getScaledWidth(), mouseIn.getY())); //horiz crosshair
+                g2d.draw(new Line2D.Double(mouseIn.getX(), -fields.origin.y, mouseIn.getX(), getScaledHeight())); //vert crosshair
             }
 
-            Rectangle dragRect = getDragSelectRectangle();
+            Rectangle2D dragRect = getDragSelectRectangle();
 
             if (mouseDrag != null) {
                 g2d.setColor(Color.BLACK);
@@ -1835,11 +1846,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 g2d.setColor(Color.BLACK);
                 String s;
                 if (mouseDrag == null)
-                    s = fields.unit.format(mouseIn.x/SCALE) + ", " + fields.unit.format(mouseIn.y/SCALE);
+                    s = fields.unit.format(mouseIn.getX()/SCALE) + ", " + fields.unit.format(mouseIn.getY()/SCALE);
                 else {
-                    s = fields.unit.format(dragRect.width/SCALE) + ", " + fields.unit.format(dragRect.height/SCALE);
+                    s = fields.unit.format(dragRect.getWidth()/SCALE) + ", " + fields.unit.format(dragRect.getHeight()/SCALE);
                 }
-                g2d.drawString(s, mouseIn.x + (int)Math.ceil(10.0 * pixScale/zoom), mouseIn.y + (int)Math.ceil(fontMetrics.getHeight() + 10.0 * pixScale/zoom));
+                paintString(g2d, s, mouseIn.getX() + (int)Math.ceil(10.0 * pixScale/zoom), mouseIn.getY() + (int)Math.ceil(fontMetrics.getHeight() + 10.0 * pixScale/zoom));
             }
   
             
@@ -1868,7 +1879,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     //Determine the selected object, if any, from the mouse pick.  If the object is selected, the upper left corner (transformed) is returned
     private void selectElement(MouseEvent e) {
         
-        Point mouseLoc = getScaledMouse(e);
+        Point2D mouseLoc = getScaledMouse(e);
         
         //Select the pointed object, if there is one
         //See if the mouse click was within the bounds of any component, checking upper objects before moving down the z stack
@@ -1878,9 +1889,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (!o.isSelectable()) //don't select anything that's unselectable
                 continue;
                           
-            Rectangle boundsBox = o.getBounds(SCALE);
+            Rectangle2D boundsBox = o.getBounds2D(SCALE);
 
-            Point lowerRightCorner = new Point(boundsBox.x + boundsBox.width, boundsBox.y + boundsBox.height);
+            Point2D lowerRightCorner = new Point2D.Double(boundsBox.getX() + boundsBox.getWidth(), boundsBox.getY() + boundsBox.getHeight());
             AffineTransform t = o.getElementTransform(SCALE, false);
             Shape s = t.createTransformedShape(boundsBox);
             Point2D lowerRightTransformed = t.transform(lowerRightCorner, null);  //also transform the lower right corner
@@ -1919,15 +1930,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 for (ZCanvasEventListener l : selectListeners)
                     l.elementSelected(o);
        
-                Point location = o.getPosition(SCALE);  //get the upper left, find the mouse offset from the upper left
+                Point2D location = o.getPosition(SCALE);  //get the upper left, find the mouse offset from the upper left
                 
                 selectedObj_mousePoint = mouseLoc;
                 
-                selectedObj_xOffset = mouseLoc.x - location.x;
-                selectedObj_yOffset = mouseLoc.y - location.y;
+                selectedObj_xOffset = mouseLoc.getX() - location.getX();
+                selectedObj_yOffset = mouseLoc.getY() - location.getY();
                 
-                selectedObj_xOffset_toRightCorner = lowerRightTransformed.getX() - mouseLoc.x;
-                selectedObj_yOffset_toRightCorner = lowerRightTransformed.getY() - mouseLoc.y;
+                selectedObj_xOffset_toRightCorner = lowerRightTransformed.getX() - mouseLoc.getX();
+                selectedObj_yOffset_toRightCorner = lowerRightTransformed.getY() - mouseLoc.getY();
                 
                 //Check if the mouse was within the drag box
                 if (o.isResizable() && lowerRightTransformed.distance(mouseLoc)/pixScale < DRAG_BOX_SIZE) { 
@@ -1957,12 +1968,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 
         AffineTransform elementTransform = passThruElement.getElementTransform(SCALE, true);
         Point2D transformedMouse = elementTransform.transform(getScaledMouse(e), null);
-        Point position = passThruElement.getPosition(SCALE);
+        Point2D position = passThruElement.getPosition(SCALE);
 
-        int xOffset = (int)transformedMouse.getX() - position.x;
-        int yOffset = (int)transformedMouse.getY() - position.y;
+        double xOffset = transformedMouse.getX() - position.getX();
+        double yOffset = transformedMouse.getY() - position.getY();
         
-        MouseEvent m = new MouseEvent(this, e.getID(), e.getWhen(), e.getModifiers(), xOffset, yOffset, e.getClickCount(), false, e.getButton());
+        MouseEvent m = new MouseEvent(this, e.getID(), e.getWhen(), e.getModifiers(), (int)Math.round(xOffset), (int)Math.round(yOffset), e.getClickCount(), false, e.getButton());
         passThruElement.mouseEvent(this, m);  //tell the element about the mouse                  
         repaint();
     }
@@ -2007,16 +2018,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
     }
     
-    private Point getScaledMouse(MouseEvent e) {
-        Point p = e.getPoint();
+    private Point2D getScaledMouse(MouseEvent e) {
+        double x = e.getPoint().x;
+        double y = e.getPoint().y;
 
-        p.x *= (pixScale / zoom);
-        p.y *= (pixScale / zoom);
+        x *= (pixScale / zoom);
+        y *= (pixScale / zoom);
         
-        p.x -= fields.origin.x / zoom;
-        p.y -= fields.origin.y / zoom;
+        x -= (double)fields.origin.x / zoom;
+        y -= (double)fields.origin.y / zoom;
         
-        return p;
+        return new Point2D.Double(x, y);
     }
     
     public int getScaledHeight() {
@@ -2037,7 +2049,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             mouseFirstPressed = System.nanoTime();
         
         
-        Point mouseLoc = getScaledMouse(e);
+        Point2D mouseLoc = getScaledMouse(e);
         mousePress = mouseLoc;
         
         if (drawClient != null) {
@@ -2064,7 +2076,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             }
             
             if (!selectedElementResizeOn) 
-                selectedMousePress = new Point2D.Double((mouseLoc.x - selectedObj_xOffset), (mouseLoc.y - selectedObj_yOffset));  
+                selectedMousePress = new Point2D.Double((mouseLoc.getX() - selectedObj_xOffset), (mouseLoc.getY() - selectedObj_yOffset));  
 
 
             undoStack.saveContext(fields.zElements);
@@ -2093,7 +2105,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         //If drag-selecting, select all elements falling in the bounds
         if (mousePress != null && mouseDrag != null) {
             
-            Rectangle dragSelect = getDragSelectRectangle();
+            Rectangle2D dragSelect = getDragSelectRectangle();
             
             Iterator<ZElement> it = fields.zElements.iterator();
             while (it.hasNext()) {
@@ -2101,7 +2113,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 if (!o.isSelectable()) //don't select anything that's unselectable
                     continue;
                 
-                Rectangle boundsBox = o.getBounds(SCALE);
+                Rectangle2D boundsBox = o.getBounds2D(SCALE);
                 AffineTransform t = o.getElementTransform(SCALE, false);
                 Shape s = t.createTransformedShape(boundsBox);
                 
@@ -2140,7 +2152,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     @Override
     public void mouseDragged(MouseEvent e) {
                  
-        Point mouseLoc = getScaledMouse(e);
+        Point2D mouseLoc = getScaledMouse(e);
         mouseIn = mouseLoc;
 
         selectedMouseDrag = null;
@@ -2159,14 +2171,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         
         //If element selected and mouse is within the canvas
-        if (lastSelectedElement != null && mouseLoc.x < getScaledWidth() && mouseLoc.y < getScaledHeight())  {      
+        if (lastSelectedElement != null && mouseLoc.getX() < getScaledWidth() && mouseLoc.getY() < getScaledHeight())  {      
                 
             
             if (!selectedElementResizeOn) { //Reposition the object to the mouse, only when it won't take the object off the component
                 
                 if (lastSelectedElement.isMoveable()) {
-                    lastSelectedElement.reposition((mouseLoc.x - selectedObj_xOffset)/SCALE, (mouseLoc.y - selectedObj_yOffset)/SCALE);  
-                    selectedMouseDrag = new Point2D.Double((mouseLoc.x - selectedObj_xOffset), (mouseLoc.y - selectedObj_yOffset));  
+                    lastSelectedElement.reposition((mouseLoc.getX() - selectedObj_xOffset)/SCALE, (mouseLoc.getY() - selectedObj_yOffset)/SCALE);  
+                    selectedMouseDrag = new Point2D.Double((mouseLoc.getX() - selectedObj_xOffset), (mouseLoc.getY() - selectedObj_yOffset));  
                 }
             } else if (selectedResizeElement != null) { //Resize the object
                     
@@ -2187,7 +2199,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
                 //Get the transformed position of the lower right coordinate
                 t = selectedResizeElement.getElementTransform(SCALE, false);
-                Rectangle2D bounds = selectedResizeElement.getBounds(SCALE);
+                Rectangle2D bounds = selectedResizeElement.getBounds2D(SCALE);
                 Point2D lowerRightT = t.transform(new Point2D.Double(bounds.getX() + bounds.getWidth(), bounds.getY() + bounds.getHeight()), null);
                 
                 //Find the amount to move in order to keep the drag box co-located with the mouse point

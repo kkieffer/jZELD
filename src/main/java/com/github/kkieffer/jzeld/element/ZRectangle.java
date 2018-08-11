@@ -85,13 +85,13 @@ public class ZRectangle extends ZAbstractShape {
     }
     
     @Override
-    protected void fillShape(Graphics2D g, int unitSize, int width, int height) {
-        g.fillRect(0, 0, width, height);
+    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
+        g.fill(new Rectangle2D.Double(0, 0, width, height));
     }
     
     @Override
-    protected void drawShape(Graphics2D g, int unitSize, int width, int height) {
-        g.drawRect(0, 0, width, height);
+    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
+        g.draw(new Rectangle2D.Double(0, 0, width, height));
     }
     
 

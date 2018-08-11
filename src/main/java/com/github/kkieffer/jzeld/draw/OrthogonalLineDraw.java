@@ -2,8 +2,9 @@
 package com.github.kkieffer.jzeld.draw;
 
 import com.github.kkieffer.jzeld.ZCanvas;
-import java.awt.Graphics;
-import java.awt.Point;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
 /**
@@ -16,21 +17,20 @@ import java.awt.geom.Point2D;
  */
 public class OrthogonalLineDraw extends BoundaryDraw {
 
-    public OrthogonalLineDraw(ZCanvas canvas, boolean close) {
-        super(canvas, close);
+    public OrthogonalLineDraw(ZCanvas canvas, boolean close, float strokeWidth, Color lineColor) {
+        super(canvas, close, strokeWidth, lineColor);
     }
     
-    private Point getDrawToPoint(Point2D mouse, Point2D last) {
-        Point p;
+    private Point2D getDrawToPoint(Point2D mouse, Point2D last) {
+
         if (Math.abs(mouse.getX() - last.getX()) > Math.abs(mouse.getY() - last.getY()))  //if x distance is greater, use it
-            p = new Point((int)mouse.getX(), (int)last.getY());
+            return new Point2D.Double(mouse.getX(), last.getY());
         else
-            p = new Point((int)last.getX(), (int)mouse.getY());
-        return p;
+            return new Point2D.Double(last.getX(), mouse.getY());
     }
 
     @Override
-    public void drawClientMouseClicked(Point mouse, int clickCount, int button) {
+    public void drawClientMouseClicked(Point2D mouse, int clickCount, int button) {
         
         if (mousePoints.isEmpty()) { //first point
             this.addPoint(mouse);
@@ -44,7 +44,7 @@ public class OrthogonalLineDraw extends BoundaryDraw {
             Point2D last = mousePoints.get(mousePoints.size()-1);
             
             //last point needed orthogonal to first
-            Point p = getDrawToPoint(last, first);
+            Point2D p = getDrawToPoint(last, first);
             this.addPoint(p);
            
             
@@ -54,35 +54,35 @@ public class OrthogonalLineDraw extends BoundaryDraw {
             
             Point2D last = mousePoints.get(mousePoints.size()-1);
        
-            Point p = getDrawToPoint(mouse, last);
+            Point2D p = getDrawToPoint(mouse, last);
             this.addPoint(p);
  
         }
     }
 
     @Override
-    protected void drawToMouse(Graphics g, Point2D last, Point mouse) {
+    protected void drawToMouse(Graphics2D g, Point2D last, Point2D mouse) {
         if (last == null || mouse == null)
             return;
             
-        Point p = getDrawToPoint(mouse, last);
+        Point2D p = getDrawToPoint(mouse, last);
         
         //Draw temporary line to the current mouse point
-        g.drawLine((int)last.getX(), (int)last.getY(), p.x, p.y);
+        g.draw(new Line2D.Double(last.getX(), last.getY(), p.getX(), p.getY()));
         
     }
     
     
     @Override
-    public void drawClientMousePressed(Point mouse) {
+    public void drawClientMousePressed(Point2D mouse) {
     }
 
     @Override
-    public void drawClientMouseReleased(Point mouse) {
+    public void drawClientMouseReleased(Point2D mouse) {
     }
 
     @Override
-    public void drawClientMouseDragged(Point mouse) {
+    public void drawClientMouseDragged(Point2D mouse) {
     }
     
 }

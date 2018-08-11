@@ -35,18 +35,18 @@ public abstract class ZPolygon extends ZAbstractShape {
     protected abstract Path2D getPath2D(double width, double height); 
     
     @Override
-    protected void fillShape(Graphics2D g, int unitSize, int width, int height) {
+    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
         g.fill(polygon);
     }
     
     @Override
-    protected void drawShape(Graphics2D g, int unitSize, int width, int height) {
+    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
         g.draw(polygon);
     }
     
     
     @Override
-    public void paint(Graphics2D g, int unitSize, int width, int height) {
+    public void paint(Graphics2D g, double unitSize, double width, double height) {
  
        polygon = getPath2D(width, height);
        super.paint(g, unitSize, width, height);

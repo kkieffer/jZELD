@@ -71,14 +71,14 @@ public class ZOval extends ZRectangle {
         return new Ellipse2D.Double(0, 0, r.getWidth(), r.getHeight());
     }
     
-     @Override
-    protected void fillShape(Graphics2D g, int unitSize, int width, int height) {
-        g.fillOval(0, 0, width, height);
+    @Override
+    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
+        g.fill(new Ellipse2D.Double(0, 0, width, height));
     }
     
     @Override
-    protected void drawShape(Graphics2D g, int unitSize, int width, int height) {
-        g.drawOval(0, 0, width, height);
+    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
+        g.draw(new Ellipse2D.Double(0, 0, width, height));
     }
    
     

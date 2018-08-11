@@ -61,7 +61,7 @@ public final class ZCanvasRuler extends ZRectangle {
     
     
     @Override
-    public void paint(Graphics2D g, int unitSize, int width, int height) {
+    public void paint(Graphics2D g, double unitSize, double width, double height) {
         if (!isVisible())
             return;
                 
@@ -81,17 +81,17 @@ public final class ZCanvasRuler extends ZRectangle {
                 
                 int inc = (int)Math.round(i);
                 
-                g.drawLine(inc, 0, inc, 3*height/4);  //draw a vertical bar at i for major tick
+                g.drawLine(inc, 0, inc, (int)(3*height/4));  //draw a vertical bar at i for major tick
                 
                 for (double j=i; j<width; j+=scale/minorTicks) {
                     int jnc = (int)Math.round(j);
-                    g.drawLine(jnc, 0, jnc, height/4);  //draw a vertical bar at j for minor tick
+                    g.drawLine(jnc, 0, jnc, (int)(height/4));  //draw a vertical bar at j for minor tick
                 }
                 
                 if (i==0)
                     g.drawString(unit.getName(), 2, fontMetrics.getHeight());  //draw unit name instead of zero
                 else
-                    g.drawString(Integer.toString(majorVal), inc+2, height-2);
+                    g.drawString(Integer.toString(majorVal), inc+2, (int)height-2);
 
                 majorVal+=majorTickStep;
             }
@@ -102,11 +102,11 @@ public final class ZCanvasRuler extends ZRectangle {
                  
                 int inc = (int)Math.round(i);
 
-                g.drawLine(0, inc, 3*width/4, inc);  //draw a horizontal bar at i for major tick
+                g.drawLine(0, inc, (int)(3*width/4), inc);  //draw a horizontal bar at i for major tick
                 
                  for (double j=i; j<height; j+=scale/minorTicks) {
                         int jnc = (int)Math.round(j);
-                     g.drawLine(0, jnc, width/4, jnc);  //draw a horizontal bar at j for minor tick
+                     g.drawLine(0, jnc, (int)(width/4), jnc);  //draw a horizontal bar at j for minor tick
                  }
                  
                 if (i==0)
