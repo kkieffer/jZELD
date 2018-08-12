@@ -1085,9 +1085,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     
     /**
-     * Merge the selected elements, starting with the first selected and applying the operation to each selected one.  Only elements that
+     * Merge the selected elements, starting with the lowest layer selected and applying the operation to each next layer selected.  Only elements that
      * extend ZAbstractShape can be combined.
-     * The attributes of the newly combined shape are those of the first selected ZAbstractShape.  
+     * The attributes of the newly combined shape are those of the lowest layer selected ZAbstractShape.  
      * @param operation the operation to apply
      * @return the number of shapes combined including the first selected one. If there are no selected ZAbstractShape
      * elements, 0 is returned.
@@ -1105,11 +1105,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         ZAbstractShape ref = null;
         
-        for (ZElement e: selectedElements) {   
+        
+        for (int i=selectedElements.size()-1; i>=0; i--) {
+            
+            ZElement e = selectedElements.get(i);
+            
             if (e instanceof ZAbstractShape) {  
                  
                 if (ref == null) {
-                    ref = (ZAbstractShape)e;  //the first one selected is the reference element
+                    ref = (ZAbstractShape)e;  //lowest layer selected is the reference element
                     removeElement(ref);
                 }
                 else {
@@ -1133,7 +1137,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         addElement(ref);  //add the merged shape
         lastMethod = null;
         selectNone();
-        selectedElements.add(ref);  //make the reference the selected one
+        selectElement(ref, false);
+        
+        repaint();
         return combinedCount;
     }
    
