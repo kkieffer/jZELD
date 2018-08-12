@@ -5,7 +5,7 @@ import com.github.kkieffer.jzeld.ZCanvas;
 import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
 import com.github.kkieffer.jzeld.draw.BoundaryDraw;
 import java.awt.Color;
-import java.awt.geom.Path2D;
+import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
@@ -126,7 +126,7 @@ public class ZQuadrilateral extends ZPolygon {
     
     
     @Override
-    protected Path2D getPath2D(double width, double height) {
+    protected Shape getPolygon(double width, double height) {
                   
         //Move counterclockwise around - these are defaults (rectangle)
         x[0] = 0;

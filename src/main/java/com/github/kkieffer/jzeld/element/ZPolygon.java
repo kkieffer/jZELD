@@ -4,6 +4,7 @@ package com.github.kkieffer.jzeld.element;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -19,8 +20,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ZPolygon extends ZAbstractShape {
     
-    transient private Path2D polygon; 
-  
+    transient private Shape shape;
+    
     protected ZPolygon(){}
     
 
@@ -32,36 +33,50 @@ public abstract class ZPolygon extends ZAbstractShape {
         super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);
     }
     
-    protected abstract Path2D getPath2D(double width, double height); 
+    @Override
+    public boolean supportsFlip() {
+        return true;
+    }
+    //protected abstract Path2D getPath2D(double width, double height); 
     
     @Override
     protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
-        g.fill(polygon);
+        g.fill(shape);
     }
     
     @Override
     protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
-        g.draw(polygon);
+        g.draw(shape);
     }
     
+    
+    protected abstract Shape getPolygon(double width, double height);
+   
+    @Override
+    protected Shape getAbstractShape() {
+        Rectangle2D r = getBounds2D();
+        return getPolygon(r.getWidth(), r.getHeight());
+    }
+
     
     @Override
     public void paint(Graphics2D g, double unitSize, double width, double height) {
  
-       polygon = getPath2D(width, height);
+       Shape polygon = getPolygon(width, height);
+       
+       if (flipHoriz || flipVert) {
+            AffineTransform scaleInstance = AffineTransform.getScaleInstance(flipHoriz ? -1.0 : 1.0, flipVert ? -1.0 : 1.0);  //scaling negative creates a mirror image the other direction
+            shape = scaleInstance.createTransformedShape(polygon);
+            AffineTransform translateInstance = AffineTransform.getTranslateInstance(flipHoriz ? width : 0, flipVert ? height : 0);  //move back to where it was
+            shape = translateInstance.createTransformedShape(shape);
+       }
+       else
+           shape = polygon;  //optimize
+    
        super.paint(g, unitSize, width, height);
     }
 
-    @Override
-    protected Shape getAbstractShape() {
-        Rectangle2D r = getBounds2D();
-        return getPath2D(r.getWidth(), r.getHeight());
-    }
-
-    @Override
-    public boolean supportsFlip() {
-        return false;
-    }
+    
     
    
 

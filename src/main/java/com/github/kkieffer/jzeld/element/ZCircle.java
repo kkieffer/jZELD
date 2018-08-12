@@ -2,7 +2,6 @@
 package com.github.kkieffer.jzeld.element;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -45,9 +44,8 @@ public class ZCircle extends ZOval {
         super(copy, forNew);
     }
     
-    private double radius() {
-        Rectangle2D r = getBounds2D();
-        return r.getWidth() < r.getHeight() ? r.getWidth() : r.getHeight();
+    private static double radius(double w, double h) {
+        return w < h ? w : h;
     }
     
     @Override
@@ -66,22 +64,17 @@ public class ZCircle extends ZOval {
     }
     
     @Override
-    protected Shape getAbstractShape() {
-        double r = radius();
+    protected Shape getPolygon(double width, double height) {
+        double r = radius(width, height);
         return new Ellipse2D.Double(0, 0, r, r);
     }
     
-     @Override
-    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
-        double radius = width < height ? width : height;
-        super.fillShape(g, unitSize, radius, radius);
-    }
-    
     @Override
-    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
-        double radius = width < height ? width : height;
-        super.drawShape(g, unitSize, radius, radius);
+    protected Shape getAbstractShape() {
+        Rectangle2D b = getBounds2D();
+        double r = radius(b.getWidth(), b.getHeight());
+        return new Ellipse2D.Double(0, 0, r, r);
     }
-   
+ 
     
 }

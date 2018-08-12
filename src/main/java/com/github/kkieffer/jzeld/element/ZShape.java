@@ -180,7 +180,7 @@ public class ZShape extends ZAbstractShape {
         shape = scaleInstance.createTransformedShape(shape);
         AffineTransform translateInstance = AffineTransform.getTranslateInstance(bounds.getWidth(), 0);  //move back to where it was
         shape = translateInstance.createTransformedShape(shape);
-        hasChanges = true;
+        super.flipHorizontal();
     }
     
     @Override
@@ -190,7 +190,7 @@ public class ZShape extends ZAbstractShape {
         shape = scaleInstance.createTransformedShape(shape);
         AffineTransform translateInstance = AffineTransform.getTranslateInstance(0, bounds.getHeight());  //move back to where it was
         shape = translateInstance.createTransformedShape(shape);
-        hasChanges = true;
+        super.flipVertical();
     }
     
     

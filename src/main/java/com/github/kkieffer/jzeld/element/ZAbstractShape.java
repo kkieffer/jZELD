@@ -248,7 +248,7 @@ public abstract class ZAbstractShape extends ZElement {
             fillShape(g, unitSize, width, height);
         }
         if (paintAttr != null) {
-            paintAttr.applyPaintAttribute(g, width, height, unitSize);
+            paintAttr.applyPaintAttribute(g, width, height, unitSize, flipHoriz, flipVert);
             fillShape(g, unitSize, width, height);
         }
 

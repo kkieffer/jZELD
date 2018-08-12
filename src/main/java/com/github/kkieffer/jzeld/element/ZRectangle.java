@@ -2,7 +2,6 @@
 package com.github.kkieffer.jzeld.element;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -22,7 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "ZRectangle")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ZRectangle extends ZAbstractShape {
+public class ZRectangle extends ZPolygon {
 
     
     
@@ -62,12 +61,7 @@ public class ZRectangle extends ZAbstractShape {
         return "";
     }
     
-    @Override
-    public boolean supportsFlip() {
-        return false;
-    }
 
-    
     @Override
     public ZRectangle copyOf(boolean forNew) {
         return new ZRectangle(this, forNew);
@@ -78,20 +72,10 @@ public class ZRectangle extends ZAbstractShape {
         return false;
     };
     
-    @Override
-    protected Shape getAbstractShape() {
-        Rectangle2D r = getBounds2D();
-        return new Rectangle2D.Double(0, 0, r.getWidth(), r.getHeight());
-    }
     
     @Override
-    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
-        g.fill(new Rectangle2D.Double(0, 0, width, height));
-    }
-    
-    @Override
-    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
-        g.draw(new Rectangle2D.Double(0, 0, width, height));
+    protected Shape getPolygon(double width, double height) {
+        return new Rectangle2D.Double(0, 0, width, height);
     }
     
 

@@ -4,9 +4,7 @@ package com.github.kkieffer.jzeld.element;
 import com.github.kkieffer.jzeld.ZCanvas;
 import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Shape;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -80,14 +78,12 @@ public class ZRoundedRectangle extends ZRectangle {
         hasChanges = true;
     }
      
-    
     @Override
-    protected Shape getAbstractShape() {
-        Rectangle2D r = getBounds2D();
-        return new RoundRectangle2D.Double(0, 0, r.getWidth(), r.getHeight(), radius*2, radius*2);
+    protected Shape getPolygon(double width, double height) {
+        return new RoundRectangle2D.Double(0, 0, width, height, radius*2, radius*2);
     }
     
-     @Override
+    @Override
     public boolean supportsEdit() {
         return true;
     };
@@ -109,18 +105,6 @@ public class ZRoundedRectangle extends ZRectangle {
         
         return false;
     }
-    
-     
-    @Override
-    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
-        g.fill(new RoundRectangle2D.Double(0, 0, width, height, radius*unitSize*2, radius*unitSize*2));
-    }
-    
-    @Override
-    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
-        g.draw(new RoundRectangle2D.Double(0, 0, width, height, radius*unitSize*2, radius*unitSize*2));
-    }
-    
    
 
     

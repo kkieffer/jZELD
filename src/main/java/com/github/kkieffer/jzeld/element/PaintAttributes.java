@@ -78,7 +78,7 @@ public class PaintAttributes implements Serializable {
         }
     }
     
-    public void applyPaintAttribute(Graphics2D g2d, double width, double height, double unitSize) {
+    public void applyPaintAttribute(Graphics2D g2d, double width, double height, double unitSize, boolean flipHoriz, boolean flipVert) {
         
         float w = (float)width;
         float h = (float)height;
@@ -86,10 +86,14 @@ public class PaintAttributes implements Serializable {
         Paint p = null;
         switch (type) {
             case LINEAR:
-                p = new LinearGradientPaint(w * start.x, h * start.y, w * finish.x, h * finish.y, dist, colors, cycleMethod);
+                
+                Point2D.Float theStart = new Point2D.Float(flipHoriz ? 1.0f-start.x : start.x, flipVert ? 1.0f-start.y : start.y);
+                Point2D.Float theEnd = new Point2D.Float(flipHoriz ? 1.0f-finish.x : finish.x, flipVert ? 1.0f-finish.y : finish.y);
+             
+                p = new LinearGradientPaint(w * theStart.x, h * theStart.y, w * theEnd.x, h * theEnd.y, dist, colors, cycleMethod);
                 break;
             case RADIAL:
-                
+                                
                 float radiusVal = 0.0f;
                 switch (radiusRelative) {
                     case WIDTH:
@@ -106,11 +110,16 @@ public class PaintAttributes implements Serializable {
                         break;
                 }
                 
-                p = new RadialGradientPaint(w * center.x, h * center.y, radiusVal, w * focus.x, h * focus.y, dist, colors, cycleMethod);
+                Point2D.Float theCenter = new Point2D.Float(flipHoriz ? 1.0f-center.x : center.x, flipVert ? 1.0f-center.y : center.y);
+                Point2D.Float theFocus = new Point2D.Float(flipHoriz ? 1.0f-focus.x : focus.x, flipVert ? 1.0f-focus.y : focus.y);
+
+                
+                p = new RadialGradientPaint(w * theCenter.x, h * theCenter.y, radiusVal, w * theFocus.x, h * theFocus.y, dist, colors, cycleMethod);
                 break;
 
             case PATTERN:
-                p = new TexturePaint((BufferedImage)patternImage.getImage(), new Rectangle2D.Double(0, 0, imgWidth * unitSize, imgHeight * unitSize));
+                                
+                p = new TexturePaint((BufferedImage)patternImage.getImage(), new Rectangle2D.Double(0, 0, imgWidth * unitSize * (flipHoriz ? -1 : 1), imgHeight * unitSize * (flipVert ? -1 : 1)));
                 break;
                 
         }

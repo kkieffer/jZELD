@@ -97,12 +97,7 @@ public class ZImage extends ZRectangle {
         backgroundColor = null;
         hasChanges = true;
     }
-    
-    
-    @Override
-    public boolean supportsFlip() {
-        return true;
-    }
+   
     
     @Override
     public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {

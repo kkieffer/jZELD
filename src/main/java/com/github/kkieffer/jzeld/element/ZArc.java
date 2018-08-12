@@ -4,14 +4,11 @@ package com.github.kkieffer.jzeld.element;
 import com.github.kkieffer.jzeld.ZCanvas;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
-import java.awt.geom.Rectangle2D;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -105,21 +102,12 @@ public class ZArc extends ZRectangle {
     }
     
     @Override
-    protected Shape getAbstractShape() {
-        Rectangle2D r = getBounds2D();
-        return new Arc2D.Double(0, 0, r.getWidth(), r.getHeight(), startAngle, arcAngle, type.typeVal);
+    protected Shape getPolygon(double width, double height) {
+        return new Arc2D.Double(0, 0, width, height, startAngle, arcAngle, type.typeVal);
     }
     
-    @Override
-    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
-        g.fill(shape);
-    }
-
-    @Override
-    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
-        g.draw(shape);
-    }
     
+   
     public void setStartAngle(double start) {
         startAngle = start;
         hasChanges = true;
@@ -176,15 +164,6 @@ public class ZArc extends ZRectangle {
         deselectedForEdit();
     }
 
-    @Override
-    public void paint(Graphics2D g, double unitSize, double width, double height) {
-        AffineTransform scaleInstance = AffineTransform.getScaleInstance(unitSize, unitSize);
-        shape = scaleInstance.createTransformedShape(getAbstractShape());
-        
-        super.paint(g, unitSize, width, height);
-
-    }
-  
     
     private static class ArcDialog extends JFrame {
 

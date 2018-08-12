@@ -3,7 +3,7 @@ package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.draw.BoundaryDraw;
 import java.awt.Color;
-import java.awt.geom.Path2D;
+import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -56,14 +56,7 @@ public abstract class ZAbstractTriangle extends ZPolygon {
     
     
     @Override
-    public boolean supportsFlip() {
-        return true;
-    }
-    
-
-    
-    @Override
-    protected Path2D getPath2D(double width, double height) {
+    protected Shape getPolygon(double width, double height) {
            
         if (type == null)
             throw new RuntimeException("Custom triangles must override getPath2D()");
@@ -72,17 +65,10 @@ public abstract class ZAbstractTriangle extends ZPolygon {
         
         double x = 0;
         double x2 = width;
-        if (flipHoriz) {
-            x = width;
-            x2 = 0;                  
-        }
         
         double y=0;
         double y2=height;
-        if (flipVert) {
-            y = height;
-            y2 = 0;
-        }
+        
         
         double xc;  
         if (type == TriType.ISOCELES)
