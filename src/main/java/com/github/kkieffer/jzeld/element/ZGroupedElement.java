@@ -255,12 +255,26 @@ public final class ZGroupedElement extends ZElement {
 
     }
 
-    public Iterable<Class<? extends ZElement>> getGroupedClasses() {
-        ArrayList<Class<? extends ZElement>> classes = new ArrayList<>(elements.size());
-        for (ZElement e : elements)
-            classes.add(e.getClass());
-        
-        return classes;
+
+    /**
+     * Add all grouped element classes to the provided list if they aren't already in the list. If the group contains another ZGroupedElement,
+     * its elements are added by calling this method again recursively.
+     * @param elementTypes the array to add element classes ot
+     */
+    public void addGroupedClasses(final ArrayList<Class<? extends ZElement>> elementTypes) {
+
+        for (ZElement e : elements) {
+            
+            if (e instanceof ZGroupedElement)
+                ((ZGroupedElement)e).addGroupedClasses(elementTypes);  //recursively add its element's classes
+            else {
+                Class<? extends ZElement> theClass = e.getClass();
+                if (!elementTypes.contains(theClass))  //Add this class type to our list of types, if it doesn't already exist there
+                    elementTypes.add(theClass);
+            }
+            
+        }
+
     }
 
     

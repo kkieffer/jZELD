@@ -109,15 +109,20 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         
         public String getHtmlHelp() {
+            
+            String common = "<br><br>The element at the lowest layer is the reference element, and elements are combined in sequence moving up the Z-plane layers to the top. " + 
+                            "The resultant shape inherits all the color and line properties from the reference element.";
+            
+            
             switch (this) {
                 case Join:
-                    return "Joins multiple shapes into a single shape.  All parts of the shapes are included, both overlapping and non-overlapping.";
+                    return "Joins multiple shapes into a single shape.  All parts of the shapes are included, both overlapping and non-overlapping." + common;
                 case Subtract:
-                    return "Subtracts from the first selected shape the overlapping areas in the other selected shapes";
+                    return "Subtracts from the first selected shape the overlapping areas in the other selected shapes" + common;
                 case Intersect:
-                    return "Creates a shape from only the overlapping parts of the selected shapes.";
+                    return "Creates a shape from only the overlapping parts of the selected shapes." + common;
                 case Exclusive_Join:
-                    return "Joins multiple shapes into a single shape.  All parts of the shapes are included except the ones that overlap with each other.";
+                    return "Joins multiple shapes into a single shape.  All parts of the shapes are included except the ones that overlap with each other." + common;
                 default:
                     throw new RuntimeException("Unhandled CombineOperation case");
             }
@@ -1121,10 +1126,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                  
                 ZAbstractShape abs = (ZAbstractShape)e;
                 
+                //Check first one - it becomes reference element
                 if (ref == null) 
                     ref = abs;  //lowest layer selected is the reference element            
                 else 
-                    combineList.add(abs);
+                    combineList.add(abs);  //add all others to our list
                
                 removeElement(abs);
 
@@ -1135,7 +1141,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return 0;
         
         
-        Shape mergedShape = ref.combineWith(operation, combineList);  //combine shapes
+        Shape mergedShape = ref.combineWith(operation, combineList);  //combine reference with list of other elements
         Rectangle2D bounds = mergedShape.getBounds2D();  //find the new position of the joined object
 
         //Move back to zero position reference
@@ -2316,12 +2322,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (!elementTypes.contains(e.getClass()))  //Add this class type to our list of types
                  elementTypes.add(e.getClass());
             
-            if (e instanceof ZGroupedElement) {  //find classes contained within
-                for (Class<? extends ZElement> c : ((ZGroupedElement)e).getGroupedClasses()) {
-                    if (!elementTypes.contains(c))  //Add this class type to our list of types
-                        elementTypes.add(c);
-                }
-            }
+            if (e instanceof ZGroupedElement)   //find classes contained within group
+                ((ZGroupedElement)e).addGroupedClasses(elementTypes);
+            
             
         }
         

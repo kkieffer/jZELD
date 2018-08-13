@@ -193,10 +193,10 @@ public abstract class ZAbstractShape extends ZElement {
     
     
     /**
-     * Combine this shape with the provided ZAbstractShape
+     * Combine this shape with the provided list of ZAbstractShapes. The 
      * @param operation the merge operation
-     * @param shapes the shape to merge with
-     * @return true if a merge occurred, false if the provided ZAbstractShape does not support being merged
+     * @param shapes the elements whose shapes are combined
+     * @return the combined shape
      */
     public final Shape combineWith(CombineOperation operation, ArrayList<ZAbstractShape> shapes) {
         
