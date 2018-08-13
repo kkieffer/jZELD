@@ -13,6 +13,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Arrays;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -194,42 +195,36 @@ public abstract class ZAbstractShape extends ZElement {
     /**
      * Combine this shape with the provided ZAbstractShape
      * @param operation the merge operation
-     * @param zShape the shape to merge with
+     * @param shapes the shape to merge with
      * @return true if a merge occurred, false if the provided ZAbstractShape does not support being merged
      */
-    public final Shape combineWith(CombineOperation operation, ZAbstractShape zShape) {
+    public final Shape combineWith(CombineOperation operation, ArrayList<ZAbstractShape> shapes) {
         
-        Shape mergeShape = getShape();
+        Shape refShape = getShape();  //reference shape
+        Area a = new Area(refShape);
         
-        Shape from = zShape.getShape();
-        if (from == null)
-            return null;
-        
-        Area a = new Area(mergeShape);
-        
-        switch (operation) {
-            case Join:
-                a.add(new Area(from));
-                break;
-            case Subtract:
-                a.subtract(new Area(from));
-                break;
-            case Intersect:
-                a.intersect(new Area(from));
-                break;
-            case Exclusive_Join:
-                a.exclusiveOr(new Area(from));
-                break;
+        for (ZAbstractShape zShape : shapes) {
+            
+            Shape from = zShape.getShape();
+
+            switch (operation) {
+                case Join:
+                    a.add(new Area(from));
+                    break;
+                case Subtract:
+                    a.subtract(new Area(from));
+                    break;
+                case Intersect:
+                    a.intersect(new Area(from));
+                    break;
+                case Exclusive_Join:
+                    a.exclusiveOr(new Area(from));
+                    break;
+            }
         }
         
-                
-        Rectangle2D bounds = a.getBounds2D();  //find the new position of the joined object (may move, especially with Intersect)
-
-        //Move back to zero position reference
-        AffineTransform pos = AffineTransform.getTranslateInstance(-bounds.getX(), -bounds.getY());
-        mergeShape = pos.createTransformedShape(a);
-   
-        return mergeShape;
+               
+        return a;
     }
     
     

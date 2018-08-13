@@ -77,10 +77,12 @@ public class ZShape extends ZAbstractShape {
      * @param borderColor color of the border, which can be null only if the borderWidth is zero
      * @param dashPattern the border dash pattern, null for solid
      * @param fillColor color of the rectangle area, which can be null for transparent (but not in combination with a zero width border)
+     * @param pA paint attributes
      */
-    public ZShape(double x, double y, Shape s, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
+    public ZShape(double x, double y, Shape s, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, PaintAttributes pA) {
         super(x, y, s.getBounds2D().getWidth(), s.getBounds2D().getHeight(), rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);        
         this.shape = s;
+        this.paintAttr = pA;
     }
     
     protected ZShape(ZShape src, boolean forNew) {

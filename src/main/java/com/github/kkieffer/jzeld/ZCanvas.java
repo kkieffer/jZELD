@@ -250,6 +250,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private DrawClient drawClient = null;
     
     private boolean shiftPressed = false;
+    private boolean altPressed = false;
     private boolean shearXPressed = false;
     private boolean shearYPressed = false;
     private Point2D selectedMouseDrag;
@@ -339,6 +340,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "Plus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "Minus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, KeyEvent.SHIFT_DOWN_MASK), "ShiftPressed");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ALT, KeyEvent.ALT_DOWN_MASK), "AltPressed");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 0, true), "ShiftReleased");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ALT, 0, true), "AltReleased");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.ALT_DOWN_MASK), "S_AltPressed");
@@ -390,11 +392,18 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 shearYPressed = true;
             }
         });
+        am.put("AltPressed", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                altPressed = true;
+            }
+        });
         am.put("AltReleased", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 shearYPressed = false;
                 shearXPressed = false;
+                altPressed = false;
             }
         });
         am.put("MoveLeft", new AbstractAction(){
@@ -1090,12 +1099,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * The attributes of the newly combined shape are those of the lowest layer selected ZAbstractShape.  
      * @param operation the operation to apply
      * @return the number of shapes combined including the first selected one. If there are no selected ZAbstractShape
-     * elements, 0 is returned.
+     * elements, 0 is returned.  If only one ZAbstractShape is selected, zero is returned and it is not modified.
      */
     public int combineSelectedElements(CombineOperation operation) {
-        
-        int combinedCount = 0;
-        
+                
         ArrayList<ZElement> selectedElements = getSelectedElements();
 
         if (selectedElements.size() <= 1 || passThruElement != null) 
@@ -1104,7 +1111,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         undoStack.saveContext(fields.zElements);
 
         ZAbstractShape ref = null;
-        
+        ArrayList<ZAbstractShape> combineList = new ArrayList<>();
         
         for (int i=selectedElements.size()-1; i>=0; i--) {
             
@@ -1112,35 +1119,39 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
             if (e instanceof ZAbstractShape) {  
                  
-                if (ref == null) {
-                    ref = (ZAbstractShape)e;  //lowest layer selected is the reference element
-                    removeElement(ref);
-                }
-                else {
-                   
-                    Shape mergedShape = ref.combineWith(operation, (ZAbstractShape)e);  //combine shapes
-                    if (mergedShape != null) {  //was something that could be merged
-                        ZShape shape = new ZShape(ref.getPosition().getX(), ref.getPosition().getY(), mergedShape, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor());
-                        removeElement(e);  //remove the merged element
-                        ref = shape;  //assign to the new reference
-                    }
-                }
-                combinedCount++;
+                ZAbstractShape abs = (ZAbstractShape)e;
+                
+                if (ref == null) 
+                    ref = abs;  //lowest layer selected is the reference element            
+                else 
+                    combineList.add(abs);
+               
+                removeElement(abs);
 
             }
         }
         
-        if (ref == null)  //nothing merged
+        if (ref == null || combineList.isEmpty())  //nothing to merge
             return 0;
         
         
-        addElement(ref);  //add the merged shape
+        Shape mergedShape = ref.combineWith(operation, combineList);  //combine shapes
+        Rectangle2D bounds = mergedShape.getBounds2D();  //find the new position of the joined object
+
+        //Move back to zero position reference
+        AffineTransform pos = AffineTransform.getTranslateInstance(-bounds.getX(), -bounds.getY());
+        mergedShape = pos.createTransformedShape(mergedShape);
+   
+        
+        ZShape shape = new ZShape(bounds.getX(), bounds.getY(), mergedShape, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes());               
+        
+        addElement(shape);  //add the merged shape
         lastMethod = null;
         selectNone();
-        selectElement(ref, false);
+        selectElement(shape, false);
         
         repaint();
-        return combinedCount;
+        return combineList.size() + 1;
     }
    
     
@@ -1882,7 +1893,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     
-    //Determine the selected object, if any, from the mouse pick.  If the object is selected, the upper left corner (transformed) is returned
+    //Determine the selected object, if any, from the mouse pick. 
     private void selectElement(MouseEvent e) {
         
         Point2D mouseLoc = getScaledMouse(e);
@@ -1894,7 +1905,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             ZElement o = it.next();
             if (!o.isSelectable()) //don't select anything that's unselectable
                 continue;
-                          
+                                   
+            if (o.isSelected() && altPressed)  //ignore selected objects when alt pressed
+                continue;
+            
             Rectangle2D boundsBox = o.getBounds2D(SCALE);
 
             Point2D lowerRightCorner = new Point2D.Double(boundsBox.getX() + boundsBox.getWidth(), boundsBox.getY() + boundsBox.getHeight());
