@@ -1262,8 +1262,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
    
     
     /**
-     * Adds an object to the canvas, on the top layer
-     * @param e object to add
+     * Adds an element to the canvas, on the top layer
+     * @param e element to add
      * @return true if added, false if already exists on canvas
      */
     public boolean addElement(ZElement e) {
@@ -1281,8 +1281,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
-     * Removes an object from the canvas
-     * @param e the object to remove, fails silently if not found
+     * Removes an element from the canvas
+     * @param e the element to remove, fails silently if not found
      */
     public void removeElement(ZElement e) {
         if (!fields.zElements.remove(e))
@@ -1295,6 +1295,25 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         lastMethod = null;
     }
+    
+    /**
+     * Replaces an element in the canvas with another one.  The Z position is maintained.
+     * @param replace element to replace
+     * @param with element to replace with
+     * @return true if the element was replaced, false if "replace" element was not found
+     */
+    public boolean replaceElement(ZElement replace, ZElement with) {
+        if (!fields.zElements.contains(replace))
+            return false;
+        
+        fields.zElements.set(fields.zElements.indexOf(replace), with);
+        
+        replace.removedFrom(this);
+        with.addedTo(this);
+        
+        return true;
+    }
+    
     
     /**
      * Sends the selected elements to the lowest Z plane layer, fails silently if nothing selected
@@ -1598,7 +1617,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 //draw drag box in the corner
                 if (o.isResizable()) {  
                     g2d.setColor(Color.BLACK);  
-                    g2d.fill(new Rectangle2D.Double(r.getWidth()-(DRAG_BOX_SIZE * pixScale/zoom), r.getHeight()-(DRAG_BOX_SIZE * pixScale/zoom), DRAG_BOX_SIZE * pixScale/zoom, DRAG_BOX_SIZE * pixScale/zoom));
+                    double dragBoxWidth = DRAG_BOX_SIZE * pixScale/zoom;
+                    if (dragBoxWidth*2 < r.getWidth() || dragBoxWidth*2 < r.getHeight()) //dont' draw drag box if shape is too small
+                        g2d.fill(new Rectangle2D.Double(r.getWidth()-dragBoxWidth, r.getHeight()-dragBoxWidth, dragBoxWidth, dragBoxWidth));
                 }
                                
             }
