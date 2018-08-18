@@ -56,7 +56,7 @@ public abstract class ZAbstractTriangle extends ZPolygon {
     
     
     @Override
-    protected Shape getPolygon(double width, double height) {
+    protected Shape getPolygon(double width, double height, double scale) {
            
         if (type == null)
             throw new RuntimeException("Custom triangles must override getPath2D()");

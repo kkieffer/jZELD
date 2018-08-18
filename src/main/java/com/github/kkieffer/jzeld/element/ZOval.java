@@ -64,7 +64,7 @@ public class ZOval extends ZRectangle {
     }
     
     @Override
-    protected Shape getPolygon(double width, double height) {
+    protected Shape getPolygon(double width, double height, double scale) {
         return new Ellipse2D.Double(0, 0, width, height);
     }
     

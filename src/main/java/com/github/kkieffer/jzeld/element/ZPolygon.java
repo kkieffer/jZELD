@@ -49,19 +49,19 @@ public abstract class ZPolygon extends ZAbstractShape {
     }
     
     
-    protected abstract Shape getPolygon(double width, double height);
+    protected abstract Shape getPolygon(double width, double height, double scale);
    
     @Override
     protected Shape getAbstractShape() {
         Rectangle2D r = getBounds2D();
-        return getPolygon(r.getWidth(), r.getHeight());
+        return getPolygon(r.getWidth(), r.getHeight(), 1.0);
     }
 
     
     @Override
     public void paint(Graphics2D g, double unitSize, double width, double height) {
  
-       Shape polygon = getPolygon(width, height);
+       Shape polygon = getPolygon(width, height, unitSize);
        
        if (flipHoriz || flipVert) {
             AffineTransform scaleInstance = AffineTransform.getScaleInstance(flipHoriz ? -1.0 : 1.0, flipVert ? -1.0 : 1.0);  //scaling negative creates a mirror image the other direction

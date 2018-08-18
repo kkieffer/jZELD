@@ -74,7 +74,7 @@ public class ZRectangle extends ZPolygon {
     
     
     @Override
-    protected Shape getPolygon(double width, double height) {
+    protected Shape getPolygon(double width, double height, double scale) {
         return new Rectangle2D.Double(0, 0, width, height);
     }
     

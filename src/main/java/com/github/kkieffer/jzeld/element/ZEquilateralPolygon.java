@@ -109,7 +109,7 @@ public class ZEquilateralPolygon extends ZPolygon {
     }
     
     @Override
-    protected Shape getPolygon(double width, double height) {
+    protected Shape getPolygon(double width, double height, double scale) {
         
         Point2D center = new Point2D.Double(width/2.0, height/2.0);
         double angleStep = Math.toRadians(360.0/sides);

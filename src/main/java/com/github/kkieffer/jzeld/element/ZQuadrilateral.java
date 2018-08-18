@@ -126,7 +126,7 @@ public class ZQuadrilateral extends ZPolygon {
     
     
     @Override
-    protected Shape getPolygon(double width, double height) {
+    protected Shape getPolygon(double width, double height, double scale) {
                   
         //Move counterclockwise around - these are defaults (rectangle)
         x[0] = 0;

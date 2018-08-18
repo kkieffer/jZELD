@@ -79,8 +79,8 @@ public class ZRoundedRectangle extends ZRectangle {
     }
      
     @Override
-    protected Shape getPolygon(double width, double height) {
-        return new RoundRectangle2D.Double(0, 0, width, height, radius*2, radius*2);
+    protected Shape getPolygon(double width, double height, double scale) {
+        return new RoundRectangle2D.Double(0, 0, width, height, scale*radius*2, scale*radius*2);
     }
     
     @Override

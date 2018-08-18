@@ -64,7 +64,7 @@ public class ZCircle extends ZOval {
     }
     
     @Override
-    protected Shape getPolygon(double width, double height) {
+    protected Shape getPolygon(double width, double height, double scale) {
         double r = radius(width, height);
         return new Ellipse2D.Double(0, 0, r, r);
     }

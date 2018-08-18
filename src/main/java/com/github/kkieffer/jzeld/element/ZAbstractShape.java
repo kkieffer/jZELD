@@ -170,7 +170,7 @@ public abstract class ZAbstractShape extends ZElement {
      * Retrieves the abstract shape and then transforms it according to the rotation and position where it lies on the canvas
      * @return 
      */
-    private Shape getShape() {
+    protected Shape getShape() {
         
         Shape s = getAbstractShape();  //gets the abstract shape (placed at 0,0)
         Rectangle2D bounds = getBounds2D();
@@ -182,6 +182,10 @@ public abstract class ZAbstractShape extends ZElement {
         //Rotate it
         AffineTransform rotate = AffineTransform.getRotateInstance(Math.toRadians(this.getRotation()));
         s = rotate.createTransformedShape(s);
+        
+        //Shear it
+        AffineTransform shear = AffineTransform.getShearInstance(this.getShearX(), this.getShearY());
+        s = shear.createTransformedShape(s);
         
         //Move to its position
         AffineTransform pos = AffineTransform.getTranslateInstance(bounds.getWidth()/2 + bounds.getX(), bounds.getHeight()/2  + bounds.getY());
