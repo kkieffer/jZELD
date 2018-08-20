@@ -602,7 +602,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public Point2D getOrigin() {
         return new Point2D.Double(fields.origin.getX()/SCALE, fields.origin.getY()/SCALE);
     }
-
+    
     /**
      * Provides the page drawing area of the canvas, in units 
      * @return a Rectangle2D where x,y are the origin and width,height are the bounds, returns null if unbounded
@@ -1270,6 +1270,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (fields.zElements.contains(e))
             return false;
         
+        undoStack.saveContext(fields.zElements);
+
         fields.zElements.addFirst(e);
         uuidMap.put(e.getUUID(), e);
 
@@ -1288,6 +1290,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (!fields.zElements.remove(e))
             return;
             
+        undoStack.saveContext(fields.zElements);
+
         uuidMap.remove(e.getUUID());
         e.removedFrom(this);
     
@@ -1306,6 +1310,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (!fields.zElements.contains(replace))
             return false;
         
+        undoStack.saveContext(fields.zElements);
+
         fields.zElements.set(fields.zElements.indexOf(replace), with);
         
         replace.removedFrom(this);
@@ -1544,11 +1550,16 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         repaint();  
     }
     
+    public void deleteAllElements() {
+        undoStack.saveContext(fields.zElements);
+        deleteAll();
+    }
+    
     /**
      * Delete all elements on the canvas
      */
-    public void deleteAll() {
-
+    private void deleteAll() {
+        
         //Tell all they were removed (use array to avoid elements deleting other elements (concurrent mod issues)
         ZElement[] elements = new ZElement[fields.zElements.size()];
         fields.zElements.toArray(elements);
@@ -2031,7 +2042,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public void mouseClicked(MouseEvent e) {
                         
         if (drawClient != null) {
-            drawClient.drawClientMouseClicked(getScaledMouse(e), e.getClickCount(), e.getButton());
+            drawClient.drawClientMouseClicked(getScaledMouse(e), e);
             repaint();
             return;
         }
