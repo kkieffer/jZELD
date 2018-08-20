@@ -63,22 +63,15 @@ public abstract class ZAbstractTriangle extends ZPolygon {
 
         ArrayList<Point2D> points = new ArrayList<>(3);
         
-        double x = 0;
-        double x2 = width;
-        
-        double y=0;
-        double y2=height;
-        
-        
         double xc;  
         if (type == TriType.ISOCELES)
             xc = width/2.0;
         else 
-            xc = x;  //for right triangle
+            xc = 0;  //for right triangle
 
-        points.add(new Point2D.Double(xc, y));
-        points.add(new Point2D.Double(x, y2));
-        points.add(new Point2D.Double(x2, y2));
+        points.add(new Point2D.Double(0, height));  //lower left
+        points.add(new Point2D.Double(xc, 0));      //upper left or upper middle
+        points.add(new Point2D.Double(width, height));  //lower right
         
         
         return BoundaryDraw.pathFromPoints(points, true);

@@ -103,7 +103,7 @@ public class ZArc extends ZRectangle {
     
     @Override
     protected Shape getPolygon(double width, double height, double scale) {
-        return new Arc2D.Double(0, 0, width, height, startAngle, arcAngle, type.typeVal);
+        return new Arc2D.Double(0, 0, width, height, -startAngle, -arcAngle, type.typeVal);
     }
     
     

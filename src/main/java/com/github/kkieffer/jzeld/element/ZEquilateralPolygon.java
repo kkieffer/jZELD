@@ -135,7 +135,7 @@ public class ZEquilateralPolygon extends ZPolygon {
             
             points.add(new Point2D.Double(x,y));
             
-            angle += angleStep;
+            angle -= angleStep;
         }
         
         return BoundaryDraw.pathFromPoints(points, true);
