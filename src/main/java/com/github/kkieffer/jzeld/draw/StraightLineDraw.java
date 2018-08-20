@@ -3,6 +3,7 @@ package com.github.kkieffer.jzeld.draw;
 
 import com.github.kkieffer.jzeld.ZCanvas;
 import java.awt.Color;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 /**
@@ -19,10 +20,10 @@ public class StraightLineDraw extends BoundaryDraw {
     }
 
     @Override
-    public void drawClientMouseClicked(Point2D mouse, int clickCount, int button) {
+    public void drawClientMouseClicked(Point2D mouse, MouseEvent e) {
         this.addPoint(mouse);
         
-        if (clickCount > 1) 
+        if (e.getClickCount() > 1) 
             complete();
     }
 

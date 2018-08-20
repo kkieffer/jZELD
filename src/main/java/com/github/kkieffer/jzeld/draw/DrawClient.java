@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.draw;
 
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 /**
@@ -30,27 +31,26 @@ public interface DrawClient {
 
     /**
      * The mouse was clicked on the canvas.
-     * @param mouse mouse location
-     * @param clickCount number of clicks
-     * @param button the mouse button number
+     * @param mouse mouse location on the canvas, taking into account the zoom and origin offset
+     * @param e the original mouse event
      */
-    public void drawClientMouseClicked(Point2D mouse, int clickCount, int button);
+    public void drawClientMouseClicked(Point2D mouse, MouseEvent e);
 
     /**
      * The mouse was pressed down on the canvas
-     * @param mouse mouse location
+     * @param mouse mouse location on the canvas, taking into account the zoom and origin offset
      */
     public void drawClientMousePressed(Point2D mouse);
 
     /**
      * The mouse was released on the canvas
-     * @param mouse mouse location
+     * @param mouse mouse location on the canvas, taking into account the zoom and origin offset
      */
     public void drawClientMouseReleased(Point2D mouse);
 
     /**
      * The mouse was dragged on the canvas
-     * @param mouse mouse location
+     * @param mouse mouse location on the canvas, taking into account the zoom and origin offset
      */
     public void drawClientMouseDragged(Point2D mouse);
     
