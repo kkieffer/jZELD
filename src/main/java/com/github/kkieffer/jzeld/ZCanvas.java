@@ -780,13 +780,20 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         undoStack.saveContext(fields.zElements);
     }
     
-    
     /**
-     * Removes the previous change from the canvas
+     * Enables or suspends saving the canvas context to the undo stack.  When suspended, canvas changes after this call cannot be 
+     * undone. This is useful if a feature needs to change multiple items at once, and its not desirable to back out any one 
+     * individual change but only the whole thing.
+     * @param enable true to enable the undo, false to disable
      */
-    public void undo() {
-        
-        LinkedList<ZElement> restoreContext = undoStack.restoreContext();
+    public void enableUndoContextSave(boolean enable) {
+        if (enable)
+            undoStack.resumeSave();
+        else
+            undoStack.suspendSave();
+    }
+    
+    private void restoreContext(LinkedList<ZElement> restoreContext) {
         if (restoreContext != null) {
             
             deleteAll();
@@ -802,8 +809,25 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
             selectNone();
         }
+    }
+    
+    /**
+     * Removes the previous change from the canvas
+     */
+    public void undo() {
+        
+        restoreContext(undoStack.undo(fields.zElements));
         repaint();
     }
+    
+    
+    public void redo() {
+                
+        restoreContext(undoStack.redo());
+        repaint();
+        
+    }
+    
     
     /**
      * Repeats the previous change 
@@ -1041,6 +1065,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         undoStack.saveContext(fields.zElements);
 
+        undoStack.suspendSave();  //don't push all the remove and add changes to the undo stack
+        
         Collections.reverse(selectedElements); //the selected elements are ordered with top z plane first.  But the Grouped Element draws grouped elements in the order provided, so we need to reverse the list
         ZGroupedElement group = ZGroupedElement.createGroup(selectedElements);  //create the group of elements
         
@@ -1050,6 +1076,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         addElement(group);  //add the group element
         selectNone();
         group.select();
+        
+        undoStack.resumeSave();
+
     }
     
     /**
@@ -1064,6 +1093,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return;
 
         undoStack.saveContext(fields.zElements);
+
+        undoStack.suspendSave();  //don't push all the removed and restored element changes to the undo stack
 
         ArrayList<ZElement> restoredElements = new ArrayList<>();  //create a temporary list to hold all restored elements
 
@@ -1094,7 +1125,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             e.select();
         }
          
-        
+        undoStack.resumeSave();
+
     }
     
     
@@ -1114,7 +1146,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return 0;
 
         undoStack.saveContext(fields.zElements);
+        
+        undoStack.suspendSave();  //don't push all the removal and adding to the undo stack
 
+        
         ZAbstractShape ref = null;
         ArrayList<ZAbstractShape> combineList = new ArrayList<>();
         
@@ -1156,6 +1191,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         selectNone();
         selectElement(shape, false);
         
+        undoStack.resumeSave(); 
+  
         repaint();
         return combineList.size() + 1;
     }
@@ -1283,8 +1320,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
-     * Removes an element from the canvas
-     * @param e the element to remove, fails silently if not found
+     * Removes an element from the canvas.  Fails silently if element is not on canvas
+     * @param e element to remove
      */
     public void removeElement(ZElement e) {
         if (!fields.zElements.remove(e))
@@ -1297,7 +1334,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
         canvasModified = true;
 
-        lastMethod = null;
+        lastMethod = null; 
     }
     
     /**
@@ -1311,7 +1348,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return false;
         
         undoStack.saveContext(fields.zElements);
-
+        
         fields.zElements.set(fields.zElements.indexOf(replace), with);
         
         replace.removedFrom(this);
@@ -1488,7 +1525,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 i++;
             }
             
-            lastMethod = null;
             return externalCopy;
         }
         else
@@ -1545,7 +1581,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         addElement(toPaste);
         toPaste.select();
-        lastMethod = null;            
 
         repaint();  
     }
@@ -1759,7 +1794,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         lastSelectedElement = null;
         for (ZCanvasEventListener l : selectListeners)
             l.elementSelected(null);
-        lastMethod = null;        
 
     }
     
@@ -2269,7 +2303,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
             }
                         
-            lastMethod = null;                 
         }
         else {  //nothing selected
             mouseDrag = mouseLoc;
@@ -2319,7 +2352,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 }
             }
             
-            lastMethod = null;            
             mouseWheelLastMoved = System.nanoTime();
             repaint();
         }

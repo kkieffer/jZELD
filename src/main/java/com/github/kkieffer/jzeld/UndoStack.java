@@ -19,6 +19,10 @@ public class UndoStack {
        
     //History of all the ZElement changes, push each new revision to the stack, pop to undo
     Deque<LinkedList<ZElement>> undoHistory = new ArrayDeque<>();
+    Deque<LinkedList<ZElement>> redoHistory = new ArrayDeque<>();
+    
+    
+    private boolean suspend  = false;
     
 
     /**
@@ -31,12 +35,19 @@ public class UndoStack {
         this.stackDepth = stackDepth;
     }
  
-
     /**
      * Copy the element list and push it to the undo stack
      * @param ctx 
      */
     public void saveContext(LinkedList<ZElement> ctx) {
+        saveContext(ctx, true);
+    }
+
+    
+    private void saveContext(LinkedList<ZElement> ctx, boolean clearRedo) {
+
+        if (suspend)
+            return;
         
         if (undoHistory.size() == stackDepth)  //remove oldest, if reached capacity limit
             undoHistory.removeLast();
@@ -48,19 +59,53 @@ public class UndoStack {
         
         undoHistory.addFirst(copy);  //push a copy to the stack
         
+        if (clearRedo)
+            redoHistory.clear(); //clear all redo because this is a new context
     } 
     
     /**
      * Pop an element list from the undo stack
+     * @param ctx the current context, for redo
      * @return the most recent element list, or null if there's no history
      */
-    public LinkedList<ZElement> restoreContext() {
+    public LinkedList<ZElement> undo(LinkedList<ZElement> ctx) {
         
         if (undoHistory.isEmpty())
             return null;
         
+        if (redoHistory.size() == stackDepth)
+            redoHistory.removeLast();
+        
+        LinkedList<ZElement> copy = new LinkedList<>();
+        Iterator<ZElement> it = ctx.iterator();
+        while (it.hasNext()) 
+            copy.addLast(it.next().copyOf(false));
+        
+        redoHistory.addFirst(copy);
+        
         return undoHistory.removeFirst();
         
+    }
+    
+    public LinkedList<ZElement> redo() {
+        
+         if (redoHistory.isEmpty())
+            return null;
+        
+        LinkedList<ZElement> redoCtx = redoHistory.removeFirst();
+        
+        saveContext(redoCtx, false);
+        return redoCtx;
+    }
+    
+    
+
+    public void suspendSave() {
+        suspend = true;
+    }
+
+    public void resumeSave() {
+        suspend = false;
     }
     
     

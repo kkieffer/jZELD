@@ -71,6 +71,7 @@ public class Demo extends javax.swing.JFrame {
     
     private void createDemoElements(ZCanvas c) throws IOException {
         
+        c.enableUndoContextSave(false); //disable, so the adding of these elements can't be undone
         
         //Create a red rectangle, large black border, moveable
         ZRectangle r = new ZRectangle(1.0, 1.0, 2.0, 1.0, 25.0, true, true, true, 3, Color.BLACK, new Float[]{.2f, .2f}, Color.RED);
@@ -138,7 +139,8 @@ public class Demo extends javax.swing.JFrame {
         ZEditableText etxt = new ZEditableText(3.0, 6.0, .5, .5, 0.0, true, "MyEditableText", 0, Color.BLACK, Color.LIGHT_GRAY, t2);
         c.addElement(etxt);
  
-        
+        c.enableUndoContextSave(true); //re-enable undo
+
     }
             
     
