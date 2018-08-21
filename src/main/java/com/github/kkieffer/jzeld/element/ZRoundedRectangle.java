@@ -93,7 +93,7 @@ public class ZRoundedRectangle extends ZRectangle {
         
         
         
-        String rc = (String)JOptionPane.showInputDialog(canvas, "Update Corner Radius", "Modify Rounded Rectangle", JOptionPane.QUESTION_MESSAGE, radiusIcon,
+        String rc = (String)JOptionPane.showInputDialog(canvas, "Update Corner Radius (" + canvas.getUnit().getName() + ")", "Modify Rounded Rectangle", JOptionPane.QUESTION_MESSAGE, radiusIcon,
                                                 (Object[])null, (Object)String.valueOf(radius));
         if (rc != null) {
             try {

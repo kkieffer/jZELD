@@ -47,6 +47,12 @@ public class UnitMeasure implements Serializable {
         this.minorTicks = minorTicks;
     }
     
+    public UnitMeasure(UnitMeasure copy) {
+        name = copy.name;
+        scale = copy.scale;
+        majorTicks = copy.majorTicks;
+        minorTicks = copy.minorTicks;
+    }
     
     public double getScale() {
         return scale;
@@ -65,8 +71,8 @@ public class UnitMeasure implements Serializable {
         return minorTicks;
     }
     
-    public String format(double val) {
-        return fmt.format(val * scale);
+    public String format(double val, boolean withUnit) {
+        return fmt.format(val * scale) + (withUnit ? " " + name : "");
     }
     
     

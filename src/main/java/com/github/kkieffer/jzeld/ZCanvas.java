@@ -1885,7 +1885,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (fields.mouseCoordFont != null) {
                 g2d.setColor(Color.BLACK);               
 
-                String mouseCoord = fields.unit.format(tMouse.getX()/SCALE) + ", " + fields.unit.format(tMouse.getY()/SCALE);                                       
+                String mouseCoord = fields.unit.format(tMouse.getX()/SCALE, true) + ", " + fields.unit.format(tMouse.getY()/SCALE, true);                                       
                 int stringX = (int)tMouse.getX() - (int)Math.ceil(fontMetrics.stringWidth(mouseCoord) + 10.0 * pixScale/zoom);
                 int stringY = (int)tMouse.getY() - (int)Math.ceil(10*pixScale/zoom);
                 
@@ -1904,7 +1904,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (selectedElementResizeOn && mouseIn != null && lastSelectedElement != null && fields.mouseCoordFont != null) {
             g2d.setColor(Color.BLACK);
             Rectangle2D bounds = lastSelectedElement.getBounds2D();
-            String mouseCoord = fields.unit.format(bounds.getWidth()) + ", " + fields.unit.format(bounds.getHeight());
+            String mouseCoord = fields.unit.format(bounds.getWidth(), true) + ", " + fields.unit.format(bounds.getHeight(), true);
             
             paintString(g2d, mouseCoord, mouseIn.getX() + DRAG_BOX_SIZE*2*pixScale/(float)zoom, mouseIn.getY() + DRAG_BOX_SIZE*2*pixScale/(float)zoom);
             
@@ -1935,9 +1935,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 g2d.setColor(Color.BLACK);
                 String s;
                 if (mouseDrag == null)
-                    s = fields.unit.format(mouseIn.getX()/SCALE) + ", " + fields.unit.format(mouseIn.getY()/SCALE);
+                    s = fields.unit.format(mouseIn.getX()/SCALE, true) + ", " + fields.unit.format(mouseIn.getY()/SCALE, true);
                 else {
-                    s = fields.unit.format(dragRect.getWidth()/SCALE) + ", " + fields.unit.format(dragRect.getHeight()/SCALE);
+                    s = fields.unit.format(dragRect.getWidth()/SCALE, true) + ", " + fields.unit.format(dragRect.getHeight()/SCALE, true);
                 }
                 paintString(g2d, s, mouseIn.getX() + (int)Math.ceil(10.0 * pixScale/zoom), mouseIn.getY() + (int)Math.ceil(fontMetrics.getHeight() + 10.0 * pixScale/zoom));
             }
