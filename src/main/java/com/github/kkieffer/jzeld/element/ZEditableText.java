@@ -472,16 +472,22 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         
         double width = b.getWidth();
         double height = b.getHeight();
+        boolean adjustSize = false;
         
         //Scale up to fit the characters
-        if (d.width > b.getWidth())
+        if (d.width > b.getWidth()) {
             width = d.width;
+            adjustSize = true;
+        }
         
-        if (d.height > b.getHeight())
+        if (d.height > b.getHeight()) {
             height = d.height;
+            adjustSize = true;
+        }
         
         
-        super.setSize(width, height, 1, scale); 
+        if (adjustSize)
+            super.setSize(width, height, 1, scale); 
         
         //Adjust the font size by the scaling factor to maintain consistency
         Font f = new Font(textAttributes.font.getFontName(), textAttributes.font.getStyle(), (int)(textAttributes.font.getSize2D()*scale/72.0));

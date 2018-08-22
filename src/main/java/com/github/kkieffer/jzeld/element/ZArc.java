@@ -50,8 +50,6 @@ public class ZArc extends ZRectangle {
     
     transient private ArcDialog dialog;
     
-    transient private Shape shape;
-
     protected ZArc() {}
     
     /**
@@ -258,7 +256,7 @@ public class ZArc extends ZRectangle {
             getContentPane().add(p, java.awt.BorderLayout.CENTER);
 
             pack();
-            Dimension d = new Dimension(300, 300);
+            Dimension d = new Dimension(300, 275);
             setMinimumSize(d);
             setPreferredSize(d);
         }

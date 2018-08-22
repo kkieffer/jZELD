@@ -31,7 +31,7 @@ public class ZEquilateralPolygon extends ZPolygon {
     protected ZEquilateralPolygon(){}
     
      /**
-     * Create a ZRoundedRectangle
+     * Create a ZEquilateralPolygon
      * @param x the x coordinate, upper left x, in units
      * @param y the y coordinate, upper left y, in units
      * @param width the width of the object in units, or -1 for unlimited width
@@ -110,7 +110,7 @@ public class ZEquilateralPolygon extends ZPolygon {
     
     @Override
     protected Shape getPolygon(double width, double height, double scale) {
-        
+          
         Point2D center = new Point2D.Double(width/2.0, height/2.0);
         double angleStep = Math.toRadians(360.0/sides);
         
@@ -141,7 +141,7 @@ public class ZEquilateralPolygon extends ZPolygon {
         return BoundaryDraw.pathFromPoints(points, true);
     }
     
+    
+    
      
-    
-    
 }
