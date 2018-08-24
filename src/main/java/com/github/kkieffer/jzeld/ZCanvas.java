@@ -56,6 +56,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -159,8 +160,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class CanvasStore implements Serializable {
 
-        @XmlElement(name="ZElement")        
-        private LinkedList<ZElement> zElements = new LinkedList<>();  //list of all Z-plane objects, first is top, bottom is last
      
         @XmlJavaTypeAdapter(ColorAdapter.class)
         private Color backgroundColor;  //canvas background color
@@ -190,6 +189,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         @XmlElement(name="Orientation")        
         private Orientation orientation;
         
+        @XmlElement(name="PageSize")
+        @XmlJavaTypeAdapter(DimensionAdapter.class)
+        private Dimension pageSize;
+        
+        @XmlElement(name="Margins")
+        @XmlJavaTypeAdapter(Rectangle2DAdapter.class)
+        private Rectangle2D.Double margins;
+
+        @XmlElement(name="MarginsOn")        
+        private boolean marginsOn;
+            
         @XmlElement(name="HorizontalRuler")        
         private ZCanvasRuler horizontalRuler;
         
@@ -199,15 +209,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         @XmlElement(name="Grid")
         private ZGrid grid;
         
-        @XmlElement(name="PageSize")
-        @XmlJavaTypeAdapter(DimensionAdapter.class)
-        private Dimension pageSize;
-        
-        @XmlElement(name="Margins")
-        @XmlJavaTypeAdapter(Rectangle2DAdapter.class)
-        private Rectangle2D.Double margins;
-        
-        private boolean marginsOn;
+        @XmlElement(name="ZElement")        
+        private LinkedList<ZElement> zElements = new LinkedList<>();  //list of all Z-plane objects, first is top, bottom is last
+ 
+        static Class<?>[] getContextClasses() {
+            return new Class<?>[] {UnitMeasure.class, Orientation.class, ZCanvasRuler.class, ZGrid.class};
+        }
         
     }
     /*----------------------------------------------------------------------*/
@@ -2374,6 +2381,20 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         return false;
     }
    
+    private static Class[] addDefaultClasses(List<Class<? extends ZElement>> elementClasses) {
+        
+        Class<?>[] cvsClasses = CanvasStore.getContextClasses();
+        Class[] contextClasses = new Class[elementClasses.size() + cvsClasses.length + 3]; 
+        elementClasses.toArray(contextClasses);
+
+        System.arraycopy(cvsClasses, 0, contextClasses, elementClasses.size(), cvsClasses.length);
+         
+        contextClasses[contextClasses.length-3] = ZAbstractShape.class;        
+        contextClasses[contextClasses.length-2] = ZCanvas.CanvasStore.class;
+        contextClasses[contextClasses.length-1] = ZElement.class;
+        return contextClasses;
+    }
+    
     /**
      * Retrieves an array of required classes for storing a ZCanvas using a JAXB context.  Includes required classes plus all element classes for elements
      * that have been added to the canvas, and for any ZGroupedElements, the classes that it contains
@@ -2387,20 +2408,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                  elementTypes.add(e.getClass());
             
             if (e instanceof ZGroupedElement)   //find classes contained within group
-                ((ZGroupedElement)e).addGroupedClasses(elementTypes);
-            
+                ((ZGroupedElement)e).addGroupedClasses(elementTypes);  
             
         }
-        
-        Class[] contextClasses = new Class[elementTypes.size() + 5]; 
-        elementTypes.toArray(contextClasses);
-
-        contextClasses[contextClasses.length-5] = ZGrid.class;        
-        contextClasses[contextClasses.length-4] = ZCanvasRuler.class;        
-        contextClasses[contextClasses.length-3] = ZAbstractShape.class;        
-        contextClasses[contextClasses.length-2] = ZCanvas.CanvasStore.class;
-        contextClasses[contextClasses.length-1] = ZElement.class;
-        return contextClasses;
+            
+        return addDefaultClasses(elementTypes);
+       
     }
     
     /**
@@ -2439,16 +2452,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         b.close();
         
   
-        Class[] contextClasses = new Class[newElementClasses.size() + 5]; 
-        newElementClasses.toArray(contextClasses);
-       
-        contextClasses[contextClasses.length-5] = ZGrid.class;        
-        contextClasses[contextClasses.length-4] = ZCanvasRuler.class;        
-        contextClasses[contextClasses.length-3] = ZAbstractShape.class;        
-        contextClasses[contextClasses.length-2] = ZCanvas.CanvasStore.class;
-        contextClasses[contextClasses.length-1] = ZElement.class;
-        
-        return contextClasses;
+        return addDefaultClasses(newElementClasses);
+
     }
     
     /**
