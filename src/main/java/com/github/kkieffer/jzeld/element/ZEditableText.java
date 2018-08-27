@@ -200,7 +200,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     @Override
     public String getHtmlHelp() {
         
-        return "<b>ZEditableText: </b>An editable text box.<br><br>Double click on the text box to show the cursor and edit text. If the size of the text box " +
+        return "<b>ZEditableText: An editable text box.</b><br><br>Double click on the text box to show the cursor and edit text. If the size of the text box " +
                 "is too small to hold the text, it will be resized to fit. " + TextAttributes.getHtmlHelp() + "<br><br>" + 
                 "The text box background color can be set, along with the border color and thickness. A dashed border is not supported.<br><br>" + super.getHtmlHelp();
         

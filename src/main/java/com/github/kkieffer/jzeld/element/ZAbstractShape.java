@@ -65,7 +65,7 @@ public abstract class ZAbstractShape extends ZElement {
     @Override
     public String getHtmlHelp() {
         String className = this.getClass().getSimpleName();
-        return "<b>" + className + ": " + getShapeSummary() + "</b><br>" + getShapeDescription() + "<br><br>" + 
+        return "<b>" + className + ": " + getShapeSummary() + "</b><br><br>" + getShapeDescription() + "<br><br>" + 
                 "Right-click on this element to set its attributes: line color and width, line dash pattern, and fill color.<br><br>" + super.getHtmlHelp();
     }
     
