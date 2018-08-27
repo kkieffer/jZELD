@@ -328,6 +328,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
             return false;
         
         textWidget.replaceSelection(t);
+        hasChanges = true;
         return true;
     }
     

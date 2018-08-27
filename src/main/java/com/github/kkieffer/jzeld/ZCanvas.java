@@ -133,7 +133,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
     }
     
-    public enum Orientation {PORTRAIT, LANDSCAPE, REVERSE_LANDSCAPE}  //The ordinals conform to the PageFormat integer defines
+    public enum Orientation {LANDSCAPE, PORTRAIT, REVERSE_LANDSCAPE}  //The ordinals conform to the PageFormat integer defines
    
     public enum Alignment {Auto, Left_Edge, Top_Edge, Right_Edge, Bottom_Edge, Centered_Vertically, Centered_Horizontally;
         
@@ -2594,13 +2594,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         setGrid(null);
         
         //Create Buffered Image
-        BufferedImage bi = new BufferedImage(fields.pageSize.width, fields.pageSize.height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new BufferedImage(fields.pageSize.width*10, fields.pageSize.height*10, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        g.scale(10, 10);
         print(g, null, 0);
         g.dispose();
         
@@ -2630,19 +2631,24 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         int imgHeight = (int)Math.round(bounds.getHeight() - bounds.getY() + 2*pixelsOut);
         
         //Create Buffered Image
-        BufferedImage bi = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new BufferedImage(imgWidth*10, imgHeight*10, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.scale(10, 10);
         
         g.translate(-bounds.getX()+pixelsOut, -bounds.getY()+pixelsOut);
         g.scale(1/pixScale, 1/pixScale);
         g.scale(zoom, zoom);
         
-        this.paintElement(g, e, false);
+        RepaintManager currentManager = RepaintManager.currentManager(this);
 
+        currentManager.setDoubleBufferingEnabled(false);
+        this.paintElement(g, e, false);
+        currentManager.setDoubleBufferingEnabled(true);
+      
         g.dispose();
         return bi; 
     }
