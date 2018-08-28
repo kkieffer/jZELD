@@ -256,7 +256,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private Object[] lastMethodParams;
 
     private boolean canvasModified;  //tracks any changes to the Z-plane order of the elements
-
+    private boolean printOn = false;  //if printing is turned on (hides some pieces during paint)
+    
     private long mouseWheelLastMoved = -1;
     private long mouseFirstPressed = -1;
     private DrawClient drawClient = null;
@@ -1843,10 +1844,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 g2d.clearRect(0, 0, getScaledWidth(), getScaledHeight());
         }
         
-        if (fields.grid != null)
+        if (!printOn && fields.grid != null)
             paintElement(g2d, fields.grid, false);
         
-        if (fields.margins != null && fields.marginsOn) {
+        if (fields.margins != null && fields.marginsOn && !printOn) {
             g2d.setColor(Color.LIGHT_GRAY);
             g2d.setStroke(new BasicStroke(0.5f));
             g2d.draw(fields.margins);
@@ -1919,7 +1920,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         
         //When nothing selected, draw the mouse
-        if (mouseIn != null && selectedElements.isEmpty() && mouseIn.getX() >= 0 && mouseIn.getY() >= 0) {  
+        if (!printOn && mouseIn != null && selectedElements.isEmpty() && mouseIn.getX() >= 0 && mouseIn.getY() >= 0) {  
                         
             //Draw crosshair
             if (fields.mouseCursorColor != null) {
@@ -2550,16 +2551,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public int print(Graphics g, PageFormat pageFormat, int pageIndex) {   
         if (pageIndex > 0) 
             return(NO_SUCH_PAGE);
-
-        //Hide margins and grid
-        boolean marginsOn = areMarginsOn();
-        marginsOn(false);
-        ZGrid savedGrid = fields.grid; //save grid
-        setGrid(null);
-
-        
+      
+        drawOff();
         resetView();
-        selectNone();
+        selectNone();  //prevents drawing any selections or client draw
+        
+        printOn = true;  //prevents drawing of grid, margins, and mouse cursor/information
 
         RepaintManager currentManager = RepaintManager.currentManager(this);
         
@@ -2569,10 +2566,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         this.paint(g2d);
         currentManager.setDoubleBufferingEnabled(true);
         
-        //Restore margins and grid
-        marginsOn(marginsOn);
-        setGrid(savedGrid);
-        
+        printOn = false;
         
         return(PAGE_EXISTS);
       
