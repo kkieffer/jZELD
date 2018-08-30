@@ -135,7 +135,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     public enum Orientation {LANDSCAPE, PORTRAIT, REVERSE_LANDSCAPE}  //The ordinals conform to the PageFormat integer defines
    
-    public enum Alignment {Auto, Left_Edge, Top_Edge, Right_Edge, Bottom_Edge, Centered_Vertically, Centered_Horizontally;
+    public enum Alignment {Auto, Left_Edge, Top_Edge, Right_Edge, Bottom_Edge, Centered_Vertically, Centered_Horizontally, Centered_Both;
         
         @Override
         public String toString() {
@@ -957,6 +957,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param atype the desired alignment type
      */
     public void align(Alignment atype) {
+        
+        if (atype == Alignment.Centered_Both) {
+            align(Alignment.Centered_Horizontally);
+            align(Alignment.Centered_Vertically);
+            return;
+        }
         
         ArrayList<ZElement> selectedElements = getSelectedElements();
         
