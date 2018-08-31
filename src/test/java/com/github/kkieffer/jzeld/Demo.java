@@ -275,8 +275,7 @@ public class Demo extends javax.swing.JFrame {
         am.put("SaveElementImage", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                ZElement el = c.getSelectedElementsArray()[0];
-                BufferedImage i = c.printElementToImage(el);
+                BufferedImage i = c.printSelectedElementsToImage();
                 File f = new File("test.png");
                 try {
                     ImageIO.write(i, "png", f);
