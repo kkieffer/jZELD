@@ -42,7 +42,7 @@ public final class ZGroupedElement extends ZElement {
      * @param elements
      * @return 
      */
-    public static ZGroupedElement createGroup(ArrayList<ZElement> elements) {
+    public static ZGroupedElement createGroup(ArrayList<ZElement> elements, double scale) {
         
         double x = Integer.MAX_VALUE;  //furthest left
         double y = Integer.MAX_VALUE;  //furthest top
@@ -51,6 +51,10 @@ public final class ZGroupedElement extends ZElement {
         for (ZElement e : elements) {
             
             Rectangle2D b = e.getBounds2D();
+           
+            double margin = Math.ceil(3*e.getOutlineWidth()/2.0) / scale; 
+            b = new Rectangle2D.Double(b.getX()-margin, b.getY()-margin, b.getWidth() + 2*margin, b.getHeight() + 2*margin); 
+            
             AffineTransform t = e.getElementTransform(1.0, false);
             Shape s = t.createTransformedShape(b);
       

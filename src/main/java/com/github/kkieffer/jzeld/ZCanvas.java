@@ -391,11 +391,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             @Override
             public void actionPerformed(ActionEvent e) {
                 shiftPressed = false;
+                shearYPressed = false;
             }
         });
         am.put("S_AltPressed", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
+                shearYPressed = false;
                 shearXPressed = true;
             }
         });
@@ -403,6 +405,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             @Override
             public void actionPerformed(ActionEvent e) {
                 shearYPressed = true;
+                shearXPressed = false;
             }
         });
         am.put("AltPressed", new AbstractAction(){
@@ -1104,7 +1107,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         undoStack.suspendSave();  //don't push all the remove and add changes to the undo stack
         
         Collections.reverse(selectedElements); //the selected elements are ordered with top z plane first.  But the Grouped Element draws grouped elements in the order provided, so we need to reverse the list
-        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements);  //create the group of elements
+        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements, SCALE);  //create the group of elements
         
         for (ZElement e: selectedElements) //remove all selected
             removeElement(e);
@@ -1689,12 +1692,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (!highlightSelectedOnly) {  //paint the element
                 o.paint(g2d, SCALE, r.getWidth()<0 ? getScaledWidth() : r.getWidth(), r.getHeight()<0 ? getScaledHeight() : r.getHeight());      
             }
-                                  
+                                 
             if (o.isSelected() && highlightSelectedOnly && r.getWidth() > 0 && r.getHeight() > 0) {  //highlight selected element, just outside its boundaries
                 g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke(1.0f * (float)(pixScale/zoom), CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
-                int pixelsOut = (int)Math.ceil((o.getOutlineWidth()/2 + 1) * pixScale/zoom);
-                g2d.draw(new Rectangle2D.Double(-pixelsOut, -pixelsOut, r.getWidth()+pixelsOut*2, r.getHeight()+pixelsOut*2)); 
+                double margin = Math.ceil(3*o.getOutlineWidth()/2.0) + (1.0 * pixScale/zoom);  //add the outline width, plus 2 pixels out
+                g2d.draw(new Rectangle2D.Double(-margin, -margin, r.getWidth()+margin*2, r.getHeight()+margin*2)); 
                    
                 //draw drag box in the corner
                 if (o.isResizable()) {  
@@ -1831,6 +1834,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZCanvasEventListener l : selectListeners)
             l.elementSelected(null);
 
+        shearXPressed = false;
+        shearYPressed = false;
+        shiftPressed = false;
+        altPressed = false;
+        
     }
     
     
@@ -2644,10 +2652,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return null;
         
         Collections.reverse(selectedElements); //the selected elements are ordered with top z plane first.  But the Grouped Element draws grouped elements in the order provided, so we need to reverse the list
-        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements);  //create the group of elements
-        
-      
-        int pixelsOut = (int)((group.getOutlineWidth()/2 + 1) * pixScale);
+        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements, SCALE);  //create the group of elements
         
         group.reposition(0, 0); //no offset (not on canvas, painting to image
         
@@ -2657,19 +2662,19 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
       
         bounds = s.getBounds2D();  //make bounds something that can hold the transformed shape
                 
-        int imgWidth = (int)Math.round(bounds.getWidth() - bounds.getX() + 2*pixelsOut);
-        int imgHeight = (int)Math.round(bounds.getHeight() - bounds.getY() + 2*pixelsOut);
+        int imgWidth = (int)Math.round(bounds.getWidth() - bounds.getX());
+        int imgHeight = (int)Math.round(bounds.getHeight() - bounds.getY());
         
         //Create Buffered Image
-        BufferedImage bi = new BufferedImage(imgWidth*10, imgHeight*10, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new BufferedImage(imgWidth*3, imgHeight*3, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.scale(10, 10);
+        g.scale(3, 3);
         
-        g.translate(-bounds.getX()+pixelsOut, -bounds.getY()+pixelsOut);
+        g.translate(-bounds.getX(), -bounds.getY());
         g.scale(1/pixScale, 1/pixScale);
         g.scale(zoom, zoom);
         
