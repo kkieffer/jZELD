@@ -3,6 +3,7 @@ package com.github.kkieffer.jzeld.element;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -48,16 +49,22 @@ public final class ZGroupedElement extends ZElement {
         double x2 = 0;                 //furthest right
         double y2 = 0;                 //furthest bottom
         for (ZElement e : elements) {
-            Rectangle2D r = e.getBounds2D();
-            if (r.getX() < x)
-                x = r.getX();
-            if (r.getY() < y)
-                y = r.getY();
             
-            if (r.getX() + r.getWidth() > x2)
-                x2 = r.getX() + r.getWidth();
-            if (r.getY() + r.getHeight() > y2)
-                y2 = r.getY() + r.getHeight();
+            Rectangle2D b = e.getBounds2D();
+            AffineTransform t = e.getElementTransform(1.0, false);
+            Shape s = t.createTransformedShape(b);
+      
+            b = s.getBounds2D();  //make bounds something that can hold the transformed shape
+              
+            if (b.getX() < x)
+                x = b.getX();
+            if (b.getY() < y)
+                y = b.getY();
+            
+            if (b.getX() + b.getWidth() > x2)
+                x2 = b.getX() + b.getWidth();
+            if (b.getY() + b.getHeight() > y2)
+                y2 = b.getY() + b.getHeight();
             
         }
         
@@ -239,12 +246,10 @@ public final class ZGroupedElement extends ZElement {
         for (ZElement e : elements) {    
             AffineTransform orig = g.getTransform();
             Rectangle2D bounds = e.getBounds2D(unitSize);
-            
-            g.translate(bounds.getX() + bounds.getWidth()/2, bounds.getY() + bounds.getHeight()/2);  //translate to the center of the element
-            g.rotate(Math.toRadians(e.getRotation()));  //rotate
-            g.translate(-bounds.getWidth()/2, -bounds.getHeight()/2);  //translate so that 0,0 is the top left corner
-            
 
+            AffineTransform elementTransform = e.getElementTransform(unitSize, false);
+            g.transform(elementTransform);
+            g.translate(bounds.getX(), bounds.getY());
             e.paint(g, unitSize, bounds.getWidth(), bounds.getHeight());
             
             g.setTransform(orig);
