@@ -2375,7 +2375,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             for (ZElement selectedElement : selectedElements) {
                 if (!shiftPressed && !shearXPressed && !shearYPressed) {
                     double increase = e.getPreciseWheelRotation() * SIZE_INCREASE_MULTIPLIER;
-                    selectedElement.increaseSizeMaintainAspect(increase, DRAG_BOX_SIZE, SCALE);
+                    selectedElement.increaseSize(increase, increase, DRAG_BOX_SIZE, SCALE);
                 }
                 else if (shiftPressed && !shearXPressed && !shearYPressed) {       
                     selectedElement.rotate(e.getPreciseWheelRotation() * ROTATION_MULTIPLIER);
@@ -2636,23 +2636,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
 
     
-    public BufferedImage printSelectedElementsToImage() {
+    public BufferedImage printElementToImage(ZElement e) {
         
-        ArrayList<ZElement> selectedElements = getSelectedElements();
-
-        if (selectedElements.isEmpty()) 
-            return null;
+        e = e.copyOf(true);  //make a copy
+        int pixelsOut = (int)((e.getOutlineWidth()/2 + 1) * pixScale);
         
-        Collections.reverse(selectedElements); //the selected elements are ordered with top z plane first.  But the Grouped Element draws grouped elements in the order provided, so we need to reverse the list
-        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements);  //create the group of elements
+        e.reposition(0, 0); //no offset (not on canvas, painting to image
         
-      
-        int pixelsOut = (int)((group.getOutlineWidth()/2 + 1) * pixScale);
-        
-        group.reposition(0, 0); //no offset (not on canvas, painting to image
-        
-        Rectangle2D bounds = group.getBounds2D(SCALE*zoom);
-        AffineTransform t = group.getElementTransform(SCALE*zoom, false);
+        Rectangle2D bounds = e.getBounds2D(SCALE*zoom);
+        AffineTransform t = e.getElementTransform(SCALE*zoom, false);
         Shape s = t.createTransformedShape(bounds);
       
         bounds = s.getBounds2D();  //make bounds something that can hold the transformed shape
@@ -2676,7 +2668,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         RepaintManager currentManager = RepaintManager.currentManager(this);
 
         currentManager.setDoubleBufferingEnabled(false);
-        this.paintElement(g, group, false);
+        this.paintElement(g, e, false);
         currentManager.setDoubleBufferingEnabled(true);
       
         g.dispose();

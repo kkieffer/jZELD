@@ -450,22 +450,6 @@ public abstract class ZElement implements Serializable {
         setSize(w, h, minSize, scale);
     }
     
-    /**
-     * Increase the size of the element by the specified amount, maintaining the aspect ratio of width to height
-     * @param widthIncrease the amount to increase the width. The height is increased by the radio of height to width.
-     * @param minSize the minimum size, in pixels
-     * @param scale scale factor
-     */
-    public final void increaseSizeMaintainAspect(double widthIncrease, double minSize, double scale) {
-        if (!resizable)
-            return;
-        
-        
-        double w = widthIncrease;
-        double h = (bounds.height/bounds.width * widthIncrease);
-        
-        increaseSize(w, h, minSize, scale);
-    }
     
     /**
      * Increase the size of the element by the specified width and height in pixels (negative reduces size).
@@ -538,9 +522,9 @@ public abstract class ZElement implements Serializable {
     
     
     /**
-     * Get the transform that describes how this element is rotated and sheared
+     * Get the transform that describes how this element is rotated
      * @param scale scale of pixels per unit
-     * @param toBase true to transform back to the base coordinate system (no rotation), false to move to the transformed coordinate system
+     * @param toBase true to rotate back to the base coordinate system (no rotation), false to move to the rotated coordinate system
      * @return 
      */
     public final AffineTransform getElementTransform(double scale, boolean toBase) {
