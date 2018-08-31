@@ -358,10 +358,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ALT, 0, true), "AltReleased");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.ALT_DOWN_MASK), "S_AltPressed");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.ALT_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK), "S_AltShiftPressed");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), "MoveLeft");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK), "MoveRight");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK), "MoveUp");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK), "MoveDown");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "MoveLeft");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "MoveRight");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "MoveUp");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "MoveDown");
         
         am.put("Tab", new AbstractAction(){
             @Override
@@ -451,6 +451,28 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
     }
     
+    /**
+     * Retrieve the number of elements on the canvas
+     * @return the number of elements
+     */
+    public int getNumElements() {
+        return fields.zElements.size();
+    }
+    
+    /**
+     * Returns the Z-plane layer of the specified element, from 0 (top) to the last value (bottom)
+     * @param e the element to find
+     * @return the layer number, or -1 if not found
+     */
+    public int getElementLayerPosition(ZElement e) {
+        int i=0;
+        for (ZElement ze : fields.zElements) {
+            if (ze == e)
+                return i;
+            i++;
+        }
+        return -1;
+    }
     
     private boolean hasSelectedElements() {  //A little faster than getSelectedElements, because it returns on first one found
         for (ZElement e : fields.zElements) {
