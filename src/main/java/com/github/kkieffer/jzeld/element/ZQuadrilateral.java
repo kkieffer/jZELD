@@ -7,6 +7,7 @@ import com.github.kkieffer.jzeld.draw.BoundaryDraw;
 import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -74,7 +75,7 @@ public class ZQuadrilateral extends ZPolygon {
     
     @Override
     protected String getShapeDescription() {
-        return "Double click on the polygon to select the skew from 0 to 100 percent.";     
+        return "Double click on the polygon to select the skew from 0 to 100 percent, and set the shape bounds to the minimum.";     
     }
  
     
@@ -101,22 +102,33 @@ public class ZQuadrilateral extends ZPolygon {
     
     @Override
     public boolean selectedForEdit(ZCanvas canvas) {
+            
+        if (type != QuadType.SQUARE) {
+            
         
-        if (type == QuadType.SQUARE) //square has no skew
-            return false;
-        
-        String rc = (String)JOptionPane.showInputDialog(canvas, "Update Percent of Maximum Skew", "Modify Quadrilateral", JOptionPane.QUESTION_MESSAGE, radiusIcon,
-                                                (Object[])null, (Object)String.valueOf(percent));
-        if (rc != null) {
-            try {
-                int pc = Integer.parseInt(rc);
-                if (pc < 0 || pc > 100)
-                    throw new NumberFormatException("Percent must be between 0 and 100");
-                setPercent(pc);
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(canvas, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
+            String rc = (String)JOptionPane.showInputDialog(canvas, "Update Percent of Maximum Skew", "Modify Quadrilateral", JOptionPane.QUESTION_MESSAGE, radiusIcon,
+                                                    (Object[])null, (Object)String.valueOf(percent));
+            if (rc != null) {
+                try {
+                    int pc = Integer.parseInt(rc);
+                    if (pc < 0 || pc > 100)
+                        throw new NumberFormatException("Percent must be between 0 and 100");
+                    setPercent(pc);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(canvas, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
+                }
             }
         }
+        
+        if (type == QuadType.SQUARE || type == QuadType.RHOMBUS) {
+            Rectangle2D bounds = this.getBounds2D(canvas.getScale());
+            double w = bounds.getWidth();
+            double h = bounds.getHeight();
+                
+            double s = w > h ? h : w;
+            setSize(s, s, 0.0, canvas.getScale());
+        }
+        
         
         return false;
     }
@@ -206,7 +218,7 @@ public class ZQuadrilateral extends ZPolygon {
     private void getRhombus(double w, double h) {
         
         double shorter = w > h ? h : w;
-
+        
  
         x[0] = (double)shorter * ((double)percent / 200.0);
         x[1] = shorter;

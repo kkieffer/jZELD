@@ -1,6 +1,7 @@
 
 package com.github.kkieffer.jzeld.element;
 
+import com.github.kkieffer.jzeld.ZCanvas;
 import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
@@ -60,7 +61,7 @@ public class ZCircle extends ZOval {
     
     @Override
     protected String getShapeDescription() {
-        return "";     
+        return "Double click on the circle to minimize the shape bounds to the diameter";     
     }
     
     @Override
@@ -76,5 +77,19 @@ public class ZCircle extends ZOval {
         return new Ellipse2D.Double(0, 0, r, r);
     }
  
+    
+    @Override
+    public boolean supportsEdit() {
+        return true;
+    };
+    
+    @Override
+    public boolean selectedForEdit(ZCanvas canvas) {
+        
+        Rectangle2D bounds = this.getBounds2D(canvas.getScale());
+        double r = radius(bounds.getWidth(), bounds.getHeight());
+        setSize(r, r, 0.0, canvas.getScale());
+        return false;
+    }
     
 }
