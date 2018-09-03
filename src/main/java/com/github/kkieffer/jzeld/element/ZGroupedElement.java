@@ -85,7 +85,7 @@ public final class ZGroupedElement extends ZElement {
         elements = copyElements(srcElements);
         
         //Remove the x,y offset from each element's position
-        for (ZElement e : this.elements)
+        for (ZElement e : this.elements) 
             e.move(-x, -y, Integer.MAX_VALUE, Integer.MAX_VALUE);
         
     }
@@ -129,11 +129,32 @@ public final class ZGroupedElement extends ZElement {
      */
     public ArrayList<ZElement> ungroup() {
         
-        Point2D position = this.getPosition();
+        Rectangle2D bounds = this.getBounds2D();
+        Point2D center = new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
         
-        //Restore the x,y offset to each element's position
-        for (ZElement e : this.elements)
-            e.move(position.getX(), position.getY(), Integer.MAX_VALUE, Integer.MAX_VALUE);
+        for (ZElement e : this.elements) {
+
+            e.move(bounds.getX(), bounds.getY(), Integer.MAX_VALUE, Integer.MAX_VALUE);  //Restore the x,y offset
+            Rectangle2D eBounds = e.getBounds2D();
+
+            Point2D centerE = new Point2D.Double(eBounds.getCenterX(), eBounds.getCenterY());
+
+            Point2D ePos = e.getPosition();
+            
+            Point2D relativeE = new Point2D.Double(centerE.getX() - center.getX(), centerE.getY() - center.getY());
+           
+            AffineTransform rotateInstance = AffineTransform.getRotateInstance(Math.toRadians(getRotation()));
+            Point2D rotated = rotateInstance.transform(relativeE, null);
+
+            System.out.println(relativeE + " - > " + rotated);
+            
+            double xMove = rotated.getX() - relativeE.getX();
+            double yMove = rotated.getY() - relativeE.getY();
+            
+            e.move(xMove, yMove,  Integer.MAX_VALUE, Integer.MAX_VALUE);
+            e.rotate(getRotation());
+            
+        }
         
         ArrayList<ZElement> copy = copyElements(elements);
         this.elements.clear();  //invalidate 
@@ -234,18 +255,40 @@ public final class ZGroupedElement extends ZElement {
         return false;
     }
     
+    //Override setSize for ZGroupedElement. In this case, find the radio of how much the group has increased,
+    //and apply that ratio to the individual elements. Also determine for each element, the ratio of the x,y offset of the element 
+    //from the group's position to the width and height of the group.  Apply that ratio to the new group size to find the new locatiin
+    //of the element. 
+    @Override
+    protected void setSize(double w, double h, double minSize, double scale) {
+        
+        Rectangle2D bounds = this.getBounds2D(scale);
+        double scaleX = w / bounds.getWidth(); 
+        double scaleY = h / bounds.getHeight(); 
+  
+        
+        //Restore the x,y offset to each element's position
+        for (ZElement e : this.elements) { 
+            e.scaleSize(scaleX, scaleY);
+            Point2D position = e.getPosition(scale);
+            double relPositionX = position.getX() / bounds.getWidth();
+            double relPositionY = position.getY() / bounds.getHeight();
+            double newX = relPositionX * w;
+            double newY = relPositionY * h;
+            e.reposition(newX/scale, newY/scale);
+        }
+        
+        super.setSize(w, h, minSize, scale);
+    }
     
+   
     @Override
     public void paint(Graphics2D g, double unitSize, double width, double height) {
                        
         if (!isVisible())
             return;
-                        
-        double scaleX = (double)width / (this.groupedWidth * unitSize);
-        double scaleY = (double)height / (this.groupedHeight * unitSize);
         
-        g.scale(scaleX, scaleY);
-        
+         
         //Paint each element - each element has been "moved" to its offset within the group already
         for (ZElement e : elements) {    
             AffineTransform orig = g.getTransform();

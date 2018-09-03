@@ -341,11 +341,7 @@ public abstract class ZElement implements Serializable {
      * @param angle 
      */
     public void rotate(double angle) {
-        rotation += angle;
-        rotation = rotation % 360.0;
-        if (rotation < 0)
-            rotation = 360.0 + rotation;
-        hasChanges = true;
+        setRotation(rotation + angle);
     }
     
     public void shearX(double s) {
@@ -437,7 +433,7 @@ public abstract class ZElement implements Serializable {
    }
     
     /**
-     * Change size by the specified width and height in units.
+     * Change size to the specified width and height in units.
      * @param w width in units
      * @param h height in units
      * @param minSize the minimum size, in pixels
@@ -448,6 +444,14 @@ public abstract class ZElement implements Serializable {
             return;
         
         setSize(w, h, minSize, scale);
+    }
+    
+    
+    public void scaleSize(double wScale, double hScale) {         
+        double w = bounds.width * wScale;
+        double h = bounds.height * hScale;
+     
+        setSize(w, h, 0, 1.0);
     }
     
     /**
