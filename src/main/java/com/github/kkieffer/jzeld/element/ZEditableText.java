@@ -170,6 +170,8 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         modifyText(defaultText);
         setAttributes(borderThickness, borderColor, null, backgroundColor);
 
+        setSize(width, height, 0, 1); //validate size against text
+        
         setup();
         hasChanges = false;
 
@@ -466,35 +468,21 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     }
 
     @Override
-    public Rectangle2D getBounds2D(double scale) {
-        
+    protected void setSize(double w, double h, double minSize, double scale) {
+             
         Dimension d = textWidget.getPreferredSize();  //preferred size is the size that it should be based on the amount of characters
-        Rectangle2D b = super.getBounds2D(scale);
         
-        double width = b.getWidth();
-        double height = b.getHeight();
-        boolean adjustSize = false;
+        double textMinWidth = d.getWidth() * scale/72;
+        double textMinHeight = d.getHeight() * scale/72;
         
         //Scale up to fit the characters
-        if (d.width > b.getWidth()) {
-            width = d.width;
-            adjustSize = true;
-        }
-        
-        if (d.height > b.getHeight()) {
-            height = d.height;
-            adjustSize = true;
-        }
-        
-        
-        if (adjustSize)
-            super.setSize(width, height, 1, scale); 
-        
-        //Adjust the font size by the scaling factor to maintain consistency
-        Font f = new Font(textAttributes.font.getFontName(), textAttributes.font.getStyle(), (int)(textAttributes.font.getSize2D()*scale/72.0));
-        textWidget.setFont(f);
-        
-        return super.getBounds2D(scale);
+        if (textMinWidth > w) 
+            w = textMinWidth;
+              
+        if (textMinHeight > h) 
+            h = textMinHeight;
+  
+        super.setSize(w, h, minSize, scale);        
     }
        
     
