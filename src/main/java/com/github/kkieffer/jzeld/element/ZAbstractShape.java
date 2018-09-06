@@ -40,7 +40,9 @@ public abstract class ZAbstractShape extends ZElement {
     protected Float[] dashPattern = null;
     
     protected PaintAttributes paintAttr = null;
-   
+      
+    protected CustomStroke customStroke = null;
+       
     protected ZAbstractShape(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
         super(x, y, width, height, rotation, canSelect, canResize, canMove);
         setAttributes(borderWidth, borderColor, dashPattern, fillColor);
@@ -52,6 +54,7 @@ public abstract class ZAbstractShape extends ZElement {
         setAttributes(src.borderThickness, src.borderColor, src.dashPattern, src.backgroundColor);
         paintAttr = src.paintAttr == null ? null : new PaintAttributes(src.paintAttr);
         hasChanges = false;
+        customStroke = src.customStroke == null ? null : src.customStroke.copyOf();
     }
     
     protected ZAbstractShape() {}
@@ -146,6 +149,14 @@ public abstract class ZAbstractShape extends ZElement {
     @Override
     public boolean hasDash() {
         return true;
+    }
+    
+    public void setCustomStroke(CustomStroke s) {
+        customStroke = s;
+    }
+    
+    public CustomStroke getCustomStroke() {
+        return customStroke;
     }
     
     /**
@@ -251,7 +262,13 @@ public abstract class ZAbstractShape extends ZElement {
             fillShape(g, unitSize, width, height);
         }
 
-       if (borderThickness != 0) {
+       if (customStroke != null) {
+           g.setStroke(customStroke);
+           g.setColor(customStroke.getColor());
+           drawShape(g, unitSize, width, height);
+       } 
+        
+       if (borderThickness != 0 && borderColor != null) {  //use built-in Basic Stroke
            
             if (dashPattern == null || dashPattern.length == 0)
                 g.setStroke(new BasicStroke(borderThickness));
@@ -270,6 +287,7 @@ public abstract class ZAbstractShape extends ZElement {
        }
        
     }
+
     
     
 }

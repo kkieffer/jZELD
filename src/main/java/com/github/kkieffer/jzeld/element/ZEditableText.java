@@ -20,6 +20,7 @@ import java.io.IOException;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.text.SimpleAttributeSet;
@@ -170,11 +171,9 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         modifyText(defaultText);
         setAttributes(borderThickness, borderColor, null, backgroundColor);
 
-        setSize(width, height, 0, 1); //validate size against text
-        
         setup();
-        hasChanges = false;
-
+        SwingUtilities.invokeLater(new Runnable() { public void run() {validateSize();}});
+    
     }
     
     protected ZEditableText(ZEditableText copy, boolean forNew) {
@@ -221,6 +220,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     @Override
     public void setOutlineWidth(float width) {
         borderThickness = width; 
+        validateSize();        
         hasChanges = true;
     }
   
@@ -309,6 +309,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
      */
     public final void modifyText(String t) {
         textWidget.setText(t);
+        validateSize();        
         hasChanges = true;
     }
     
@@ -330,6 +331,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
             return false;
         
         textWidget.replaceSelection(t);
+        validateSize();        
         hasChanges = true;
         return true;
     }
@@ -348,6 +350,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     public final void setFont(Font f) {
         this.textAttributes.font = f;
         textWidget.setFont(f);
+        validateSize();        
         hasChanges = true;
     }
 
@@ -429,6 +432,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         textWidget.setSelectionEnd(0);
         textWidget.getParent().requestFocusInWindow(); //give away focus to remove caret
         timer.stop();
+        validateSize();
     }
     
     
@@ -467,6 +471,14 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
             return true;
     }
 
+    private void validateSize() {
+       
+        Rectangle2D bounds = this.getBounds2D();
+        setSize(bounds.getWidth(), bounds.getHeight(), 0, 1); //validate size against text
+
+    }
+    
+    
     @Override
     protected void setSize(double w, double h, double minSize, double scale) {
              

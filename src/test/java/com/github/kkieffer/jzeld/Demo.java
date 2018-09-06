@@ -16,7 +16,6 @@ import com.github.kkieffer.jzeld.element.TextAttributes;
 import com.github.kkieffer.jzeld.element.ZArc;
 import com.github.kkieffer.jzeld.element.ZArc.ArcType;
 import com.github.kkieffer.jzeld.element.ZCircle;
-import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZEquilateralPolygon;
 import com.github.kkieffer.jzeld.element.ZGrid;
 import com.github.kkieffer.jzeld.element.ZImage;
@@ -115,6 +114,7 @@ public class Demo extends javax.swing.JFrame {
           
         ZQuadrilateral pg = new ZQuadrilateral(QuadType.RHOMBUS, 6.0, 2.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, 20);
         c.addElement(pg);
+        pg.setCustomStroke(new CircleStrokeExample());
         
          //Create an arc
         ZArc a = new ZArc(1.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 7, Color.ORANGE, null, Color.RED, 30.0, 45.0, ArcType.PIE);
@@ -177,7 +177,7 @@ public class Demo extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "File does not exist yet.  Create by running Demo and CTRL-S to save a file", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            c = ZCanvas.fromFile(f);
+            c = CanvasSave.fromFile(f);
             
         } else {
             
@@ -250,7 +250,7 @@ public class Demo extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     File f = new File("test.xml");
-                    c.toFile(f);
+                    CanvasSave.toFile(c, f);
                     System.out.println("Saved file: " + f.getAbsolutePath());
                 } catch (JAXBException ex) {
                     Logger.getLogger(Demo.class.getName()).log(Level.SEVERE, null, ex);

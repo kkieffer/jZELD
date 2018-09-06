@@ -1225,7 +1225,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         mergedShape = pos.createTransformedShape(mergedShape);
    
         
-        ZShape shape = new ZShape(bounds.getX(), bounds.getY(), mergedShape, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes());               
+        ZShape shape = new ZShape(bounds.getX(), bounds.getY(), mergedShape, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes(), ref.getCustomStroke());               
         
         addElement(shape);  //add the merged shape
         lastMethod = null;
@@ -2535,54 +2535,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         canvasModified = false;
     }
     
-    /**
-     * Save the canvas to an XML file, and mark all elements as saved
-     * @param f the file to write, if f is null, nothing is saved, but the canvas is marked as no longer modified
-     * @throws JAXBException 
-     */
-    public void toFile(File f) throws JAXBException {
-               
-  
-        JAXBContext jaxbContext = JAXBContext.newInstance(getContextClasses());
- 
-        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-        if (f != null)
-            jaxbMarshaller.marshal(fields, f);
-        
-        markAsSaved();
-        
-    }
-    
-    
-    /**
-     * Restores a canvas from an XML file
-     * @param f the file to read
-     * @return the loaded ZCanvas
-     * @throws JAXBException on unmarshall error
-     * @throws java.io.IOException f cannot be found or read
-     * @throws java.lang.ClassNotFoundException if an Element defined in the file has no corresponding subclass of ZElement
-     */
-    public static ZCanvas fromFile(File f) throws JAXBException, IOException, ClassNotFoundException {
-      
-        JAXBContext jaxbContext = JAXBContext.newInstance(getContextClasses(f));
- 
-        Unmarshaller jaxbUnMarshaller = jaxbContext.createUnmarshaller();
- 
-        ZCanvas c = new ZCanvas();
-        c.fields = (ZCanvas.CanvasStore)jaxbUnMarshaller.unmarshal(f);
-        
-        Iterator<ZElement> it = c.fields.zElements.iterator();
-        while (it.hasNext()) {
-            it.next().addedTo(c);
-        }
-        
-        c.canvasModified = false;
-        c.init();
-        return c;
-    }
     
    
     @Override
