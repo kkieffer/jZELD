@@ -93,7 +93,7 @@ public class TextAttributes implements Serializable {
     public TextAttributes() {}
 
     public static String getHtmlHelp() {
-        return "This element supports text attributes. The font size, style, and color are adjustable.  The text can be justified left aligned, centered, or right aligned.";
+        return "This element supports text attributes. The font, size, style (bold/italic), and color are adjustable.  The text can be justified left aligned, centered, or right aligned.";
     }
     
 }

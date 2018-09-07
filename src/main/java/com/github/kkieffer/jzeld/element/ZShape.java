@@ -132,7 +132,7 @@ public class ZShape extends ZAbstractShape {
     @XmlJavaTypeAdapter(ShapeAdapter.class)
     protected Shape shape;  //holds the original, unaltered shape
     
-    transient private Shape scaledShape;  //holds a resized version of the shape for painting
+    transient protected Shape scaledShape;  //holds a resized version of the shape for painting
     
     protected ZShape() {}
     
