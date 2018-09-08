@@ -67,10 +67,6 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.RepaintManager;
 import javax.swing.Timer;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -1698,7 +1694,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (o.isSelected() && highlightSelectedOnly && r.getWidth() > 0 && r.getHeight() > 0) {  //highlight selected element, just outside its boundaries
                 g2d.setColor(Color.BLACK);
                 g2d.setStroke(new BasicStroke(1.0f * (float)(pixScale/fields.zoom), CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
-                double margin = Math.ceil(3*o.getOutlineWidth()/2.0) + (1.0 * pixScale/fields.zoom);  //add the outline width, plus 2 pixels out
+                double margin = Math.ceil(o.getOutlineWidth()/2.0) + (1.0 * pixScale/fields.zoom);  //add the outline width, plus 2 pixels out
                 g2d.draw(new Rectangle2D.Double(-margin, -margin, r.getWidth()+margin*2, r.getHeight()+margin*2)); 
                    
                 //draw drag box in the corner
@@ -1915,7 +1911,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
             Rectangle2D r = selectedElement.getBounds2D(SCALE);  //find the location and bounds of the selected element
 
-            //AffineTransform t = AffineTransform.getRotateInstance(Math.toRadians(selectedElement.getRotation()), r.x + r.width/2, r.y + r.height/2);
             AffineTransform t = selectedElement.getElementTransform(SCALE, false);
             Point2D tMouse = t.transform(selectedMouseDrag, null);   
             
