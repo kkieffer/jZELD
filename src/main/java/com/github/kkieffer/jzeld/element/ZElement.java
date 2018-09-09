@@ -128,8 +128,9 @@ public abstract class ZElement implements Serializable {
      */
     public String getHtmlHelp() {
         return (resizable ? "Resize the element by clicking and dragging the resize box in the lower right corner.<br><br>" : "") +
-               (canMove ? "Move the element by selecting it and dragging it to the new position or use the arrow keys.<br><br>" : "") +
-               (resizable ? "Resize the element, maintaining its aspect ratio, by selecting it and using the mouse wheel.<br><br>" : "") +
+               (canMove ? "Move the element by selecting it and dragging it to the new position or use the arrow keys.<br><br>" : "This element cannot be moved.<br><br>") +
+               (resizable ? "Resize the element, maintaining its aspect ratio, by selecting it and using the mouse wheel or press <i>CTRL + or CTRL -</i><br><br>" : 
+                "This element cannot be resized but pressing <i>CTRL + or CTRL - </i>will force a resize.<br><br>") +
                "Rotate the element by selecting it and using the mouse wheel while holding Shift. Rotations to 90 degree positions are available in the right-click context menu.<br><br>" +
                "Shear the element horizontally by selecting it and using the mouse wheel while pressing keys Alt-S.<br><br>" +
                "Shear the element vertically by selecting it and using the mouse wheel while pressing keys Alt-Shift-S.<br><br>" +
@@ -456,7 +457,7 @@ public abstract class ZElement implements Serializable {
     
     /**
      * Increase the size of the element by the specified amount, maintaining the aspect ratio of width to height
-     * @param widthIncrease the amount to increase the width. The height is increased by the radio of height to width.
+     * @param widthIncrease the amount to increase the width in pixels. The height is increased by the radio of height to width.
      * @param minSize the minimum size, in pixels
      * @param scale scale factor
      */

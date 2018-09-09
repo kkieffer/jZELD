@@ -24,4 +24,9 @@ public interface ZCanvasEventListener {
     public void canvasHasDrawClient(boolean hasClient);
 
     
+    /**
+     * Called whenever the canvas has been repainted
+     */
+    public void canvasRepainted();
+    
 }

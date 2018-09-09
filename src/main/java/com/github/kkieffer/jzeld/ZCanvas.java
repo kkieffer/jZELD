@@ -98,6 +98,18 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 public class ZCanvas extends JComponent implements Printable, MouseListener, MouseMotionListener, MouseWheelListener  {
 
+
+    public enum HighlightAnimation {Fast(200), Slow(500), None(0);
+
+        private final int delayPeriod;
+        private HighlightAnimation(int delay) {
+            delayPeriod = delay;
+        }
+        private int delaySpeed() {
+            return delayPeriod;
+        }
+    }
+    
     public enum CombineOperation {Join, Subtract, Intersect, Exclusive_Join;
     
         @Override
@@ -248,6 +260,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private Rectangle2D selectedResizeElementOrigDim;
     private ZElement selectedResizeElement = null;
     private ZElement lastSelectedElement;
+    
+    private Timer animationTimer;
+    private HighlightAnimation animation = HighlightAnimation.Fast;
 
     private boolean selectedAlternateBorder;
     private Method lastMethod = null;
@@ -322,7 +337,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         addMouseWheelListener(this);
        
 
-        Timer timer = new Timer(200, new ActionListener() {  //timer to animate the selected dashed line border, draw coordinates
+        animationTimer = new Timer(animation.delaySpeed(), new ActionListener() {  //timer to animate the selected dashed line border, draw coordinates
             @Override
             public void actionPerformed(ActionEvent e) {
                 boolean repaint = false;
@@ -339,14 +354,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                     repaint();
             }
         });
-        timer.start();
+        animationTimer.start();
         
         
         //Set up the standard hotkeys for the canvas, more can be added by custom implementations
         InputMap im = getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = getActionMap();
 
-        
+       
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "Tab");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "Plus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "Minus");
@@ -360,7 +375,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "MoveRight");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "MoveUp");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "MoveDown");
-        
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.META_DOWN_MASK), "Increase");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.META_DOWN_MASK), "Decrease");
+ 
+       
         am.put("Tab", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -445,6 +463,30 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             }
         });
         
+        am.put("Increase", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent a) {
+                for (ZElement e : getSelectedElements()) {
+                    boolean r = e.isResizable();
+                    e.setResizable(true);  //override resizable
+                    e.increaseSizeMaintainAspect(1, 1, SCALE);
+                    e.setResizable(r);
+                }
+            }
+        });
+        am.put("Decrease", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent a) {
+                for (ZElement e : getSelectedElements()) {
+                    boolean r = e.isResizable();
+                    e.setResizable(true);  //override resizable
+                    e.increaseSizeMaintainAspect(-1, 1, SCALE);
+                    e.setResizable(r);
+                }
+            }
+        });
+        
+        
         
              
         updatePreferredSize();
@@ -492,6 +534,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         return selected;
     }
     
+    public void setHighlightAnimation(HighlightAnimation a) {
+        animation = a;
+        canvasModified = true;
+        if (animation == HighlightAnimation.None)
+            animationTimer.stop();
+        else {
+            animationTimer.setDelay(animation.delaySpeed());
+            animationTimer.start();
+        }
+        repaint();
+    }
     
     /**
      * Set the horizontal ruler
@@ -552,6 +605,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void marginsOn(boolean on) {
         fields.marginsOn = on;
+        repaint();
     }
     
     /**
@@ -1990,6 +2044,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (drawClient != null) {
             drawClient.drawClientPaint(g, mouseIn);
         }
+        
+        for (ZCanvasEventListener l : selectListeners)
+            l.canvasRepainted();
+        
         
     }
 
