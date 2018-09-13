@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -86,6 +87,28 @@ public class JAXBAdapter {
         @Override
         public String marshal(final Point object) throws Exception {
            return object.x + ", " + object.y;
+        }
+
+     }
+    
+    
+    public static class Point2DAdapter extends XmlAdapter<String, Point2D> {
+
+        @Override
+        public Point2D unmarshal(final String xml) throws Exception {
+           String[] parts = xml.split(",");
+           if (parts.length != 2)
+               throw new java.text.ParseException("Object must have 2 integers", 0);
+
+           double x = Double.parseDouble(parts[0].trim());
+           double y = Double.parseDouble(parts[1].trim());
+                     
+           return new Point2D.Double(x, y);
+        }
+
+        @Override
+        public String marshal(final Point2D object) throws Exception {
+           return object.getX() + ", " + object.getY();
         }
 
      }

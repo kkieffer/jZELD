@@ -437,13 +437,14 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     
     
     @Override
-    public void mouseEvent(ZCanvas canvas, MouseEvent e) {
+    public boolean mouseEvent(ZCanvas canvas, MouseEvent e) {
         if (isSelected) {
             MouseEvent m = new MouseEvent(textWidget, e.getID(), e.getWhen(), e.getModifiers(), e.getX() , e.getY(), e.getClickCount(), false, e.getButton());
             textWidget.dispatchEvent(m); //send mouse events to the text widget
             canvas.setCurrentCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR)); 
             textWidget.getParent().repaint();
         }
+        return false;
     }
         
    

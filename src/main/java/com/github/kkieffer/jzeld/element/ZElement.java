@@ -637,11 +637,16 @@ public abstract class ZElement implements Serializable {
     
     
     /**
-     * When selected, a mouse event within the element calls this method. 
+     * When the element is selected for edit, a mouse event calls this method. The method may either swallow the mouse event
+     * or pass it back to the caller
      * @param canvas from which the event originated
      * @param e the mouse event, which is set to the element and coordinates relative to the top left corner of the element
+     * @return true if the element swallowed the event (meaning it should not be further processed).  If false, the event
+     * can also be processed by the canvas (potentially to deselect the element)
      * */
-    public void mouseEvent(ZCanvas canvas, MouseEvent e) {}
+    public boolean mouseEvent(ZCanvas canvas, MouseEvent e) {
+        return false;
+    }
 
 
 
