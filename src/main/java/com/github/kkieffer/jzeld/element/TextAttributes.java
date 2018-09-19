@@ -11,7 +11,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-
+/**
+ * Class that holds text attributes for ZElements that support text features.
+ * @author kkieffer
+ */
 @XmlRootElement(name = "TextAttributes")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TextAttributes implements Serializable {

@@ -9,6 +9,7 @@ import com.github.kkieffer.jzeld.draw.OrthogonalLineDraw;
 import com.github.kkieffer.jzeld.draw.StraightLineDraw;
 import com.github.kkieffer.jzeld.element.PaintAttributes;
 import com.github.kkieffer.jzeld.element.PaintAttributes.RadiusRelative;
+import com.github.kkieffer.jzeld.element.ShadowAttributes;
 import com.github.kkieffer.jzeld.element.ZCanvasRuler;
 import com.github.kkieffer.jzeld.element.ZEditableText;
 import com.github.kkieffer.jzeld.element.TextAttributes.HorizontalJustify;
@@ -110,6 +111,7 @@ public class Demo extends javax.swing.JFrame {
         ZEquilateralPolygon p = new ZEquilateralPolygon(6.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, 5);        
         PaintAttributes linPaint = PaintAttributes.createLinearPaintAttribute(new Point2D.Double(.25,.5), new Point2D.Double(.75,.5), new float[]{0.1f, 0.5f, 0.8f}, new Color[]{Color.BLUE, Color.RED, Color.GREEN}, MultipleGradientPaint.CycleMethod.REFLECT);
         p.setPaintAttributes(linPaint);
+        p.setShadowAttributes(new ShadowAttributes());
         c.addElement(p);
           
         ZQuadrilateral pg = new ZQuadrilateral(QuadType.RHOMBUS, 6.0, 2.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, 20);

@@ -3,6 +3,7 @@ package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.JAXBAdapter.ColorAdapter;
 import com.github.kkieffer.jzeld.ZCanvas.CombineOperation;
+import com.jhlabs.image.ShadowFilter;
 import java.awt.BasicStroke;
 import static java.awt.BasicStroke.CAP_SQUARE;
 import static java.awt.BasicStroke.JOIN_MITER;
@@ -13,6 +14,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -36,13 +38,14 @@ public abstract class ZAbstractShape extends ZElement {
     protected Color backgroundColor;
     
     protected float borderThickness;
-    
     protected Float[] dashPattern = null;
-    
-    protected PaintAttributes paintAttr = null;
-      
+    protected PaintAttributes paintAttr = null;    
     protected CustomStroke customStroke = null;
        
+    protected ShadowAttributes shadowAttributes = null;
+    
+    protected transient BufferedImage shadowImage = null;
+    
     protected ZAbstractShape(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
         super(x, y, width, height, rotation, canSelect, canResize, canMove);
         setAttributes(borderWidth, borderColor, dashPattern, fillColor);
@@ -53,6 +56,7 @@ public abstract class ZAbstractShape extends ZElement {
         super(src, forNew);
         setAttributes(src.borderThickness, src.borderColor, src.dashPattern, src.backgroundColor);
         paintAttr = src.paintAttr == null ? null : new PaintAttributes(src.paintAttr);
+        shadowAttributes = src.shadowAttributes == null ? null : new ShadowAttributes(src.shadowAttributes);
         hasChanges = false;
         customStroke = src.customStroke == null ? null : src.customStroke.copyOf();
     }
@@ -92,6 +96,7 @@ public abstract class ZAbstractShape extends ZElement {
     @Override
     public void setOutlineWidth(float width) {
         borderThickness = width;
+        shadowImage = null;  //could change overall shadow size
         hasChanges = true;
     }
     
@@ -173,6 +178,20 @@ public abstract class ZAbstractShape extends ZElement {
         return paintAttr;
     }
     
+    
+    public ShadowAttributes getShadowAttributes() {
+        return shadowAttributes;
+    }
+    
+    public void setShadowAttributes(ShadowAttributes s) {
+        shadowAttributes = s;
+        shadowImage = null;  //force refresh of the image
+        hasChanges = true;
+    }
+    
+    
+    
+    
     protected abstract Shape getAbstractShape();
     protected abstract void fillShape(Graphics2D g, double unitSize, double width, double height);
     protected abstract void drawShape(Graphics2D g, double unitSize, double width, double height);
@@ -242,6 +261,42 @@ public abstract class ZAbstractShape extends ZElement {
         return a;
     }
     
+    @Override
+    protected void setSize(double w, double h, double minSize, double scale) {
+        super.setSize(w, h, minSize, scale);
+        shadowImage = null;  //force refresh of the image
+    }
+    
+    //Draw and fill the shape on a new image in black, then from the shadow parameters, create a shadow filter and create the shadow image
+    private void createShadow(double unitSize, double width, double height) {
+        
+        ShadowFilter shadow = shadowAttributes.createFilter();
+       
+        float distance = shadow.getRadius() + getOutlineWidth()/2;  //increase image to support the additional size on the edge from kernel and shape outline
+            
+        //Create Buffered Image
+        BufferedImage bi = new BufferedImage((int)Math.ceil(width+distance), (int)Math.ceil(height+distance), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D imgGraphics = bi.createGraphics();
+        imgGraphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        imgGraphics.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
+        imgGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        imgGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                      
+        imgGraphics.setColor(Color.BLACK);
+        imgGraphics.translate(distance/2, distance/2);  //center the shadowed image
+        if (backgroundColor != null || paintAttr != null)
+            fillShape(imgGraphics, unitSize, width, height);
+
+        if (customStroke != null || (borderThickness > 0 && borderColor != null))
+            drawShape(imgGraphics, unitSize, width, height);
+              
+        imgGraphics.dispose();
+        
+        //Filter the image to create the shadow
+        shadowImage = shadow.filter(bi, null);
+        
+    }
+    
     
     @Override
     public void paint(Graphics2D g, double unitSize, double width, double height) {
@@ -251,8 +306,20 @@ public abstract class ZAbstractShape extends ZElement {
         
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
       
+        //If the element has a shadow, create the shadow image (if needed), and place it at the desired offset
+        if (shadowAttributes != null && shadowAttributes.isEnabled()) {
+            if (shadowImage == null)
+                createShadow(unitSize, width, height);
+        
+            float distance = shadowAttributes.getRadius() + getOutlineWidth()/2;
+   
+            int shadW = (int)(shadowImage.getWidth() * shadowAttributes.getSizeRatio());
+            int shadH = (int)(shadowImage.getHeight() * shadowAttributes.getSizeRatio());
+    
+            g.drawImage(shadowImage, (int)(shadowAttributes.getXOffset()*unitSize - distance/2), (int)(shadowAttributes.getYOffset()*unitSize - distance/2), shadW, shadH, null);
+        }
+
         if (backgroundColor != null) {
             g.setColor(backgroundColor);
             fillShape(g, unitSize, width, height);
@@ -285,7 +352,7 @@ public abstract class ZAbstractShape extends ZElement {
             g.setColor(borderColor);
             drawShape(g, unitSize, width, height);
        }
-       
+              
     }
 
     

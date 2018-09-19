@@ -6,10 +6,22 @@
     <artifactId>jZELD</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
+    
+    <!-- https://mvnrepository.com/artifact/com.jhlabs/filters -->
+
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+   
+   <dependencies>
+        <dependency>
+            <groupId>com.jhlabs</groupId>
+            <artifactId>filters</artifactId>
+            <version>2.0.235-1</version>
+        </dependency>
+   </dependencies>
    
 </project>

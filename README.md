@@ -105,7 +105,7 @@ Navigate to the "target" directory
 
 Run: java -cp classes:test-classes com.github.kkieffer.jzeld.Demo
 
-Only the Java JRE 1.8 is required.  No other dependencies are needed.
+Java JRE 1.8 is required.  The other dependency is the [filters library from jhlabs](http://www.jhlabs.com/ip/filters/download.html) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 ## Extending
 
@@ -124,7 +124,7 @@ Here are some ideas for using jZELD in a larger application:
 
 ## License
 
-This project is licensed under the LGPL License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the LGPL License - see the [LICENSE.md](LICENSE.md) file for details.
 
 
 
