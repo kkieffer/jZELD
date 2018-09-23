@@ -2,11 +2,11 @@
 package com.github.kkieffer.jzeld;
 
 import com.github.kkieffer.jzeld.contextMenu.ZCanvasContextMenu;
-import com.github.kkieffer.jzeld.JAXBAdapter.ColorAdapter;
-import com.github.kkieffer.jzeld.JAXBAdapter.DimensionAdapter;
-import com.github.kkieffer.jzeld.JAXBAdapter.FontAdapter;
-import com.github.kkieffer.jzeld.JAXBAdapter.PointAdapter;
-import com.github.kkieffer.jzeld.JAXBAdapter.Rectangle2DAdapter;
+import com.github.kkieffer.jzeld.adapters.JAXBAdapter.ColorAdapter;
+import com.github.kkieffer.jzeld.adapters.JAXBAdapter.DimensionAdapter;
+import com.github.kkieffer.jzeld.adapters.JAXBAdapter.FontAdapter;
+import com.github.kkieffer.jzeld.adapters.JAXBAdapter.PointAdapter;
+import com.github.kkieffer.jzeld.adapters.JAXBAdapter.Rectangle2DAdapter;
 import com.github.kkieffer.jzeld.draw.DrawClient;
 import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZAbstractShape;
@@ -2619,12 +2619,47 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
-     * Grab an image of the canvas
-     * @return the image
+     * Print the canvas to a supplied Graphics2D context, the margins and grid are hidden
+     * @param g the context to draw on
      */
-    public BufferedImage printToImage() {
+    public void paintToGraphicsContext(Graphics2D g) {
         
-        if (fields.pageSize == null)
+        //Hide margins and grid
+        boolean marginsOn = areMarginsOn();
+        marginsOn(false);
+        ZGrid savedGrid = fields.grid; //save grid
+        setGrid(null);
+        
+        drawOff();
+        resetView();
+        selectNone();  //prevents drawing any selections or client draw
+        
+        printOn = true;  //prevents drawing of grid, margins, and mouse cursor/information
+
+        RepaintManager currentManager = RepaintManager.currentManager(this);
+        
+        Graphics2D g2d = (Graphics2D)g;
+        g2d.translate(-fields.origin.x, -fields.origin.y);
+        currentManager.setDoubleBufferingEnabled(false);
+        this.paint(g2d);
+        currentManager.setDoubleBufferingEnabled(true);
+        
+        printOn = false;
+        
+        
+        //Restore margins and grid
+        marginsOn(marginsOn);
+        setGrid(savedGrid);
+    }
+    
+    /**
+     * Grab an image of the canvas, the margins and grid are hidden
+     * @param resolutionScale the desired resolution multiplier. A value of 1 = 72dpi (screen resolution).  2 doubles this, and so on.
+     * @return the image of the canvas
+     */
+    public BufferedImage printToImage(int resolutionScale) {
+        
+        if (fields.pageSize == null || resolutionScale < 1)
             return null;
         
         //Hide margins and grid
@@ -2634,14 +2669,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         setGrid(null);
         
         //Create Buffered Image
-        BufferedImage bi = new BufferedImage(fields.pageSize.width*10, fields.pageSize.height*10, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new BufferedImage(fields.pageSize.width*resolutionScale, fields.pageSize.height*resolutionScale, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g.scale(10, 10);
+        g.scale(resolutionScale, resolutionScale);
         print(g, null, 0);
         g.dispose();
         
@@ -2654,7 +2689,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
 
     
-    public BufferedImage printSelectedElementsToImage() {
+    /**
+     * Print all selected elements by first creating a grouped element from them, and printing that element to an image
+     * @param resolutionScale the desired resolution multiplier. A value of 1 = 72dpi (screen resolution).  2 doubles this, and so on.
+     * @return the image of the selected elements
+     */
+    public BufferedImage printSelectedElementsToImage(int resolutionScale) {
+        
+        if (resolutionScale < 1)
+            return null;
         
         ArrayList<ZElement> selectedElements = getSelectedElements();
 
@@ -2676,13 +2719,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         int imgHeight = (int)Math.round(bounds.getHeight() - bounds.getY());
         
         //Create Buffered Image
-        BufferedImage bi = new BufferedImage(imgWidth*3, imgHeight*3, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new BufferedImage(imgWidth*resolutionScale, imgHeight*resolutionScale, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.scale(3, 3);
+        g.scale(resolutionScale, resolutionScale);
         
         g.translate(-bounds.getX(), -bounds.getY());
         g.scale(1/pixScale, 1/pixScale);

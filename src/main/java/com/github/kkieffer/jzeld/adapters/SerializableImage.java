@@ -1,5 +1,5 @@
 
-package com.github.kkieffer.jzeld;
+package com.github.kkieffer.jzeld.adapters;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;

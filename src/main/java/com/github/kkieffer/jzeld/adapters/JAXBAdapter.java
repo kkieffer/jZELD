@@ -1,5 +1,5 @@
 
-package com.github.kkieffer.jzeld;
+package com.github.kkieffer.jzeld.adapters;
 
 import java.awt.Color;
 import java.awt.Dimension;

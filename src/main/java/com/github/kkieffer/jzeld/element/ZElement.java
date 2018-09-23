@@ -1,7 +1,7 @@
 
 package com.github.kkieffer.jzeld.element;
 
-import com.github.kkieffer.jzeld.JAXBAdapter.Rectangle2DAdapter;
+import com.github.kkieffer.jzeld.adapters.JAXBAdapter.Rectangle2DAdapter;
 import com.github.kkieffer.jzeld.UnitMeasure;
 import com.github.kkieffer.jzeld.ZCanvas;
 import java.awt.Color;

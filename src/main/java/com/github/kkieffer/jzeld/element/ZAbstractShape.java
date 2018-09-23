@@ -1,7 +1,7 @@
 
 package com.github.kkieffer.jzeld.element;
 
-import com.github.kkieffer.jzeld.JAXBAdapter.ColorAdapter;
+import com.github.kkieffer.jzeld.adapters.JAXBAdapter.ColorAdapter;
 import com.github.kkieffer.jzeld.ZCanvas.CombineOperation;
 import com.jhlabs.image.ShadowFilter;
 import java.awt.BasicStroke;

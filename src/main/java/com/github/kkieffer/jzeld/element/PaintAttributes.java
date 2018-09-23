@@ -1,8 +1,8 @@
 
 package com.github.kkieffer.jzeld.element;
 
-import com.github.kkieffer.jzeld.JAXBAdapter;
-import com.github.kkieffer.jzeld.SerializableImage;
+import com.github.kkieffer.jzeld.adapters.JAXBAdapter;
+import com.github.kkieffer.jzeld.adapters.SerializableImage;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;

@@ -2,7 +2,7 @@
 package com.github.kkieffer.jzeld.element;
 
 
-import com.github.kkieffer.jzeld.JAXBAdapter.ColorAdapter;
+import com.github.kkieffer.jzeld.adapters.JAXBAdapter.ColorAdapter;
 import com.github.kkieffer.jzeld.ZCanvas;
 import com.github.kkieffer.jzeld.element.TextAttributes.HorizontalJustify;
 import java.awt.Color;

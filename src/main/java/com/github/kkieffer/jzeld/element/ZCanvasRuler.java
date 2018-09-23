@@ -1,7 +1,7 @@
 
 package com.github.kkieffer.jzeld.element;
 
-import com.github.kkieffer.jzeld.JAXBAdapter.FontAdapter;
+import com.github.kkieffer.jzeld.adapters.JAXBAdapter.FontAdapter;
 import com.github.kkieffer.jzeld.UnitMeasure;
 import java.awt.Color;
 import java.awt.Font;

@@ -3,7 +3,7 @@
 jZELD is a Java Swing Framework for layout and emplacement of various ZElements (drawn shapes and other more complex items) on a 
 canvas (the ZCanvas) that supports a z-plane layer.  ZElements can placed in the z-plane so they overlap and/or are overlapped by other ZElements.
 The framework can be user-interactive and supports changing position, size, z-plane order, and other attributes of ZElements. 
-Furthermore, new elements can be defined by a user creating drawings on the canvas.
+Furthermore, new elements can be defined by a user creating drawings on the canvas. The canvas can be printed, saved to an image, or written to a file.
 
 There are three main components to the jZELD framework described below, and other supporting classes documented in the source code.
 
@@ -45,8 +45,8 @@ well it is defined in parenthesis.  For MacOS, substitute Command instead of Ctr
 11. Specify the ZElement line width, line color, dash pattern, and fill color (if ZElement supports)
 12. Aligning multiple ZElements to each other
 
-
-Other operations supported by ZCanvas including saving the ZCanvas and its ZElements to an XML file (using JAXB) and then later restoring as well as printing the ZCanvas.
+The ZCanvas can be printed to a printer, saved as an image, or saved to a file.  The native file format uses an XML format (using JAXB). The ZCanvas can
+later be restored from this file. The ZCanvas can also be exported to a SVG file.
 
 ## ZElements
 
@@ -88,9 +88,10 @@ additional hotkeys.
 1.  Send an image of the ZCanvas to the printer  (Ctrl-P)
 2.  Save the ZCanvas to an XML file (Ctrl-S)
 3.  Create a freeform drawing (Ctrl-F)
-4.  Create a straight-line drawing (Ctrl-D)
+4.  Create a straight-line drawing (Ctrl-D) and close, or (Ctrl-L) not to close
 5.  Create a orthogonal-line drawing (Ctrl-O)
-6.  Copy the selected element as an image to the clipboard (Ctrl-E)
+6.  Copy the selected element as an image to a png file (Ctrl-E)
+7.  Export to an svg file (Ctrl-G)
 
 When starting the demo, if a previous instance was saved with Ctrl-S, it can be loaded.  If the user chooses not to load, a default ZCanvas is loaded with a collection
 of demo ZElements.  The default Demo is shown below.
@@ -105,7 +106,14 @@ Navigate to the "target" directory
 
 Run: java -cp classes:test-classes com.github.kkieffer.jzeld.Demo
 
-Java JRE 1.8 is required.  The other dependency is the [filters library from jhlabs](http://www.jhlabs.com/ip/filters/download.html) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
+## Dependencies
+
+Java JRE 1.8 is required.  Other dependencies are provided in the pom.xml file:
+
+The [filters library from jhlabs](http://www.jhlabs.com/ip/filters/download.html) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
+The [batik library from Apache](https://xmlgraphics.apache.org/batik/) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
+
+The source code also contains an [extension to the batik library](https://gist.github.com/msteiger/4509119) as modified by Marco Hutter (see comments on github page) 
 
 ## Extending
 

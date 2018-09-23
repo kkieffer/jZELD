@@ -1,7 +1,7 @@
 
 package com.github.kkieffer.jzeld.element;
 
-import com.github.kkieffer.jzeld.JAXBAdapter;
+import com.github.kkieffer.jzeld.adapters.JAXBAdapter;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.Serializable;

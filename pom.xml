@@ -7,8 +7,6 @@
     <version>1.0</version>
     <packaging>jar</packaging>
     
-    <!-- https://mvnrepository.com/artifact/com.jhlabs/filters -->
-
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,12 +14,50 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
    
+   <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                    <configuration>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                     </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                    <goals>
+                         <goal>single</goal>
+                    </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+   
+   
    <dependencies>
         <dependency>
             <groupId>com.jhlabs</groupId>
             <artifactId>filters</artifactId>
             <version>2.0.235-1</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-svggen</artifactId>
+            <version>1.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-dom</artifactId>
+            <version>1.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-codec</artifactId>
+            <version>1.10</version>
+        </dependency>
+      
    </dependencies>
    
 </project>

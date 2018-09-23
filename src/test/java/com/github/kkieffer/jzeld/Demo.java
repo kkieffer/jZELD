@@ -2,6 +2,7 @@ package com.github.kkieffer.jzeld;
 
 
 
+import com.github.kkieffer.jzeld.adapters.SVGExport;
 import com.github.kkieffer.jzeld.contextMenu.ZDefaultContextMenu;
 import com.github.kkieffer.jzeld.ZCanvas.Orientation;
 import com.github.kkieffer.jzeld.draw.FreeformDraw;
@@ -277,7 +278,7 @@ public class Demo extends javax.swing.JFrame {
         am.put("SaveElementImage", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                BufferedImage i = c.printSelectedElementsToImage();
+                BufferedImage i = c.printSelectedElementsToImage(3);  //print at 216 dpi
                 File f = new File("test.png");
                 try {
                     ImageIO.write(i, "png", f);
@@ -287,7 +288,19 @@ public class Demo extends javax.swing.JFrame {
                 }   
             }
         });
-        
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "SaveSVG");
+        am.put("SaveSVG", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    File f = new File("test.svg");
+                    SVGExport.toSVG(c, f);
+                    System.out.println("Wrote canvas to " + f.getAbsolutePath());
+                } catch (IOException ex) {
+                    System.err.println(ex);
+                } 
+            }
+        });
         
         
         
