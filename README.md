@@ -101,19 +101,17 @@ of demo ZElements.  The default Demo is shown below.
 
 ## Getting Started
 
-Build and Run using Maven:  "mvn package"
-Navigate to the "target" directory
-
-Run: java -cp classes:test-classes com.github.kkieffer.jzeld.Demo
+* Build and Run using Maven:  "mvn package"
+* Navigate to the "target" directory
+* Run: java -cp classes:test-classes com.github.kkieffer.jzeld.Demo
 
 ## Dependencies
 
 Java JRE 1.8 is required.  Other dependencies are provided in the pom.xml file:
 
-The [filters library from jhlabs](http://www.jhlabs.com/ip/filters/download.html) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
-The [batik library from Apache](https://xmlgraphics.apache.org/batik/) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
-
-The source code also contains an [extension to the batik library](https://gist.github.com/msteiger/4509119) as modified by Marco Hutter (see comments on github page) 
+* The [filters library from jhlabs](http://www.jhlabs.com/ip/filters/download.html) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
+* The [batik library from Apache](https://xmlgraphics.apache.org/batik/) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
+* The source code also contains an [extension to the batik library](https://gist.github.com/msteiger/4509119) as modified by Marco Hutter (see comments on github page) 
 
 ## Extending
 
