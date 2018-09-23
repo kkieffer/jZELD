@@ -19,6 +19,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UnitMeasure implements Serializable {
     
+    protected static final String SQ = "\u00B2";  //superscript 2
+    
     //Define a standard unit of Inch, with a 1:1 ratio
     public static UnitMeasure inchUnit = new UnitMeasure("in", 1.0, 1, 4, 2);
     
@@ -103,10 +105,25 @@ public class UnitMeasure implements Serializable {
         return minorTicks;
     }
     
+    /**
+     * Format the value as a linear measurement 
+     * @param val the linear value
+     * @param withUnit true to append the unit name
+     * @return the formatted value string
+     */
     public String format(double val, boolean withUnit) {
         return dFormat.format(val * scale) + (withUnit ? " " + name : "");
     }
     
+    /**
+     * Format the value as an area measurement (squared)
+     * @param val the area value
+     * @param withUnit true to append the unit name "squared"
+     * @return the formatted value string
+     */
+    public String formatArea(double val, boolean withUnit) {
+        return dFormat.format(val * Math.pow(scale, 2)) + (withUnit ? " " + name + SQ : "");
+    }
     
     public double parseFormat(String text) {
         return Double.parseDouble(text);

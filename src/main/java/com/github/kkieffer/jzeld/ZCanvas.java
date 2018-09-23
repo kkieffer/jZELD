@@ -782,6 +782,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         drawClient = null;
         for (ZCanvasEventListener l : selectListeners)
             l.canvasHasDrawClient(false);
+        
+        repaint();
     }
     
     /**
@@ -2023,12 +2025,19 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (fields.mouseCoordFont != null) {
                 g2d.setColor(Color.BLACK);
                 String s;
+                String measString = null;
                 if (mouseDrag == null)
                     s = fields.unit.format(mouseIn.getX()/SCALE, true) + ", " + fields.unit.format(mouseIn.getY()/SCALE, true);
                 else {
-                    s = fields.unit.format(dragRect.getWidth()/SCALE, true) + ", " + fields.unit.format(dragRect.getHeight()/SCALE, true);
+                    double area = (dragRect.getWidth()/SCALE) * (dragRect.getHeight()/SCALE);  //area is w*h in units
+                    s = fields.unit.format(dragRect.getWidth()/SCALE, true) + " x " + fields.unit.format(dragRect.getHeight()/SCALE, true);
+                    measString = fields.unit.formatArea(area, true);
                 }
-                paintString(g2d, s, mouseIn.getX() + (int)Math.ceil(10.0 * pixScale/fields.zoom), mouseIn.getY() + (int)Math.ceil(fontMetrics.getHeight() + 10.0 * pixScale/fields.zoom));
+                double x = mouseIn.getX() + (int)Math.ceil(10.0 * pixScale/fields.zoom);
+                double y = mouseIn.getY() + (int)Math.ceil(fontMetrics.getHeight() + 10.0 * pixScale/fields.zoom);
+                paintString(g2d, s, x, y);
+                if (measString != null)
+                    paintString(g2d, measString, x, y + (int)Math.ceil(fontMetrics.getHeight() + 10.0 * pixScale/fields.zoom));
             }
   
             
