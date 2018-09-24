@@ -128,6 +128,15 @@ public abstract class ZAbstractShape extends ZElement {
     @Override
     public void setFillColor(Color fillColor) {
         backgroundColor = fillColor;
+        shadowImage = null;  //force refresh of the image
+        hasChanges = true;
+    }
+    
+    @Override
+    public void removeFill() {
+        backgroundColor = null;
+        paintAttr = null;
+        shadowImage = null;  //force refresh of the image
         hasChanges = true;
     }
     
@@ -170,6 +179,7 @@ public abstract class ZAbstractShape extends ZElement {
      */
     public void setPaintAttributes(PaintAttributes p) {
         paintAttr = p;
+        shadowImage = null;  //force refresh of the image
         hasChanges = true;
     }
     

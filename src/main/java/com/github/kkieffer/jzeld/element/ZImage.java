@@ -22,6 +22,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZImage extends ZRectangle {
     
+    protected static final Color FILL_COLOR = new Color(255, 255, 255, 0);  //translucent white, default fill unless set explicitly
+    
     protected SerializableImage image;
     
     protected ZImage() {}
@@ -43,11 +45,18 @@ public class ZImage extends ZRectangle {
      * @param img the image painted on this element, if null, it is not painted
      */
     public ZImage(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove,  float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, BufferedImage img) {
-        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);
+        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, FILL_COLOR);
         if (width <= 0 || height <= 0)
             throw new IllegalArgumentException("Width and height must be positive value");
-
-        image = new SerializableImage(img);
+        
+        
+        //Create the serializable image from a resized image.  The image doesn't actually change size but we switch to ARGB or RGB types because some
+        //other types don't always print when printing the image to a printer.
+        if (img.getColorModel().hasAlpha())
+            image = new SerializableImage(SerializableImage.resizeImage(img, img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB));
+        else
+            image = new SerializableImage(SerializableImage.resizeImage(img, img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB));
+                
     }
     
     public ZImage(ZImage copy, boolean forNew) {
@@ -92,26 +101,13 @@ public class ZImage extends ZRectangle {
     }
     
 
-     @Override
-    public void setFillColor(Color fillColor) {
-        backgroundColor = null;
-        hasChanges = true;
-    }
-   
-    
     @Override
     public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
         super.setAttributes(outlineWidth, outlineColor, dashPattern, fillColor);
-        backgroundColor = null;
         hasChanges = true;
     }
     
     
-    @Override
-    public boolean hasFill() {
-        return false;     
-    }
-
     @Override
     public boolean supportsEdit() {
         return false;
@@ -138,6 +134,8 @@ public class ZImage extends ZRectangle {
              
         if (!isVisible())
             return;
+
+        super.paint(g, unitSize, width, height);       
         
         if (image != null) {
             int x = flipHoriz ? (int)width : 0;
@@ -147,7 +145,6 @@ public class ZImage extends ZRectangle {
             
             paintImage(g, image.getImage(), x, y, w, h);
         }
-        super.paint(g, unitSize, width, height);       
     }
     
     

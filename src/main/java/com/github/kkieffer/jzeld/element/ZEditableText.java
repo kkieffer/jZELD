@@ -273,6 +273,11 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         
     }
     
+    @Override
+    public void removeFill() {
+        setFillColor(null);
+    }
+    
     
     @Override
     public boolean hasOutline() {

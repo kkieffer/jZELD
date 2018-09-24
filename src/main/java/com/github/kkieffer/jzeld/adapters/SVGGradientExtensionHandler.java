@@ -51,15 +51,18 @@ import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
+import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 import org.apache.batik.svggen.DefaultExtensionHandler;
 import org.apache.batik.svggen.SVGColor;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGPaintDescriptor;
+import org.apache.batik.svggen.SVGTexturePaint;
 import org.w3c.dom.Element;
-
 /**
  * Taken (with permission) from https://gist.github.com/msteiger/4509119, 
  * including the fixes that are discussed in the comments <br>
@@ -75,9 +78,8 @@ import org.w3c.dom.Element;
 class SVGGradientExtensionHandler extends DefaultExtensionHandler
 {
     @Override
-    public SVGPaintDescriptor handlePaint(Paint paint,
-        SVGGeneratorContext genCtx)
-    {
+    public SVGPaintDescriptor handlePaint(Paint paint, SVGGeneratorContext genCtx) {
+        
         // Handle LinearGradientPaint
         if (paint instanceof LinearGradientPaint)
             return getLgpDescriptor((LinearGradientPaint) paint, genCtx);
@@ -85,15 +87,18 @@ class SVGGradientExtensionHandler extends DefaultExtensionHandler
         // Handle RadialGradientPaint
         if (paint instanceof RadialGradientPaint)
             return getRgpDescriptor((RadialGradientPaint) paint, genCtx);
+        
+        // Handle TexturePaint
+        if (paint instanceof TexturePaint)
+            return getTextureDescriptor((TexturePaint)paint, genCtx);
 
         return super.handlePaint(paint, genCtx);
     }
 
-    private SVGPaintDescriptor getRgpDescriptor(RadialGradientPaint gradient,
-        SVGGeneratorContext genCtx)
-    {
-        Element gradElem = genCtx.getDOMFactory()
-            .createElementNS(SVG_NAMESPACE_URI, SVG_RADIAL_GRADIENT_TAG);
+    
+    private SVGPaintDescriptor getRgpDescriptor(RadialGradientPaint gradient,SVGGeneratorContext genCtx) {
+        
+        Element gradElem = genCtx.getDOMFactory().createElementNS(SVG_NAMESPACE_URI, SVG_RADIAL_GRADIENT_TAG);
 
         // Create and set unique XML id
         String id = genCtx.getIDGenerator().generateID("gradient");
@@ -112,15 +117,12 @@ class SVGGradientExtensionHandler extends DefaultExtensionHandler
 
         addMgpAttributes(gradElem, genCtx, gradient);
 
-        return new SVGPaintDescriptor("url(#" + id + ")", SVG_OPAQUE_VALUE,
-            gradElem);
+        return new SVGPaintDescriptor("url(#" + id + ")", SVG_OPAQUE_VALUE, gradElem);
     }
 
-    private SVGPaintDescriptor getLgpDescriptor(LinearGradientPaint gradient,
-        SVGGeneratorContext genCtx)
-    {
-        Element gradElem = genCtx.getDOMFactory()
-            .createElementNS(SVG_NAMESPACE_URI, SVG_LINEAR_GRADIENT_TAG);
+    private SVGPaintDescriptor getLgpDescriptor(LinearGradientPaint gradient, SVGGeneratorContext genCtx) {
+        
+        Element gradElem = genCtx.getDOMFactory().createElementNS(SVG_NAMESPACE_URI, SVG_LINEAR_GRADIENT_TAG);
 
         // Create and set unique XML id
         String id = genCtx.getIDGenerator().generateID("gradient");
@@ -137,31 +139,25 @@ class SVGGradientExtensionHandler extends DefaultExtensionHandler
 
         addMgpAttributes(gradElem, genCtx, gradient);
 
-        return new SVGPaintDescriptor("url(#" + id + ")", SVG_OPAQUE_VALUE,
-            gradElem);
+        return new SVGPaintDescriptor("url(#" + id + ")", SVG_OPAQUE_VALUE, gradElem);
     }
 
-    private void addMgpAttributes(Element gradElem, SVGGeneratorContext genCtx,
-        MultipleGradientPaint gradient)
-    {
-        gradElem.setAttribute(SVG_GRADIENT_UNITS_ATTRIBUTE,
-            SVG_USER_SPACE_ON_USE_VALUE);
+    private void addMgpAttributes(Element gradElem, SVGGeneratorContext genCtx,MultipleGradientPaint gradient) {
+        
+        gradElem.setAttribute(SVG_GRADIENT_UNITS_ATTRIBUTE, SVG_USER_SPACE_ON_USE_VALUE);
 
         // Set cycle method
         switch (gradient.getCycleMethod())
         {
             case REFLECT:
-                gradElem.setAttribute(SVG_SPREAD_METHOD_ATTRIBUTE,
-                    SVG_REFLECT_VALUE);
+                gradElem.setAttribute(SVG_SPREAD_METHOD_ATTRIBUTE, SVG_REFLECT_VALUE);
                 break;
             case REPEAT:
-                gradElem.setAttribute(SVG_SPREAD_METHOD_ATTRIBUTE,
-                    SVG_REPEAT_VALUE);
+                gradElem.setAttribute(SVG_SPREAD_METHOD_ATTRIBUTE, SVG_REPEAT_VALUE);
                 break;
             case NO_CYCLE:
             default:
-                gradElem.setAttribute(SVG_SPREAD_METHOD_ATTRIBUTE,
-                    SVG_PAD_VALUE); // this is the default
+                gradElem.setAttribute(SVG_SPREAD_METHOD_ATTRIBUTE, SVG_PAD_VALUE); // this is the default
                 break;
         }
 
@@ -169,14 +165,12 @@ class SVGGradientExtensionHandler extends DefaultExtensionHandler
         switch (gradient.getColorSpace())
         {
             case LINEAR_RGB:
-                gradElem.setAttribute(SVG_COLOR_INTERPOLATION_ATTRIBUTE,
-                    SVG_LINEAR_RGB_VALUE);
+                gradElem.setAttribute(SVG_COLOR_INTERPOLATION_ATTRIBUTE, SVG_LINEAR_RGB_VALUE);
                 break;
 
             case SRGB:
             default:
-                gradElem.setAttribute(SVG_COLOR_INTERPOLATION_ATTRIBUTE,
-                    SVG_SRGB_VALUE);
+                gradElem.setAttribute(SVG_COLOR_INTERPOLATION_ATTRIBUTE, SVG_SRGB_VALUE);
                 break;
         }
 
@@ -213,4 +207,33 @@ class SVGGradientExtensionHandler extends DefaultExtensionHandler
             gradElem.appendChild(stop);
         }
     }
+    
+    
+    public SVGPaintDescriptor getTextureDescriptor(TexturePaint texture, SVGGeneratorContext genCtx) {
+        
+        BufferedImage textureImage = texture.getImage();
+        Rectangle2D anchorRect = texture.getAnchorRect();
+        
+        // Rescale only if necessary
+        if(textureImage.getWidth() != anchorRect.getWidth() || textureImage.getHeight() != anchorRect.getHeight()){
+
+            // Rescale only if anchor area is not a point or a line
+            if(anchorRect.getWidth() > 0 && anchorRect.getHeight() > 0){
+                
+                double scaleX = anchorRect.getWidth()/textureImage.getWidth();
+                double scaleY = anchorRect.getHeight()/textureImage.getHeight();
+                
+           
+                //Use better rendering quality for resize!
+                textureImage = SerializableImage.resizeImage(textureImage, (int)(scaleX*textureImage.getWidth()), (int)(scaleY* textureImage.getHeight()), BufferedImage.TYPE_INT_ARGB);
+            }
+        }
+        
+        TexturePaint tP = new TexturePaint(textureImage, anchorRect);
+     
+        SVGTexturePaint svgTexturePaint = new SVGTexturePaint(genCtx);
+        return svgTexturePaint.toSVG(tP);
+        
+    }
+  
 }

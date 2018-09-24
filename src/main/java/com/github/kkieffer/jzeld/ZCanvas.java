@@ -733,6 +733,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         else {
             Dimension d = new Dimension((int)(fields.bounds.width * fields.zoom + fields.origin.x), (int)(fields.bounds.height * fields.zoom + fields.origin.y));
             setPreferredSize(d);
+            setSize(d);
         }
         canvasModified = true;
 
@@ -1386,6 +1387,23 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         setLastMethod("setFillColor", c);
     }
     
+    /**
+     * Removes the fill color and paint attributes of the selected elements
+     */
+    public void removeFill() {
+
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
+        if (selectedElements.isEmpty() || passThruElement != null) 
+            return;
+
+        undoStack.saveContext(fields.zElements);
+    
+        for (ZElement selectedElement : selectedElements)
+            selectedElement.removeFill();
+        
+        setLastMethod("removeFill");
+    }
    
     
     /**

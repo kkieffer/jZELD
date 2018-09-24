@@ -217,10 +217,16 @@ public abstract class ZElement implements Serializable {
     public abstract Float[] getDashPattern();
     
     /**
-     * For elements that support a fill, sets the color of the fill.  Null is transparent.
+     * For elements that support a fill, sets the color of the fill.  
      * @param fillColor 
      */
     public abstract void setFillColor(Color fillColor);
+    
+    
+    /**
+     * For elements that support a fill, removes the fill color or paint attributes
+     */
+    public abstract void removeFill();
     
     /**
      * Get the current fill color

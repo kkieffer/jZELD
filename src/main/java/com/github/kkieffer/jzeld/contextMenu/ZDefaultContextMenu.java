@@ -48,6 +48,7 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
     protected final JMenuItem resetVerticalShearMenuItem;
     protected final JMenuItem resetHorizontalShearMenuItem;
     protected final JMenu shearMenu;
+    protected final JMenuItem removeFillMenuItem;
     
     
     public ZDefaultContextMenu(ZCanvas c) {
@@ -137,6 +138,8 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         fillColorMenuItem = new ColorMenuItem("Fill Color", c, ColorMenuItem.Type.FILL);
         colorMenu.add(fillColorMenuItem);
 
+        removeFillMenuItem = new JMenuItem("Remove Fill Color");
+        colorMenu.add(removeFillMenuItem);
         
         attributesMenu.add(lineWeightMenu);
         attributesMenu.add(lineDashMenu);
@@ -236,6 +239,12 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 c.resetShear(false);
+            }
+        });
+        removeFillMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                c.removeFill();
             }
         });
         

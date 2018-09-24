@@ -234,7 +234,6 @@ public class ZShape extends ZAbstractShape {
     @Override
     protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
         g.fill(scaledShape);
-        hasChanges = true;
     }
 
    

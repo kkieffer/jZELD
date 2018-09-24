@@ -224,6 +224,16 @@ public final class ZGroupedElement extends ZElement {
             }
         } 
     }
+    
+    @Override
+    public void removeFill() {
+        for (ZElement e : elements) {
+            if (e.hasFill()) {
+                e.removeFill();
+                hasChanges = true;
+            }
+        } 
+    }
 
     @Override
     public Color getFillColor() {
