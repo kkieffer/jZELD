@@ -66,6 +66,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -2282,7 +2283,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
             setCurrentCursor(Cursor.getDefaultCursor());
 
-            if (e.isPopupTrigger() && contextMenu != null) { 
+            if (SwingUtilities.isRightMouseButton(e) && contextMenu != null) { 
                 contextMenu.show(e.getComponent(), e.getX(), e.getY());
                 return;
             }
