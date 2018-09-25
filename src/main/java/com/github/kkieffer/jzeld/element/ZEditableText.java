@@ -411,7 +411,15 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     public boolean supportsEdit() {
         return true;
     };
-
+ 
+    
+    @Override
+    public Rectangle2D getMarginBounds(double scale) {  //margins just take into account half the line width
+        Rectangle2D bounds = getBounds2D(scale);
+        double ow = (getOutlineWidth()/2.0)/72.0 * scale;  //half the line width
+        return new Rectangle2D.Double(-ow, -ow, bounds.getWidth() + ow, bounds.getWidth() + ow);
+        
+    }
     
     /**
      * Determine if the user is actively editing this text (has focus and caret flashing)

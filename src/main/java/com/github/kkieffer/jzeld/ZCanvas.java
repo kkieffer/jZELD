@@ -2728,14 +2728,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         group.reposition(0, 0); //no offset (not on canvas, painting to image
         
-        Rectangle2D bounds = group.getBounds2D(SCALE*fields.zoom);
+        //Find the shape that holds the element with its margins
+        Rectangle2D margins = group.getMarginBounds(SCALE*fields.zoom); 
         AffineTransform t = group.getElementTransform(SCALE*fields.zoom, false);
-        Shape s = t.createTransformedShape(bounds);
+        Shape s = t.createTransformedShape(margins);
       
-        bounds = s.getBounds2D();  //make bounds something that can hold the transformed shape
+        Rectangle2D bounds = s.getBounds2D(); //make bounds something that can hold the transformed shape
                 
-        int imgWidth = (int)Math.round(bounds.getWidth() - bounds.getX());
-        int imgHeight = (int)Math.round(bounds.getHeight() - bounds.getY());
+        int imgWidth = (int)Math.ceil(bounds.getWidth() - bounds.getX());
+        int imgHeight = (int)Math.ceil(bounds.getHeight() - bounds.getY());
         
         //Create Buffered Image
         BufferedImage bi = new BufferedImage(imgWidth*resolutionScale, imgHeight*resolutionScale, BufferedImage.TYPE_INT_ARGB);
@@ -2746,7 +2747,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.scale(resolutionScale, resolutionScale);
         
-        g.translate(-bounds.getX(), -bounds.getY());
+        //Set the position to paint such that the margins will end up at the top left of the image
+        g.translate(-bounds.getX() - margins.getX(), -bounds.getY() - margins.getY());
         g.scale(1/pixScale, 1/pixScale);
         g.scale(fields.zoom, fields.zoom);
         

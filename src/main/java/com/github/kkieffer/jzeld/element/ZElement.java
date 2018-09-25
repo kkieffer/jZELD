@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
@@ -517,6 +518,16 @@ public abstract class ZElement implements Serializable {
         return new Rectangle2D.Double((position.x + bounds.x) * scale, (position.y + bounds.y) * scale, bounds.width * scale, bounds.height * scale);
     }
     
+    /**
+     * Returns the pixel bounds of the object relative to its position using the scaling unit as a Rectangle2D. The element may require additional margin
+     * around itself in order to properly draw any additional features such as shadows or reflections.
+     * @param scale
+     * @return the bounding rectangle, x is negative if additional space is required left of the object, 0 otherwise.
+     *                                 y is negative if additional space is required right of the object, 0 otherwise.
+     *                                 width is the required width, which is equal to or exceeds the object width bounds
+     *                                 height is the required height, which is equal to or exceeds the object height bounds
+     */
+    public abstract Rectangle2D getMarginBounds(double scale);
     
     
     /**
@@ -542,8 +553,8 @@ public abstract class ZElement implements Serializable {
      * @return 
      */
     public final Point2D getCenterPosition(double scale) {
-        Rectangle2D bounds = getBounds2D(scale);
-        Point2D.Double center = new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
+        Rectangle2D b = getBounds2D(scale);
+        Point2D.Double center = new Point2D.Double(b.getCenterX(), b.getCenterY());
         return getElementTransform(scale, false).transform(center, null);
     }
     

@@ -277,15 +277,53 @@ public abstract class ZAbstractShape extends ZElement {
         shadowImage = null;  //force refresh of the image
     }
     
+    
+    
+    @Override
+    public Rectangle2D getMarginBounds(double scale) {
+                   
+        //If the element has a shadow, determine the rectangle that will hold the shape and shadow based on the shadow size & position,
+        //otherwise, just add half the line width for the margins
+        
+        Rectangle2D bounds = getBounds2D(scale);
+        double ow = (getOutlineWidth()/2.0)/72.0 * scale;  //half the line width
+        
+        if (shadowImage != null) {           
+            double margin = scale * (2*shadowAttributes.getRadius()/72.0) + ow;  //additional margin for line width and shadow
+             
+            double shadW = bounds.getWidth() * shadowAttributes.getSizeRatio();
+            double shadH = bounds.getHeight() * shadowAttributes.getSizeRatio();
+           
+            double shadowPosX = shadowAttributes.getXOffset()*scale;
+            double shadowPosY = shadowAttributes.getYOffset()*scale;
+            
+            double shadowLeft = shadowPosX - margin;
+            double shadowTop = shadowPosY - margin;
+            double shadowRight = shadowPosX + shadW + margin;
+            double shadowBottom = shadowPosY + shadH + margin;
+
+            return new Rectangle2D.Double(shadowLeft < -ow ? shadowLeft : -ow,
+                                          shadowTop < -ow ? shadowTop : -ow,
+                                          shadowRight > bounds.getWidth() + ow ? shadowRight : bounds.getWidth() + ow,
+                                          shadowBottom > bounds.getHeight() + ow ? shadowBottom : bounds.getHeight() + ow);
+                    
+        }
+        else {
+            return new Rectangle2D.Double(-ow, -ow, bounds.getWidth() + ow, bounds.getHeight() + ow);
+        }
+        
+    }
+
+    
     //Draw and fill the shape on a new image in black, then from the shadow parameters, create a shadow filter and create the shadow image
     private void createShadow(double unitSize, double width, double height) {
         
         ShadowFilter shadow = shadowAttributes.createFilter();
        
-        float distance = shadow.getRadius() + getOutlineWidth()/2;  //increase image to support the additional size on the edge from kernel and shape outline
+        float margin = shadow.getRadius()*2 + getOutlineWidth()/2;  //increase image to support the additional size on the edge from kernel and shape outline
             
         //Create Buffered Image
-        BufferedImage bi = new BufferedImage((int)Math.ceil(width+distance), (int)Math.ceil(height+distance), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new BufferedImage((int)Math.ceil(width+margin), (int)Math.ceil(height+margin), BufferedImage.TYPE_INT_ARGB);
         Graphics2D imgGraphics = bi.createGraphics();
         imgGraphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         imgGraphics.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
@@ -293,7 +331,7 @@ public abstract class ZAbstractShape extends ZElement {
         imgGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                       
         imgGraphics.setColor(Color.BLACK);
-        imgGraphics.translate(distance/2, distance/2);  //center the shadowed image
+        imgGraphics.translate(margin/2, margin/2);  //center the shadowed image
         if (backgroundColor != null || paintAttr != null)
             fillShape(imgGraphics, unitSize, width, height);
 
@@ -326,7 +364,7 @@ public abstract class ZAbstractShape extends ZElement {
    
             int shadW = (int)(shadowImage.getWidth() * shadowAttributes.getSizeRatio());
             int shadH = (int)(shadowImage.getHeight() * shadowAttributes.getSizeRatio());
-    
+                
             g.drawImage(shadowImage, (int)(shadowAttributes.getXOffset()*unitSize - distance/2), (int)(shadowAttributes.getYOffset()*unitSize - distance/2), shadW, shadH, null);
         }
 

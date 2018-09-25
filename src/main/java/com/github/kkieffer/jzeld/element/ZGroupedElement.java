@@ -36,6 +36,21 @@ public final class ZGroupedElement extends ZElement {
         return copy;
     }
     
+    private static Rectangle2D getElementBounds(ZElement e) {
+        
+        Point2D p = e.getPosition();
+           
+        Rectangle2D margin = e.getMarginBounds(1.0); 
+        
+        Rectangle2D.Double b = new Rectangle2D.Double(p.getX() + margin.getX(), p.getY() + margin.getY(), margin.getWidth(), margin.getHeight()); 
+
+        AffineTransform t = e.getElementTransform(1.0, false);
+        Shape s = t.createTransformedShape(b);
+
+        return s.getBounds2D();  //make bounds something that can hold the transformed shape
+              
+    }
+    
     /**
      * Groups the elements into a ZGroupedElement. Sub-elements are repositioned relative to the grouped element.  The grouped element
      * position and size is set to bound all the sub-elements.
@@ -44,36 +59,29 @@ public final class ZGroupedElement extends ZElement {
      */
     public static ZGroupedElement createGroup(ArrayList<ZElement> elements, double scale) {
         
-        double x = Integer.MAX_VALUE;  //furthest left
-        double y = Integer.MAX_VALUE;  //furthest top
-        double x2 = 0;                 //furthest right
-        double y2 = 0;                 //furthest bottom
+        double left = Integer.MAX_VALUE;  //furthest left
+        double top = Integer.MAX_VALUE;  //furthest top
+        double right = 0;                 //furthest right
+        double bottom = 0;                 //furthest bottom
+        
+        //Find furthest left and top
         for (ZElement e : elements) {
             
-            Rectangle2D b = e.getBounds2D();
-           
-            double margin = Math.ceil(3*e.getOutlineWidth()/2.0) / scale; 
-            b = new Rectangle2D.Double(b.getX()-margin, b.getY()-margin, b.getWidth() + 2*margin, b.getHeight() + 2*margin); 
+            Rectangle2D b = getElementBounds(e);
             
-            AffineTransform t = e.getElementTransform(1.0, false);
-            Shape s = t.createTransformedShape(b);
-      
-            b = s.getBounds2D();  //make bounds something that can hold the transformed shape
-              
-            if (b.getX() < x)
-                x = b.getX();
-            if (b.getY() < y)
-                y = b.getY();
+            if (b.getX() < left)
+                left = b.getX();
+            if (b.getY() < top)
+                top = b.getY();
             
-            if (b.getX() + b.getWidth() > x2)
-                x2 = b.getX() + b.getWidth();
-            if (b.getY() + b.getHeight() > y2)
-                y2 = b.getY() + b.getHeight();
-            
-        }
+            if (b.getX() + b.getWidth() > right)
+                right = b.getX() + b.getWidth();
+            if (b.getY() + b.getHeight() > bottom)
+                bottom = b.getY() + b.getHeight();
+  
+        }    
         
-        
-        return new ZGroupedElement(x, y, x2-x, y2-y, elements);
+        return new ZGroupedElement(left, top, right-left, bottom-top, elements);
     }
 
     
@@ -337,6 +345,12 @@ public final class ZGroupedElement extends ZElement {
             
         }
 
+    }
+
+    @Override
+    public Rectangle2D getMarginBounds(double scale) {
+        Rectangle2D b = getBounds2D(scale); 
+        return new Rectangle2D.Double(0, 0, b.getWidth(), b.getHeight()); //no additional margins
     }
 
     
