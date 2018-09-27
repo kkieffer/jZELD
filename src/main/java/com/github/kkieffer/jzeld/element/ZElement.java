@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
@@ -57,7 +56,7 @@ public abstract class ZElement implements Serializable {
     @XmlAttribute(name = "class")
     private String className;  //needed to reload subclasses by classname
     
-    transient protected boolean hasChanges = false;  //marks any changes to the Element prior to saving
+    transient private boolean hasChanges = false;  //marks any changes to the Element prior to saving
   
     transient private boolean selected = false;
     
@@ -83,6 +82,7 @@ public abstract class ZElement implements Serializable {
         this.className = this.getClass().getName();
         this.name = this.getClass().getSimpleName();
         this.visible = true;
+        this.hasChanges = false;
         this.uuid = UUID.randomUUID();
         
     }

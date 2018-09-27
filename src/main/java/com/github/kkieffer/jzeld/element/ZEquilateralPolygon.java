@@ -80,7 +80,7 @@ public class ZEquilateralPolygon extends ZPolygon {
         if (s < 3)
             throw new IllegalArgumentException("Sides must be greater than 2");
         sides = s;
-        hasChanges = true;
+        changed();
     }
      
     @Override

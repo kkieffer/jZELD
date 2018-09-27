@@ -44,12 +44,12 @@ public abstract class ZAbstractShape extends ZElement {
        
     protected ShadowAttributes shadowAttributes = null;
     
-    protected transient BufferedImage shadowImage = null;
+    private transient BufferedImage shadowImage = null;
     
     protected ZAbstractShape(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
         super(x, y, width, height, rotation, canSelect, canResize, canMove);
         setAttributes(borderWidth, borderColor, dashPattern, fillColor);
-        hasChanges = false;
+        shadowImage = null;
     }
     
     protected ZAbstractShape(ZAbstractShape src, boolean forNew) {
@@ -57,8 +57,8 @@ public abstract class ZAbstractShape extends ZElement {
         setAttributes(src.borderThickness, src.borderColor, src.dashPattern, src.backgroundColor);
         paintAttr = src.paintAttr == null ? null : new PaintAttributes(src.paintAttr);
         shadowAttributes = src.shadowAttributes == null ? null : new ShadowAttributes(src.shadowAttributes);
-        hasChanges = false;
         customStroke = src.customStroke == null ? null : src.customStroke.copyOf();
+        shadowImage = null;
     }
     
     protected ZAbstractShape() {}
@@ -90,14 +90,13 @@ public abstract class ZAbstractShape extends ZElement {
         setOutlineWidth(outlineWidth);
         setDashPattern(dashPattern);
         setOutlineColor(outlineColor);
-        hasChanges = true;
+        changed();
     }
     
     @Override
     public void setOutlineWidth(float width) {
         borderThickness = width;
-        shadowImage = null;  //could change overall shadow size
-        hasChanges = true;
+        changed();
     }
     
     @Override
@@ -108,7 +107,7 @@ public abstract class ZAbstractShape extends ZElement {
     @Override
     public void setDashPattern(Float[] dashPattern) {
         this.dashPattern = dashPattern == null ? null : (Float[])Arrays.copyOf(dashPattern, dashPattern.length);
-        hasChanges = true;
+        changed();
     }
     
     @Override
@@ -122,22 +121,21 @@ public abstract class ZAbstractShape extends ZElement {
     @Override
     public void setOutlineColor(Color outlineColor) {
         this.borderColor = outlineColor;
-        hasChanges = true;
+        changed();
     }
     
     @Override
     public void setFillColor(Color fillColor) {
         backgroundColor = fillColor;
-        shadowImage = null;  //force refresh of the image
-        hasChanges = true;
+        changed();
     }
     
     @Override
     public void removeFill() {
         backgroundColor = null;
         paintAttr = null;
-        shadowImage = null;  //force refresh of the image
-        hasChanges = true;
+        changed();
+
     }
     
     @Override
@@ -167,6 +165,7 @@ public abstract class ZAbstractShape extends ZElement {
     
     public void setCustomStroke(CustomStroke s) {
         customStroke = s;
+        changed();
     }
     
     public CustomStroke getCustomStroke() {
@@ -179,8 +178,7 @@ public abstract class ZAbstractShape extends ZElement {
      */
     public void setPaintAttributes(PaintAttributes p) {
         paintAttr = p;
-        shadowImage = null;  //force refresh of the image
-        hasChanges = true;
+        changed();
     }
     
     
@@ -193,14 +191,33 @@ public abstract class ZAbstractShape extends ZElement {
         return shadowAttributes;
     }
     
+    /**
+     * When a subclass modifies itself such that the shadow requires redraw, calling this will force a 
+     * recompute of the shadow image on next repaint.
+     */
+    @Override
+    public void changed() {
+        shadowImage = null;
+        super.changed();
+    }
+    
     public void setShadowAttributes(ShadowAttributes s) {
         shadowAttributes = s;
-        shadowImage = null;  //force refresh of the image
-        hasChanges = true;
+        changed();
     }
     
     
+    @Override
+    public void flipHorizontal() {
+        super.flipHorizontal();
+        changed();
+    }
     
+    @Override
+    public void flipVertical() {
+        super.flipVertical();
+        changed();
+    }
     
     protected abstract Shape getAbstractShape();
     protected abstract void fillShape(Graphics2D g, double unitSize, double width, double height);
@@ -274,10 +291,17 @@ public abstract class ZAbstractShape extends ZElement {
     @Override
     protected void setSize(double w, double h, double minSize, double scale) {
         super.setSize(w, h, minSize, scale);
-        shadowImage = null;  //force refresh of the image
+        changed();
     }
     
     
+    protected double getShadowMargin(double scale) {
+        if (shadowAttributes == null)
+            return 0;
+        
+        double margin = 2*shadowAttributes.getRadius() + getOutlineWidth()/2;  //increase image to support the additional size on the edge from kernel and shape outline
+        return margin * scale / 72.0;
+    }
     
     @Override
     public Rectangle2D getMarginBounds(double scale) {
@@ -289,11 +313,11 @@ public abstract class ZAbstractShape extends ZElement {
         double ow = (getOutlineWidth()/2.0)/72.0 * scale;  //half the line width
         
         if (shadowImage != null) {           
-            double margin = scale * (2*shadowAttributes.getRadius()/72.0) + ow;  //additional margin for line width and shadow
-             
+            double margin = getShadowMargin(scale);
+            
             double shadW = bounds.getWidth() * shadowAttributes.getSizeRatio();
             double shadH = bounds.getHeight() * shadowAttributes.getSizeRatio();
-           
+
             double shadowPosX = shadowAttributes.getXOffset()*scale;
             double shadowPosY = shadowAttributes.getYOffset()*scale;
             
@@ -302,10 +326,12 @@ public abstract class ZAbstractShape extends ZElement {
             double shadowRight = shadowPosX + shadW + margin;
             double shadowBottom = shadowPosY + shadH + margin;
 
-            return new Rectangle2D.Double(shadowLeft < -ow ? shadowLeft : -ow,
-                                          shadowTop < -ow ? shadowTop : -ow,
-                                          shadowRight > bounds.getWidth() + ow ? shadowRight : bounds.getWidth() + ow,
-                                          shadowBottom > bounds.getHeight() + ow ? shadowBottom : bounds.getHeight() + ow);
+            double leftMargin = shadowLeft < -ow ? shadowLeft : -ow;
+            double topMargin = shadowTop < -ow ? shadowTop : -ow;
+            
+            return new Rectangle2D.Double(leftMargin, topMargin,
+                                          shadowRight > bounds.getWidth() + ow ? shadowRight - leftMargin : bounds.getWidth() + ow - leftMargin,
+                                          shadowBottom > bounds.getHeight() + ow ? shadowBottom - topMargin : bounds.getHeight() + ow - topMargin);
                     
         }
         else {
@@ -315,13 +341,19 @@ public abstract class ZAbstractShape extends ZElement {
     }
 
     
-    //Draw and fill the shape on a new image in black, then from the shadow parameters, create a shadow filter and create the shadow image
-    private void createShadow(double unitSize, double width, double height) {
+    /**
+     * Draw and fill the element's shape on a new image in black, then from the shadow parameters, create a shadow filter and create the shadow image.
+     * The shadow shape's size is the width and height, Note that the size is increased by a margin to account for the blur and line width
+     * @param unitSize
+     * @param width the width of the shape
+     * @param height the height of the shape
+     */
+    protected void createShadow(double unitSize, double width, double height) {
         
         ShadowFilter shadow = shadowAttributes.createFilter();
        
-        float margin = shadow.getRadius()*2 + getOutlineWidth()/2;  //increase image to support the additional size on the edge from kernel and shape outline
-            
+        double margin = getShadowMargin(unitSize);
+
         //Create Buffered Image
         BufferedImage bi = new BufferedImage((int)Math.ceil(width+margin), (int)Math.ceil(height+margin), BufferedImage.TYPE_INT_ARGB);
         Graphics2D imgGraphics = bi.createGraphics();
@@ -357,15 +389,15 @@ public abstract class ZAbstractShape extends ZElement {
       
         //If the element has a shadow, create the shadow image (if needed), and place it at the desired offset
         if (shadowAttributes != null && shadowAttributes.isEnabled()) {
-            if (shadowImage == null)
+            if (shadowImage == null) 
                 createShadow(unitSize, width, height);
-        
-            float distance = shadowAttributes.getRadius() + getOutlineWidth()/2;
+            
+            double margin = getShadowMargin(unitSize);
    
             int shadW = (int)(shadowImage.getWidth() * shadowAttributes.getSizeRatio());
             int shadH = (int)(shadowImage.getHeight() * shadowAttributes.getSizeRatio());
                 
-            g.drawImage(shadowImage, (int)(shadowAttributes.getXOffset()*unitSize - distance/2), (int)(shadowAttributes.getYOffset()*unitSize - distance/2), shadW, shadH, null);
+            g.drawImage(shadowImage, (int)(shadowAttributes.getXOffset()*unitSize - margin/2), (int)(shadowAttributes.getYOffset()*unitSize - margin/2), shadW, shadH, null);
         }
 
         if (backgroundColor != null) {

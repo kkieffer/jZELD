@@ -227,7 +227,6 @@ public class ZShape extends ZAbstractShape {
         //Scale the shape by the ratio
         AffineTransform scaleInstance = AffineTransform.getScaleInstance(widthRatio, heightRatio);
         shape = scaleInstance.createTransformedShape(shape);
-        hasChanges = true;
     }
     
 

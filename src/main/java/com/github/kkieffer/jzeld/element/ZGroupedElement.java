@@ -188,9 +188,9 @@ public final class ZGroupedElement extends ZElement {
         for (ZElement e : elements) {
             if (e.hasOutline()) {
                 e.setOutlineWidth(width);
-                hasChanges = true;    
             }
         }
+        changed();
     }
     
     @Override
@@ -203,9 +203,9 @@ public final class ZGroupedElement extends ZElement {
         for (ZElement e : elements) {
             if (e.hasOutline()) {
                 e.setOutlineColor(outlineColor);
-                hasChanges = true;
             }
         }
+        changed();
     }
 
     @Override
@@ -213,9 +213,9 @@ public final class ZGroupedElement extends ZElement {
         for (ZElement e : elements) {
             if (e.hasDash()) {
                 e.setDashPattern(dashPattern);
-                hasChanges = true;
             }
         } 
+        changed();
     }
 
     @Override
@@ -228,9 +228,9 @@ public final class ZGroupedElement extends ZElement {
         for (ZElement e : elements) {
             if (e.hasFill()) {
                 e.setFillColor(fillColor);
-                hasChanges = true;
             }
         } 
+        changed();
     }
     
     @Override
@@ -238,9 +238,9 @@ public final class ZGroupedElement extends ZElement {
         for (ZElement e : elements) {
             if (e.hasFill()) {
                 e.removeFill();
-                hasChanges = true;
             }
         } 
+        changed();
     }
 
     @Override

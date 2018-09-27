@@ -108,17 +108,17 @@ public class ZArc extends ZRectangle {
    
     public void setStartAngle(double start) {
         startAngle = start;
-        hasChanges = true;
+        changed();
     }
 
     public void setArcAngle(double angle) {
         arcAngle = angle;
-        hasChanges = true;
+        changed();
     }
     
     public void setArcType(ArcType t) {
         type = t;
-        hasChanges = true;
+        changed();
     }
     
     public double getStartAngle() {

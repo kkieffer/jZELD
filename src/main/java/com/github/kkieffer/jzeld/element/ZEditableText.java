@@ -109,7 +109,8 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
                 textWidget.getParent().repaint();
                 if (canvas != null)
                     canvas.repaint();
-                hasChanges = true;
+                changed();
+
         }
 
             @Override
@@ -136,7 +137,6 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         setTextAttributes(textAttributes);
         setAttributes(borderThickness, borderColor, null, backgroundColor);
         setup();
-        hasChanges = false;
     }
     
     //Custom deserialize
@@ -188,7 +188,6 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         setAttributes(copy.borderThickness, copy.borderColor, null, copy.backgroundColor);
 
         setup();
-        hasChanges = false;
 
     }
     
@@ -214,14 +213,14 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         setOutlineWidth(outlineWidth);
         setDashPattern(dashPattern);
         setOutlineColor(outlineColor);  
-        hasChanges = true;
+        changed();
     }
     
     @Override
     public void setOutlineWidth(float width) {
         borderThickness = width; 
         validateSize();        
-        hasChanges = true;
+        changed();
     }
   
     @Override
@@ -241,7 +240,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     @Override
     public void setOutlineColor(Color outlineColor) {
         this.borderColor = outlineColor;
-        hasChanges = true;
+        changed();
     }
     
     @Override
@@ -269,7 +268,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         if (backgroundColor == null)
             textWidget.setBackground(new Color(0,0,0,0)); //transparent
         
-        hasChanges = true;
+        changed();
         
     }
     
@@ -315,7 +314,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     public final void modifyText(String t) {
         textWidget.setText(t);
         validateSize();        
-        hasChanges = true;
+        changed();
     }
     
     /**
@@ -337,7 +336,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         
         textWidget.replaceSelection(t);
         validateSize();        
-        hasChanges = true;
+        changed();
         return true;
     }
     
@@ -356,14 +355,14 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         this.textAttributes.font = f;
         textWidget.setFont(f);
         validateSize();        
-        hasChanges = true;
+        changed();
     }
 
     @Override
     public final void setFontColor(Color c) {
         this.textAttributes.fontColor = c;
         textWidget.setForeground(c);     
-        hasChanges = true;
+        changed();
     }
     
     
@@ -386,7 +385,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
          
         doc.setParagraphAttributes(0, doc.getLength(), a, false);
 
-        hasChanges = true;
+        changed();
     }
     
    

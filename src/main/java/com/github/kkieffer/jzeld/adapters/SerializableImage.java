@@ -77,7 +77,8 @@ public class SerializableImage implements Serializable {
     public SerializableImage() {}
     
     public SerializableImage(Image i) {
-        image = copyImage((BufferedImage)i);
+        if (i != null)
+            image = copyImage((BufferedImage)i);
     }
     
     public SerializableImage(SerializableImage i) {

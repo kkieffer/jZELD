@@ -52,11 +52,13 @@ public class ZImage extends ZRectangle {
         
         //Create the serializable image from a resized image.  The image doesn't actually change size but we switch to ARGB or RGB types because some
         //other types don't always print when printing the image to a printer.
-        if (img.getColorModel().hasAlpha())
-            image = new SerializableImage(SerializableImage.resizeImage(img, img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB));
-        else
-            image = new SerializableImage(SerializableImage.resizeImage(img, img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB));
-                
+        if (img != null) {
+            if (img.getColorModel().hasAlpha())
+                image = new SerializableImage(SerializableImage.resizeImage(img, img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB));
+            else
+                image = new SerializableImage(SerializableImage.resizeImage(img, img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB));
+        } else
+            image = new SerializableImage();
     }
     
     public ZImage(ZImage copy, boolean forNew) {
@@ -89,7 +91,7 @@ public class ZImage extends ZRectangle {
      */
     public void setImage(BufferedImage i) {
         image.setImage(i);
-        hasChanges = true;
+        changed();
     }
     
     /**
@@ -104,7 +106,7 @@ public class ZImage extends ZRectangle {
     @Override
     public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
         super.setAttributes(outlineWidth, outlineColor, dashPattern, fillColor);
-        hasChanges = true;
+        changed();
     }
     
     

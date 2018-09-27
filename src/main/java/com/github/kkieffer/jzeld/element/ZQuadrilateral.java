@@ -92,7 +92,7 @@ public class ZQuadrilateral extends ZPolygon {
         if (p < 0 || p > 100)
             throw new IllegalArgumentException("Percent must be between 0 and 100");
         percent = p;
-        hasChanges = true;
+        changed();
     }
      
     @Override
