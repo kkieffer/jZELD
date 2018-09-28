@@ -18,6 +18,14 @@ public interface ZCanvasEventListener {
     
    
     /**
+     * An element has been selected for edit (double click). 
+     * @param e the element selected
+     * @param supportsEdit true if the element supported editing, false otherwise (nothing happened)
+     */
+    public void elementEdited(ZElement e, boolean supportsEdit);
+
+    
+    /**
      * This method is called when a draw client is added or removed from the canvas
      * @param hasClient true if client is now drawing, false if one stopped
      */

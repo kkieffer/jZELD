@@ -2075,12 +2075,21 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
  
     public void editElement() {
-        if (lastSelectedElement.selectedForEdit(this))  //tell the element it was selected
-           passThruElement = lastSelectedElement;  
+        
+        if (lastSelectedElement.supportsEdit()) {
+        
+            if (lastSelectedElement.selectedForEdit(this))  //tell the element it was selected
+                passThruElement = lastSelectedElement;  
 
-       undoStack.saveContext(fields.zElements);
+            undoStack.saveContext(fields.zElements);
 
-       lastMethod = null; 
+            lastMethod = null; 
+        }
+        
+         
+        for (ZCanvasEventListener l : selectListeners)
+            l.elementEdited(lastSelectedElement, lastSelectedElement.supportsEdit());
+        
         selectedElementResizeOn = false;    
 
     }

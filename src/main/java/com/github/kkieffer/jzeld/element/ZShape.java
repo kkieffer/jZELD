@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZShape extends ZAbstractShape {
 
+    public static final double MIN_SHAPE_DIMENSION = 0.2;
+    
     public enum SegmentType {   POINT       {@Override public int getPathType() { return PathIterator.SEG_MOVETO;}},
                                 LINE        {@Override public int getPathType() { return PathIterator.SEG_LINETO;}},
                                 QUADRCURVE  {@Override public int getPathType() { return PathIterator.SEG_QUADTO;}},
@@ -153,10 +155,12 @@ public class ZShape extends ZAbstractShape {
      * @param cS any custom stroke
      */
     public ZShape(double x, double y, Shape s, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, PaintAttributes pA, CustomStroke cS) {
-        super(x, y, s.getBounds2D().getWidth(), s.getBounds2D().getHeight(), rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);        
+        super(x, y, s.getBounds2D().getWidth() == 0 ? MIN_SHAPE_DIMENSION : s.getBounds2D().getWidth(), 
+                    s.getBounds2D().getHeight() == 0 ? MIN_SHAPE_DIMENSION : s.getBounds2D().getHeight(), 
+                    rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);        
         this.shape = s;
         this.paintAttr = pA;
-        this.customStroke = cS;
+        this.customStroke = cS;        
     }
     
     protected ZShape(ZShape src, boolean forNew) {
@@ -179,7 +183,7 @@ public class ZShape extends ZAbstractShape {
     
     public void setShape(Shape s) {
         this.shape = s;
-        super.setSize(s.getBounds2D().getWidth(), s.getBounds2D().getHeight(), 0, 1.0);
+        super.setSize(s.getBounds2D().getWidth(), s.getBounds2D().getHeight(), MIN_SHAPE_DIMENSION, 1.0);
     }
     
     

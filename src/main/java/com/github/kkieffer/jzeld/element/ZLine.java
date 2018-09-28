@@ -1,10 +1,11 @@
 
 package com.github.kkieffer.jzeld.element;
 
+import static com.github.kkieffer.jzeld.element.ZShape.MIN_SHAPE_DIMENSION;
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -23,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "ZLine")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ZLine extends ZAbstractShape {
+public class ZLine extends ZPolygon {
 
   
     protected ZLine() {}
@@ -42,8 +43,8 @@ public class ZLine extends ZAbstractShape {
      * @param dashPattern
      */
     public ZLine(double x, double y, double width, double rotation, boolean canSelect, boolean canResize, boolean canMove, float lineThickness, Color lineColor, Float[] dashPattern) {
-        super(x, y, width, .5, rotation, canSelect, canResize, canMove, lineThickness, lineColor, dashPattern, null);
-             
+        super(x, y, width, MIN_SHAPE_DIMENSION, rotation, canSelect, canResize, canMove, lineThickness, lineColor, dashPattern, null);                     
+
         if (lineColor == null)
             throw new IllegalArgumentException("Line color cannot be null");
         
@@ -57,7 +58,7 @@ public class ZLine extends ZAbstractShape {
     }
     
     @Override
-    public ZElement copyOf(boolean forNew) {
+    public ZLine copyOf(boolean forNew) {
         return new ZLine(this, forNew);
     }
     
@@ -88,18 +89,12 @@ public class ZLine extends ZAbstractShape {
         return false;
     };
 
-    @Override
-    protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
-    }
+    
 
     @Override
-    protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
-        g.draw(new Line2D.Double(0, height/2, width, height/2));
-    }
-
-    @Override
-    protected Shape getAbstractShape() {
-        return null;
+    protected Shape getPolygon(double width, double height, double scale) {
+        Rectangle2D bounds2D = getBounds2D(scale);
+        return new Line2D.Double(0, bounds2D.getHeight()/2, bounds2D.getWidth(), bounds2D.getHeight()/2);
     }
 
       
