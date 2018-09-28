@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import javax.swing.BorderFactory;
@@ -23,6 +24,8 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -115,13 +118,30 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
 
             @Override
             public void keyReleased(KeyEvent e) {
+                validateSize();                    
             }
         });
                 
+        textWidget.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {  //Note: The caretUpdate method is not guaranteed to be called in the event-dispatching thread.
+                    @Override
+                    public void run() {
+                        changed();
+                        validateSize();                    
+                    }
+                });
+                
+            }
+            
+        });
+        
         
         textPanel.add(textWidget);
         textPanel.setFocusTraversalKeysEnabled(false);
-        
+        textWidget.setCaretColor(textAttributes.fontColor);
+
         timer = new Timer(20, new ActionListener() {  //needed to flash the caret
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -361,7 +381,8 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     @Override
     public final void setFontColor(Color c) {
         this.textAttributes.fontColor = c;
-        textWidget.setForeground(c);     
+        textWidget.setForeground(c);  
+        textWidget.setCaretColor(c);
         changed();
     }
     
@@ -450,13 +471,23 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     
     @Override
     public boolean mouseEvent(ZCanvas canvas, MouseEvent e) {
-        if (isSelected) {
-            MouseEvent m = new MouseEvent(textWidget, e.getID(), e.getWhen(), e.getModifiers(), e.getX() , e.getY(), e.getClickCount(), false, e.getButton());
-            textWidget.dispatchEvent(m); //send mouse events to the text widget
-            canvas.setCurrentCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR)); 
-            textWidget.getParent().repaint();
-        }
-        return false;
+        if (!isSelected) 
+            return false;
+        
+        MouseEvent m = new MouseEvent(textWidget, e.getID(), e.getWhen(), e.getModifiers(), e.getX() , e.getY(), e.getClickCount(), false, e.getButton());
+        textWidget.dispatchEvent(m); //send mouse events to the text widget
+        canvas.setCurrentCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR)); 
+        textWidget.getParent().repaint();
+
+        Rectangle2D bounds = getBounds2D(canvas.getScale());
+        Point2D mousePress = new Point2D.Double(e.getX(), e.getY());
+
+        //If outside the element, don't swallow event, it will be deselected
+        if (mousePress.getX() < 0 || mousePress.getX() > bounds.getWidth() || mousePress.getY() < 0 || mousePress.getY() > bounds.getHeight())
+            return false;
+
+        return true;  //swallow the mouse event, don't pass it to the canvas
+       
     }
         
    
