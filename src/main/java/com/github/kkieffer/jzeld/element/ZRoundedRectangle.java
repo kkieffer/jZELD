@@ -4,10 +4,12 @@ package com.github.kkieffer.jzeld.element;
 import com.github.kkieffer.jzeld.ZCanvas;
 import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Shape;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -91,9 +93,10 @@ public class ZRoundedRectangle extends ZRectangle {
     @Override
     public boolean selectedForEdit(ZCanvas canvas) {
         
+        Component parent = SwingUtilities.getRoot(canvas);
+
         
-        
-        String rc = (String)JOptionPane.showInputDialog(canvas, "Update Corner Radius (" + canvas.getUnit().getName() + ")", "Modify Rounded Rectangle", JOptionPane.QUESTION_MESSAGE, radiusIcon,
+        String rc = (String)JOptionPane.showInputDialog(parent, "Update Corner Radius (" + canvas.getUnit().getName() + ")", "Modify Rounded Rectangle", JOptionPane.QUESTION_MESSAGE, radiusIcon,
                                                 (Object[])null, (Object)String.valueOf(radius));
         if (rc != null) {
             try {

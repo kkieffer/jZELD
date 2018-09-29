@@ -5,12 +5,14 @@ import com.github.kkieffer.jzeld.ZCanvas;
 import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
 import com.github.kkieffer.jzeld.draw.BoundaryDraw;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -107,8 +109,9 @@ public class ZQuadrilateral extends ZPolygon {
             
         if (type != QuadType.SQUARE) {
             
-        
-            String rc = (String)JOptionPane.showInputDialog(canvas, "Update Percent of Maximum Skew", "Modify Quadrilateral", JOptionPane.QUESTION_MESSAGE, radiusIcon,
+            Component parent = SwingUtilities.getRoot(canvas);
+
+            String rc = (String)JOptionPane.showInputDialog(parent, "Update Percent of Maximum Skew", "Modify Quadrilateral", JOptionPane.QUESTION_MESSAGE, radiusIcon,
                                                     (Object[])null, (Object)String.valueOf(percent));
             if (rc != null) {
                 try {

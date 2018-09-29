@@ -143,7 +143,7 @@ public class ZArc extends ZRectangle {
     public boolean selectedForEdit(ZCanvas canvas) {
         
         dialog = new ArcDialog(this);
-        dialog.setLocationRelativeTo(canvas);
+        canvas.arrangePopup(dialog);
         dialog.setVisible(true);
 
         return false;

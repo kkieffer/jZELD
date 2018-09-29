@@ -2,7 +2,6 @@
 package com.github.kkieffer.jzeld.draw;
 
 import com.github.kkieffer.jzeld.ZCanvas;
-import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZElement.StrokeStyle;
 import com.github.kkieffer.jzeld.element.ZShape;
 import java.awt.BasicStroke;

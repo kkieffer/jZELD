@@ -20,6 +20,7 @@ import static java.awt.BasicStroke.CAP_SQUARE;
 import static java.awt.BasicStroke.JOIN_MITER;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -494,6 +495,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         updatePreferredSize();
         repaint();
 
+    }
+    
+    /**
+     * Places the popup frame (container) to the right of the canvas's frame
+     * @param c 
+     */
+    public void arrangePopup(Container c) {
+        Component parent = SwingUtilities.getRoot(this);
+        c.setLocation(parent.getX() + parent.getWidth(), parent.getY() + parent.getHeight()/2 - c.getHeight()/2);   
     }
     
     /**
