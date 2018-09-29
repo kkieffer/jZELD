@@ -1,6 +1,7 @@
 
 package com.github.kkieffer.jzeld.contextMenu;
 
+import com.github.kkieffer.jzeld.element.ZElement.StrokeStyle;
 import java.awt.Color;
 
 /**
@@ -13,6 +14,7 @@ public interface ContextMenuListener {
     public void contextMenuLineColorChanged(Color newColor);
     public void contextMenuLineWidthChanged(float width);
     public void contextMenuLineDashChanged(Float[] dash);
+    public void contextMenuLineStyleChanged(StrokeStyle newStyle);
     
     
     

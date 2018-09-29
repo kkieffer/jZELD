@@ -11,6 +11,7 @@ import com.github.kkieffer.jzeld.draw.DrawClient;
 import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZAbstractShape;
 import com.github.kkieffer.jzeld.element.ZCanvasRuler;
+import com.github.kkieffer.jzeld.element.ZElement.StrokeStyle;
 import com.github.kkieffer.jzeld.element.ZGrid;
 import com.github.kkieffer.jzeld.element.ZGroupedElement;
 import com.github.kkieffer.jzeld.element.ZShape;
@@ -1276,7 +1277,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         mergedShape = pos.createTransformedShape(mergedShape);
    
         
-        ZShape shape = new ZShape(bounds.getX(), bounds.getY(), mergedShape, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes(), ref.getCustomStroke());               
+        ZShape shape = new ZShape(bounds.getX(), bounds.getY(), mergedShape, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes(), ref.getCustomStroke(), ref.getOutlineStyle());               
         
         addElement(shape);  //add the merged shape
         lastMethod = null;
@@ -1323,6 +1324,22 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         repaint();
         
     }
+    
+    public void setOutlineStyle(StrokeStyle borderStyle) {
+        ArrayList<ZElement> selectedElements = getSelectedElements();
+
+        if (selectedElements.isEmpty() || passThruElement != null) 
+            return;
+        
+        undoStack.saveContext(fields.zElements);
+    
+        for (ZElement selectedElement : selectedElements)
+            selectedElement.setOutlineStyle(borderStyle);
+        
+        setLastMethod("setOutlineStyle", borderStyle);
+        repaint();
+    }
+    
     
     /**
      * Sets the selected elements border dash pattern
@@ -2014,7 +2031,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (selectedElementResizeOn && mouseIn != null && lastSelectedElement != null && fields.mouseCoordFont != null) {
             g2d.setColor(Color.BLACK);
             Rectangle2D bounds = lastSelectedElement.getBounds2D();
-            String mouseCoord = fields.unit.format(bounds.getWidth(), true) + ", " + fields.unit.format(bounds.getHeight(), true);
+            String mouseCoord = fields.unit.format(bounds.getWidth(), false) + " x " + fields.unit.format(bounds.getHeight(), true);
             
             paintString(g2d, mouseCoord, mouseIn.getX() + DRAG_BOX_SIZE*2*pixScale/(float)fields.zoom, mouseIn.getY() + DRAG_BOX_SIZE*2*pixScale/(float)fields.zoom);
             
@@ -2049,7 +2066,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                     s = fields.unit.format(mouseIn.getX()/SCALE, true) + ", " + fields.unit.format(mouseIn.getY()/SCALE, true);
                 else {
                     double area = (dragRect.getWidth()/SCALE) * (dragRect.getHeight()/SCALE);  //area is w*h in units
-                    s = fields.unit.format(dragRect.getWidth()/SCALE, true) + " x " + fields.unit.format(dragRect.getHeight()/SCALE, true);
+                    s = fields.unit.format(dragRect.getWidth()/SCALE, false) + " x " + fields.unit.format(dragRect.getHeight()/SCALE, true);
                     measString = fields.unit.formatArea(area, true);
                 }
                 double x = mouseIn.getX() + (int)Math.ceil(10.0 * pixScale/fields.zoom);
@@ -2218,7 +2235,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
 
                          
-        if (e.getClickCount() > 1 && lastSelectedElement != null) {  //Transfer control to the selected element
+        if (e.getClickCount() > 1 && SwingUtilities.isLeftMouseButton(e) && lastSelectedElement != null) {  //Transfer control to the selected element
             editElement();
         }
        

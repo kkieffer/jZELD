@@ -5,12 +5,8 @@ import com.github.kkieffer.jzeld.ZCanvas;
 import java.awt.BasicStroke;
 import static java.awt.BasicStroke.CAP_SQUARE;
 import static java.awt.BasicStroke.JOIN_MITER;
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
-import java.awt.Transparency;
-import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
@@ -48,11 +44,10 @@ public class LineBorderMenu extends JMenu {
         public WeightMenuItem(ZCanvas c, GraphicsConfiguration gC, float thickStep) {
             
             super(c);
+            createMenuGraphics();
+
             DecimalFormat fmt = new DecimalFormat("0.0");
-            BufferedImage bimg = gC.createCompatibleImage(100, 16, Transparency.BITMASK);
-            Graphics2D g = (Graphics2D)bimg.getGraphics();
             
-            g.setColor(Color.BLACK);
             g.setStroke(new BasicStroke(thickStep));
             String label = fmt.format(thickStep);
             int strW = g.getFontMetrics().stringWidth(label) + 10;
@@ -60,8 +55,9 @@ public class LineBorderMenu extends JMenu {
             if (thickStep > 0.0)
                 g.drawLine(strW, 8, 100, 8);
             
-
-            this.setIcon(new ImageIcon(bimg));
+            g.dispose();
+            
+            this.setIcon(new ImageIcon(bufferedImage));
                         
             
             addActionListener(new java.awt.event.ActionListener() {
@@ -86,10 +82,8 @@ public class LineBorderMenu extends JMenu {
             
             super(c);
 
-            BufferedImage bimg = gC.createCompatibleImage(100, 16, Transparency.BITMASK);
-            Graphics2D g = (Graphics2D)bimg.getGraphics();
-            g.setColor(Color.BLACK);
-            
+            createMenuGraphics();
+
             if (dash.length == 0) 
                 g.setStroke(new BasicStroke(1));
             else {
@@ -102,7 +96,9 @@ public class LineBorderMenu extends JMenu {
             }
             
             g.drawLine(0, 8, 100, 8);
-            this.setIcon(new ImageIcon(bimg));
+            g.dispose();
+
+            this.setIcon(new ImageIcon(bufferedImage));
             
             addActionListener(new java.awt.event.ActionListener() {
                 @Override

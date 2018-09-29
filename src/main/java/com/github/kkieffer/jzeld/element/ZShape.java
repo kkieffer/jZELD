@@ -154,10 +154,10 @@ public class ZShape extends ZAbstractShape {
      * @param pA paint attributes
      * @param cS any custom stroke
      */
-    public ZShape(double x, double y, Shape s, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, PaintAttributes pA, CustomStroke cS) {
+    public ZShape(double x, double y, Shape s, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, PaintAttributes pA, CustomStroke cS, StrokeStyle borderStyle) {
         super(x, y, s.getBounds2D().getWidth() == 0 ? MIN_SHAPE_DIMENSION : s.getBounds2D().getWidth(), 
                     s.getBounds2D().getHeight() == 0 ? MIN_SHAPE_DIMENSION : s.getBounds2D().getHeight(), 
-                    rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);        
+                    rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor, borderStyle);        
         this.shape = s;
         this.paintAttr = pA;
         this.customStroke = cS;        

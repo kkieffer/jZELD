@@ -44,8 +44,8 @@ public class ZImage extends ZRectangle {
      * @param fillColor color of the rectangle area, which can be null for transparent. Any transparent image pixels will have this color
      * @param img the image painted on this element, if null, it is not painted
      */
-    public ZImage(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove,  float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, BufferedImage img) {
-        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, FILL_COLOR);
+    public ZImage(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove,  float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, StrokeStyle borderStyle, BufferedImage img) {
+        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, FILL_COLOR, borderStyle);
         if (width <= 0 || height <= 0)
             throw new IllegalArgumentException("Width and height must be positive value");
         
@@ -103,12 +103,6 @@ public class ZImage extends ZRectangle {
     }
     
 
-    @Override
-    public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
-        super.setAttributes(outlineWidth, outlineColor, dashPattern, fillColor);
-        changed();
-    }
-    
     
     @Override
     public boolean supportsEdit() {

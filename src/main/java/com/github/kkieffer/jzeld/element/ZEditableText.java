@@ -65,10 +65,12 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     protected Color borderColor;
     
     protected float borderThickness;
-    
+    protected StrokeStyle borderStyle;
+
     @XmlJavaTypeAdapter(JTextPaneAdapter.class)
     @XmlElement(name = "Text")
     protected JTextPane textWidget;
+    
     
     public static class JTextPaneAdapter extends XmlAdapter<String, JTextPane> {
 
@@ -155,7 +157,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     protected void afterUnmarshal(Unmarshaller u, Object parent) {
         textPanel = new JPanel();
         setTextAttributes(textAttributes);
-        setAttributes(borderThickness, borderColor, null, backgroundColor);
+        setAttributes(borderThickness, borderColor, null, backgroundColor, borderStyle);
         setup();
     }
     
@@ -177,9 +179,10 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
      * @param borderThickness unit width of the border, use zero for no border
      * @param borderColor color of the border, which can be null only if the borderWidth is zero
      * @param backgroundColor color of the rectangle area, which can be null for transparent (but not in combination with a zero width border)
+     * @param borderStyle the style of the border, which can be null only if the borderWidth is zero
      * @param attr attributes of the text string
      */
-    public ZEditableText(double x, double y, double width, double height, double rotation, boolean selectable, String defaultText, float borderThickness, Color borderColor, Color backgroundColor, TextAttributes attr) {
+    public ZEditableText(double x, double y, double width, double height, double rotation, boolean selectable, String defaultText, float borderThickness, Color borderColor, Color backgroundColor, StrokeStyle borderStyle, TextAttributes attr) {
         super(x, y, width, height, rotation, selectable, selectable, selectable);  //unknown bounds, height and width until we have a graphics context
                
         
@@ -189,7 +192,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         textAttributes = new TextAttributes();
         setTextAttributes(attr);
         modifyText(defaultText);
-        setAttributes(borderThickness, borderColor, null, backgroundColor);
+        setAttributes(borderThickness, borderColor, null, backgroundColor, borderStyle);
 
         setup();
         SwingUtilities.invokeLater(new Runnable() { public void run() {validateSize();}});
@@ -205,7 +208,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         textAttributes = new TextAttributes();
         setTextAttributes(copy.textAttributes);
         modifyText(copy.textWidget.getText());
-        setAttributes(copy.borderThickness, copy.borderColor, null, copy.backgroundColor);
+        setAttributes(copy.borderThickness, copy.borderColor, null, copy.backgroundColor, copy.borderStyle);
 
         setup();
 
@@ -228,11 +231,12 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
 
     
     @Override
-    public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
+    public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor, StrokeStyle outlineStyle) {
         setFillColor(fillColor);
         setOutlineWidth(outlineWidth);
         setDashPattern(dashPattern);
         setOutlineColor(outlineColor);  
+        setOutlineStyle(outlineStyle);
         changed();
     }
     
@@ -246,6 +250,11 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     @Override
     public float getOutlineWidth() {
         return borderThickness;
+    }
+    
+    @Override
+    public StrokeStyle getOutlineStyle() {
+        return borderStyle;
     }
     
     @Override
@@ -266,6 +275,12 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     @Override
     public Color getOutlineColor() {
         return borderColor;
+    }
+    
+    @Override
+    public void setOutlineStyle(StrokeStyle style) {
+        this.borderStyle = style;
+        changed();
     }
     
     @Override

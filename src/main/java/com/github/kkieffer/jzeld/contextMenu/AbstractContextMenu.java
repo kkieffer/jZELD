@@ -2,7 +2,14 @@
 package com.github.kkieffer.jzeld.contextMenu;
 
 import com.github.kkieffer.jzeld.ZCanvas;
+import com.github.kkieffer.jzeld.element.ZElement.StrokeStyle;
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.RenderingHints;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.JMenuItem;
 
@@ -15,6 +22,9 @@ public class AbstractContextMenu extends JMenuItem {
     protected ZCanvas canvas;
     
     private final ArrayList<ContextMenuListener> listeners = new ArrayList<>();
+    
+    protected BufferedImage bufferedImage;
+    protected Graphics2D g;
     
     
     protected AbstractContextMenu(ZCanvas c) {
@@ -50,8 +60,25 @@ public class AbstractContextMenu extends JMenuItem {
             l.contextMenuLineDashChanged(newDash);
     }
     
+     protected void lineStyleChanged(StrokeStyle newStyle) {
+        for (ContextMenuListener l : listeners)
+            l.contextMenuLineStyleChanged(newStyle);
+    }
+    
     public void setCanvas(ZCanvas c) {
         canvas = c;
+    }
+    
+    protected void createMenuGraphics() {
+        
+        GraphicsConfiguration gC = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+
+        bufferedImage = gC.createCompatibleImage(100, 16, Transparency.BITMASK);
+        g = (Graphics2D)bufferedImage.getGraphics();
+        g.setColor(Color.BLACK);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        
     }
     
 }

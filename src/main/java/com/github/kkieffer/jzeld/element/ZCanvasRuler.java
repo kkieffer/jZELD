@@ -50,7 +50,7 @@ public final class ZCanvasRuler extends ZRectangle {
      * @param minorTicks minor ticks per unit, 0 for none. One minor tick will lie directly on the major tick.
      */
     public ZCanvasRuler(int width, boolean isHorizontal, float borderThickness, Color borderColor, Color backgroundColor, Font labelFont, UnitMeasure unit, int majorTickStep, int minorTicks) {
-        super(0, 0, isHorizontal ? -1 : width, !isHorizontal ? -1 : width, 0.0, false, false, false, borderThickness, borderColor, null, backgroundColor);
+        super(0, 0, isHorizontal ? -1 : width, !isHorizontal ? -1 : width, 0.0, false, false, false, borderThickness, borderColor, null, backgroundColor, StrokeStyle.SQUARE);
         fixedWidth = width;
         isHoriz = isHorizontal;
         this.unit = unit;

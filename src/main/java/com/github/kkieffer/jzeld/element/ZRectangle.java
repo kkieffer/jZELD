@@ -42,8 +42,8 @@ public class ZRectangle extends ZPolygon {
      * @param dashPattern the border dash pattern, null for solid
      * @param fillColor color of the rectangle area, which can be null for transparent (but not in combination with a zero width border)
      */
-    public ZRectangle(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
-        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);        
+    public ZRectangle(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, StrokeStyle borderStyle) {
+        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor, borderStyle);        
     }
     
     protected ZRectangle(ZRectangle src, boolean forNew) {

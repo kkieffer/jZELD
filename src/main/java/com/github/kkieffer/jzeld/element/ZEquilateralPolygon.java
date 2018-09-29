@@ -46,8 +46,8 @@ public class ZEquilateralPolygon extends ZPolygon {
      * @param fillColor color of the rectangle area, which can be null for transparent (but not in combination with a zero width border)
      * @param sides number of sides
      */
-    public ZEquilateralPolygon(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, int sides) {
-        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);
+    public ZEquilateralPolygon(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, StrokeStyle borderStyle, int sides) {
+        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor, borderStyle);
         this.sides = sides;
     }
     

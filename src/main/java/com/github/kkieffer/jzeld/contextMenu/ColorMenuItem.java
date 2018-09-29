@@ -19,7 +19,7 @@ import javax.swing.JColorChooser;
  */
 public class ColorMenuItem extends AbstractContextMenu {
      
-    public static enum Type {LINE, FILL}
+    public static enum Type {LINE, FILL, CLEAR}
     
     private static final ImageIcon colorIcon;
     
@@ -37,7 +37,8 @@ public class ColorMenuItem extends AbstractContextMenu {
     public ColorMenuItem(String text, ZCanvas c, Type type) {
         super(c);
         setText(text);
-        setIcon(colorIcon);
+        if (type != Type.CLEAR)
+            setIcon(colorIcon);
         
         addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -48,22 +49,28 @@ public class ColorMenuItem extends AbstractContextMenu {
                 ZElement[] selectedElements = canvas.getSelectedElementsArray();
                 
                 Color oldColor = Color.BLACK;
-                if (selectedElements.length > 0)
+                if (selectedElements.length > 0 && type != Type.CLEAR)    
                     oldColor = type == Type.FILL ? selectedElements[0].getFillColor() : selectedElements[0].getOutlineColor();
-                    
-                Color newColor = JColorChooser.showDialog(canvas, "Select " + type + " Color", oldColor);
-                if (newColor == null)
-                    return;
+                
+                
+                if (type != Type.CLEAR) {
+                    Color newColor = JColorChooser.showDialog(canvas, "Select " + type + " Color", oldColor);
+                    if (newColor == null)
+                        return;
 
-                if (type == Type.FILL) {
-                    canvas.setFillColor(newColor);
-                    fillColorChanged(newColor);
+                    if (type == Type.FILL) {
+                        canvas.setFillColor(newColor);
+                        fillColorChanged(newColor);
+                    }
+                    else {
+                        canvas.setOutlineColor(newColor);
+                        lineColorChanged(newColor);
+                    }
                 }
                 else {
-                    canvas.setOutlineColor(newColor);
-                    lineColorChanged(newColor);
+                    canvas.removeFill();
+                    fillColorChanged(null);
                 }
-
 
                 
             }

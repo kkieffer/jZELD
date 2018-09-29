@@ -5,8 +5,6 @@ import com.github.kkieffer.jzeld.adapters.JAXBAdapter.ColorAdapter;
 import com.github.kkieffer.jzeld.ZCanvas.CombineOperation;
 import com.jhlabs.image.ShadowFilter;
 import java.awt.BasicStroke;
-import static java.awt.BasicStroke.CAP_SQUARE;
-import static java.awt.BasicStroke.JOIN_MITER;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -39,6 +37,8 @@ public abstract class ZAbstractShape extends ZElement {
     
     protected float borderThickness;
     protected Float[] dashPattern = null;
+    protected StrokeStyle borderStyle = StrokeStyle.SQUARE;
+    
     protected PaintAttributes paintAttr = null;    
     protected CustomStroke customStroke = null;
        
@@ -46,15 +46,15 @@ public abstract class ZAbstractShape extends ZElement {
     
     private transient BufferedImage shadowImage = null;
     
-    protected ZAbstractShape(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor) {
+    protected ZAbstractShape(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, StrokeStyle outlineStyle) {
         super(x, y, width, height, rotation, canSelect, canResize, canMove);
-        setAttributes(borderWidth, borderColor, dashPattern, fillColor);
+        setAttributes(borderWidth, borderColor, dashPattern, fillColor, outlineStyle);
         shadowImage = null;
     }
     
     protected ZAbstractShape(ZAbstractShape src, boolean forNew) {
         super(src, forNew);
-        setAttributes(src.borderThickness, src.borderColor, src.dashPattern, src.backgroundColor);
+        setAttributes(src.borderThickness, src.borderColor, src.dashPattern, src.backgroundColor, src.borderStyle);
         paintAttr = src.paintAttr == null ? null : new PaintAttributes(src.paintAttr);
         shadowAttributes = src.shadowAttributes == null ? null : new ShadowAttributes(src.shadowAttributes);
         customStroke = src.customStroke == null ? null : src.customStroke.copyOf();
@@ -82,14 +82,16 @@ public abstract class ZAbstractShape extends ZElement {
      * @param outlineColor color of the border, which can be null for a transparent border
      * @param dashPattern the dash pattern for the border, if null, solid line 
      * @param fillColor color of the rectangle area, which can be null for transparent 
+     * @param outlineStyle the style of the outline
      */
     @Override
-    public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
+    public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor, StrokeStyle outlineStyle) {
     
         setFillColor(fillColor);
         setOutlineWidth(outlineWidth);
         setDashPattern(dashPattern);
         setOutlineColor(outlineColor);
+        setOutlineStyle(outlineStyle);
         changed();
     }
     
@@ -104,6 +106,12 @@ public abstract class ZAbstractShape extends ZElement {
         return borderThickness;
     }
     
+    @Override
+    public StrokeStyle getOutlineStyle() {
+        return borderStyle;
+    }
+    
+
     @Override
     public void setDashPattern(Float[] dashPattern) {
         this.dashPattern = dashPattern == null ? null : (Float[])Arrays.copyOf(dashPattern, dashPattern.length);
@@ -123,6 +131,13 @@ public abstract class ZAbstractShape extends ZElement {
         this.borderColor = outlineColor;
         changed();
     }
+    
+    @Override
+    public void setOutlineStyle(StrokeStyle style) {
+        this.borderStyle = style;
+        changed();
+    }
+    
     
     @Override
     public void setFillColor(Color fillColor) {
@@ -418,14 +433,13 @@ public abstract class ZAbstractShape extends ZElement {
        if (borderThickness != 0 && borderColor != null) {  //use built-in Basic Stroke
            
             if (dashPattern == null || dashPattern.length == 0)
-                g.setStroke(new BasicStroke(borderThickness));
+                g.setStroke(new BasicStroke(borderThickness, borderStyle.getCapType(), borderStyle.getJoinType()));
             else {
                 float[] d = new float[dashPattern.length];
                 for (int i=0; i<dashPattern.length; i++)
                     d[i] = dashPattern[i] * (float)unitSize + borderThickness * .75f;
                     
-
-                g.setStroke(new BasicStroke(borderThickness, CAP_SQUARE, JOIN_MITER, 10.0f, d, 0.0f));
+                g.setStroke(new BasicStroke(borderThickness, borderStyle.getCapType(), borderStyle.getJoinType(), 10.0f, d, 0.0f));           
             }
        
  

@@ -66,12 +66,13 @@ public class ZArc extends ZRectangle {
      * @param borderColor color of the border, which can be null only if the borderWidth is zero
      * @param dashPattern the border dash pattern, null for solid
      * @param fillColor color of the rectangle area, which can be null for transparent (but not in combination with a zero width border)
+     * @param borderStyle
      * @param startAngle start angle, 0 = "east pointing"
      * @param arcAngle sweep angle, counterclockwise
      * @param arcType the type of closure
      */
-    public ZArc(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, double startAngle, double arcAngle, ArcType arcType) {
-        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor);
+    public ZArc(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, StrokeStyle borderStyle, double startAngle, double arcAngle, ArcType arcType) {
+        super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor, borderStyle);
         this.startAngle = startAngle;
         this.arcAngle = arcAngle;
         this.type = arcType;

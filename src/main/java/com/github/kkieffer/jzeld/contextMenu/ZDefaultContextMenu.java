@@ -39,6 +39,7 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
     protected JMenu attributesMenu;
     protected LineBorderMenu lineWeightMenu;
     protected LineBorderMenu lineDashMenu;
+    protected LineStyleMenu lineStyleMenu;
     protected JMenu colorMenu;
     protected ColorMenuItem fillColorMenuItem;
     protected ColorMenuItem lineColorMenuItem;
@@ -48,7 +49,7 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
     protected final JMenuItem resetVerticalShearMenuItem;
     protected final JMenuItem resetHorizontalShearMenuItem;
     protected final JMenu shearMenu;
-    protected final JMenuItem removeFillMenuItem;
+    protected final ColorMenuItem removeFillMenuItem;
     
     
     public ZDefaultContextMenu(ZCanvas c) {
@@ -132,16 +133,18 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         attributesMenu = new JMenu("Attributes");
         lineWeightMenu = new LineBorderMenu("Line Weight", c, LineBorderMenu.Type.WEIGHT);
         lineDashMenu = new LineBorderMenu("Dash Pattern", c, LineBorderMenu.Type.DASH);
+        lineStyleMenu = new LineStyleMenu("Line Style", c);
         colorMenu = new JMenu("Color");
         lineColorMenuItem = new ColorMenuItem("Line Color", c, ColorMenuItem.Type.LINE);
         colorMenu.add(lineColorMenuItem);
         fillColorMenuItem = new ColorMenuItem("Fill Color", c, ColorMenuItem.Type.FILL);
         colorMenu.add(fillColorMenuItem);
 
-        removeFillMenuItem = new JMenuItem("Remove Fill Color");
+        removeFillMenuItem = new ColorMenuItem("Remove Fill Color", c, ColorMenuItem.Type.CLEAR);
         colorMenu.add(removeFillMenuItem);
         
         attributesMenu.add(lineWeightMenu);
+        attributesMenu.add(lineStyleMenu);
         attributesMenu.add(lineDashMenu);
         attributesMenu.add(colorMenu);
         

@@ -42,8 +42,8 @@ public class ZLine extends ZPolygon {
      * @param lineColor color of the border, which can be null only if the borderWidth is zero
      * @param dashPattern
      */
-    public ZLine(double x, double y, double width, double rotation, boolean canSelect, boolean canResize, boolean canMove, float lineThickness, Color lineColor, Float[] dashPattern) {
-        super(x, y, width, MIN_SHAPE_DIMENSION, rotation, canSelect, canResize, canMove, lineThickness, lineColor, dashPattern, null);                     
+    public ZLine(double x, double y, double width, double rotation, boolean canSelect, boolean canResize, boolean canMove, float lineThickness, Color lineColor, Float[] dashPattern, StrokeStyle borderStyle) {
+        super(x, y, width, MIN_SHAPE_DIMENSION, rotation, canSelect, canResize, canMove, lineThickness, lineColor, dashPattern, null, borderStyle);                     
 
         if (lineColor == null)
             throw new IllegalArgumentException("Line color cannot be null");

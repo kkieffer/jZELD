@@ -176,11 +176,12 @@ public final class ZGroupedElement extends ZElement {
     };
 
     @Override
-    public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor) {
+    public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor, StrokeStyle borderStyle) {
         setFillColor(fillColor);
         setOutlineWidth(outlineWidth);
         setDashPattern(dashPattern);
         setOutlineColor(outlineColor);
+        setOutlineStyle(borderStyle);
     }
 
     @Override
@@ -194,8 +195,23 @@ public final class ZGroupedElement extends ZElement {
     }
     
     @Override
+    public void setOutlineStyle(StrokeStyle borderStyle) {
+         for (ZElement e : elements) {
+            if (e.hasOutline()) {
+                e.setOutlineStyle(borderStyle);
+            }
+        }
+        changed();
+    }
+    
+    @Override
     public float getOutlineWidth() {
         return 0;
+    }
+    
+    @Override
+    public StrokeStyle getOutlineStyle() {
+        return null;
     }
 
     @Override

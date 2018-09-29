@@ -4,6 +4,10 @@ package com.github.kkieffer.jzeld.element;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.Rectangle2DAdapter;
 import com.github.kkieffer.jzeld.UnitMeasure;
 import com.github.kkieffer.jzeld.ZCanvas;
+import static java.awt.BasicStroke.CAP_BUTT;
+import static java.awt.BasicStroke.CAP_ROUND;
+import static java.awt.BasicStroke.JOIN_MITER;
+import static java.awt.BasicStroke.JOIN_ROUND;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
@@ -35,6 +39,20 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ZElement implements Serializable {
     
+    public enum StrokeStyle {ROUNDED(CAP_ROUND, JOIN_ROUND), 
+                             SQUARE(CAP_BUTT, JOIN_MITER);
+    
+        public int getCapType() { return cap; }
+        public int getJoinType() { return join; }
+    
+        private final int cap;
+        private final int join;
+        private StrokeStyle(int c, int j) {
+            cap = c;
+            join = j;
+        }
+    }
+
     private String name;  //user friendly name
     
     @XmlJavaTypeAdapter(Rectangle2DAdapter.class)
@@ -187,8 +205,9 @@ public abstract class ZElement implements Serializable {
      * @param outlineColor color of the element's outline, null for transparent
      * @param dashPattern a dash pattern for the outline, in pixels.  Null for solid line.  Values in units
      * @param fillColor interior fill color
+     * @param outlineStyle the style for the outline
      */
-    public abstract void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor);
+    public abstract void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor, StrokeStyle outlineStyle);
     
     /**
      * For elements that support an outline, sets the current width in pixels of the outline.  Width of 0 is no outline 
@@ -209,6 +228,13 @@ public abstract class ZElement implements Serializable {
      * @param dashPattern dash pattern with values in units
      */
     public abstract void setDashPattern(Float[] dashPattern);
+    
+    
+    /**
+     * For elements that support an outline, sets the style the outline.  \
+     * @param style the style to set
+     */
+    public abstract void setOutlineStyle(StrokeStyle style);
     
     /**
      * For elements that support an outline, gets the dash pattern of the outline.  Null is a solid line.  Dash pattern is the same
@@ -241,11 +267,17 @@ public abstract class ZElement implements Serializable {
      */
     public abstract Color getOutlineColor();
     
-     /**
+    /**
      * For elements that support an outline, gets the current width in pixels of the outline.  Width of 0 is no outline 
      * @return width in pixels
      */
     public abstract float getOutlineWidth();
+    
+    /**
+     * For elements that support an outline, gets the current style of the outline.  
+     * @return the style
+     */
+    public abstract StrokeStyle getOutlineStyle();
     
     /**
      * True if the element supports an outline

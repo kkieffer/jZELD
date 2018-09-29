@@ -18,6 +18,8 @@ import com.github.kkieffer.jzeld.element.TextAttributes;
 import com.github.kkieffer.jzeld.element.ZArc;
 import com.github.kkieffer.jzeld.element.ZArc.ArcType;
 import com.github.kkieffer.jzeld.element.ZCircle;
+import com.github.kkieffer.jzeld.element.ZElement;
+import com.github.kkieffer.jzeld.element.ZElement.StrokeStyle;
 import com.github.kkieffer.jzeld.element.ZEquilateralPolygon;
 import com.github.kkieffer.jzeld.element.ZGrid;
 import com.github.kkieffer.jzeld.element.ZImage;
@@ -75,63 +77,63 @@ public class Demo extends javax.swing.JFrame {
         c.enableUndoContextSave(false); //disable, so the adding of these elements can't be undone
         
         //Create a red rectangle, large black border, moveable
-        ZRectangle r = new ZRectangle(1.0, 1.0, 2.0, 1.0, 25.0, true, true, true, 3, Color.BLACK, new Float[]{.2f, .2f}, Color.RED);
+        ZRectangle r = new ZRectangle(1.0, 1.0, 2.0, 1.0, 25.0, true, true, true, 3, Color.BLACK, new Float[]{.2f, .2f}, Color.RED, StrokeStyle.ROUNDED);
         c.addElement(r);
 
         //Create an immovable, unselectable green square, rotated to 45 degrees (its a diamond!)
-        ZRectangle r2 = new ZRectangle(1.0, 1.0, 1.0, 1.0, 45.0, false, false, false, 1, Color.BLACK, null, Color.GREEN);
+        ZRectangle r2 = new ZRectangle(1.0, 1.0, 1.0, 1.0, 45.0, false, false, false, 1, Color.BLACK, null, Color.GREEN, StrokeStyle.SQUARE);
         c.addElement(r2);
         
         //Create a non-filled rectangle with rounded edges
-        ZRectangle r3 = new ZRoundedRectangle(4.0, 1.0, 1.0, 1.0, 0.0, true, true, true, 1, Color.BLACK, new Float[]{.1f, .1f}, null, 0.1);
+        ZRectangle r3 = new ZRoundedRectangle(4.0, 1.0, 1.0, 1.0, 0.0, true, true, true, 1, Color.BLACK, new Float[]{.1f, .1f}, null, StrokeStyle.SQUARE, 0.1);
         c.addElement(r3);
         
         //Create a semi-transparent oval
-        ZOval o = new ZOval(1.0, 3.0, 1.0, 1.0, 0.0, true, true, true, 0, Color.BLACK, null, new Color(0, 0, 255, 128));
+        ZOval o = new ZOval(1.0, 3.0, 1.0, 1.0, 0.0, true, true, true, 0, Color.BLACK, null, new Color(0, 0, 255, 128), StrokeStyle.SQUARE);
         c.addElement(o);
         
         //Create a semi-transparent circle
-        ZCircle cr = new ZCircle(1.0, 3.5, 1.0, 1.0, 0.0, true, true, true, 0, Color.BLACK, null, new Color(0, 0, 255, 128));
+        ZCircle cr = new ZCircle(1.0, 3.5, 1.0, 1.0, 0.0, true, true, true, 0, Color.BLACK, null, new Color(0, 0, 255, 128), StrokeStyle.SQUARE);
         c.addElement(cr);
         
          //Create a semi-transparent circle
-        ZOval o2 = new ZOval(2.5, 3.0, 1.0, 1.0, 0.0, true, true, true, 1, Color.BLACK, null, null);
+        ZOval o2 = new ZOval(2.5, 3.0, 1.0, 1.0, 0.0, true, true, true, 1, Color.BLACK, null, null, StrokeStyle.SQUARE);
         PaintAttributes radPaint = PaintAttributes.createRadialPaintAttribute(new Point2D.Double(0.5, 0.5), null, 0.5f, RadiusRelative.SHORTEST, new float[]{0.0f, 1.0f}, new Color[]{Color.WHITE, Color.BLACK}, MultipleGradientPaint.CycleMethod.NO_CYCLE);
         o2.setPaintAttributes(radPaint);
         c.addElement(o2);
        
         //Create a simple black line
-        ZLine l = new ZLine(5.0, 2.5, 1.0, 0.0, true, true, true, 1, Color.BLACK, null);
+        ZLine l = new ZLine(5.0, 2.5, 1.0, 0.0, true, true, true, 1, Color.BLACK, null, StrokeStyle.SQUARE);
         c.addElement(l);
         
         //Right triangle, yellow, big borders, immoveable
-        ZRightTriangle t = new ZRightTriangle(1.0, 6.0, 1.0, 1.0, 0.0, true, true, false, 4, Color.BLACK, null, Color.YELLOW);
+        ZRightTriangle t = new ZRightTriangle(1.0, 6.0, 1.0, 1.0, 0.0, true, true, false, 4, Color.BLACK, null, Color.YELLOW, StrokeStyle.SQUARE);
         c.addElement(t);
         
         
-        ZEquilateralPolygon p = new ZEquilateralPolygon(6.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, 5);        
+        ZEquilateralPolygon p = new ZEquilateralPolygon(6.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, StrokeStyle.SQUARE, 5);        
         PaintAttributes linPaint = PaintAttributes.createLinearPaintAttribute(new Point2D.Double(.25,.5), new Point2D.Double(.75,.5), new float[]{0.1f, 0.5f, 0.8f}, new Color[]{Color.BLUE, Color.RED, Color.GREEN}, MultipleGradientPaint.CycleMethod.REFLECT);
         p.setPaintAttributes(linPaint);
         p.setShadowAttributes(new ShadowAttributes());
         c.addElement(p);
           
-        ZQuadrilateral pg = new ZQuadrilateral(QuadType.RHOMBUS, 6.0, 2.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, 20);
+        ZQuadrilateral pg = new ZQuadrilateral(QuadType.RHOMBUS, 6.0, 2.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, StrokeStyle.SQUARE, 20);
         c.addElement(pg);
         pg.setCustomStroke(new CircleStrokeExample());
         
          //Create an arc
-        ZArc a = new ZArc(1.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 7, Color.ORANGE, null, Color.RED, 30.0, 45.0, ArcType.PIE);
+        ZArc a = new ZArc(1.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 7, Color.ORANGE, null, Color.RED, StrokeStyle.SQUARE, 30.0, 45.0, ArcType.PIE);
         c.addElement(a);
             
         //Add the test image
         InputStream testImg = Demo.class.getClassLoader().getResourceAsStream("tiger.jpg");
         BufferedImage image = ImageIO.read(testImg);
      
-        ZImage img = new ZImage(5.0, 5.0, 3.0, 3.0, 0.0, true, true, true, 0, Color.BLACK, null, Color.GRAY, image);  
+        ZImage img = new ZImage(5.0, 5.0, 3.0, 3.0, 0.0, true, true, true, 0, Color.BLACK, null, Color.GRAY, StrokeStyle.SQUARE, image);  
         img.setName("Tiger");
         c.addElement(img);
         
-        ZRectangle r4 = new ZRectangle(5.5, 6.0, 2.0, 1.0, 0.0, true, true, true, 3, Color.BLACK, null, Color.RED);
+        ZRectangle r4 = new ZRectangle(5.5, 6.0, 2.0, 1.0, 0.0, true, true, true, 3, Color.BLACK, null, Color.RED, StrokeStyle.SQUARE);
         PaintAttributes textPaint = PaintAttributes.createTexturePaintAttribute(image, .4f, .4f);
         r4.setPaintAttributes(textPaint);
         c.addElement(r4);
@@ -139,7 +141,7 @@ public class Demo extends javax.swing.JFrame {
         //Create some editable text
         Font f = new Font("SERIF", Font.BOLD, 22);
         TextAttributes t2 = new TextAttributes(HorizontalJustify.CENTER, f, Color.RED);
-        ZEditableText etxt = new ZEditableText(3.0, 6.0, .5, .5, 0.0, true, "MyEditableText", 0, Color.BLACK, Color.LIGHT_GRAY, t2);
+        ZEditableText etxt = new ZEditableText(3.0, 6.0, .5, .5, 0.0, true, "MyEditableText", 0, Color.BLACK, Color.LIGHT_GRAY, StrokeStyle.SQUARE, t2);
         c.addElement(etxt);
  
         c.enableUndoContextSave(true); //re-enable undo
