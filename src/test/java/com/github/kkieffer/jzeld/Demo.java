@@ -223,7 +223,7 @@ public class Demo extends javax.swing.JFrame {
         am.put("OrthoDraw", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                c.drawOn(new OrthogonalLineDraw(c, false, 1.0f, Color.BLACK));
+                c.drawOn(new OrthogonalLineDraw(c, false, 1.0f, Color.BLACK, StrokeStyle.SQUARE));
             }
         });
         
@@ -232,21 +232,21 @@ public class Demo extends javax.swing.JFrame {
         am.put("LineDrawNoClose", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                c.drawOn(new StraightLineDraw(c, false, 1.0f, Color.BLACK));
+                c.drawOn(new StraightLineDraw(c, false, 1.0f, Color.BLACK, StrokeStyle.SQUARE));
             }
         });
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "LineDraw");
         am.put("LineDraw", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                c.drawOn(new StraightLineDraw(c, true, 1.0f, Color.BLACK));
+                c.drawOn(new StraightLineDraw(c, true, 1.0f, Color.BLACK, StrokeStyle.SQUARE));
             }
         });
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "FreeDraw");
         am.put("FreeDraw", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                c.drawOn(new FreeformDraw(c, true, 1.0f, Color.BLACK));
+                c.drawOn(new FreeformDraw(c, true, 1.0f, Color.BLACK, StrokeStyle.SQUARE));
             }
         });
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "Save");

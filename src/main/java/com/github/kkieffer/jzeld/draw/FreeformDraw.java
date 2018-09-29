@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.draw;
 
 import com.github.kkieffer.jzeld.ZCanvas;
+import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
@@ -15,8 +16,8 @@ import java.awt.geom.Point2D;
  */
 public class FreeformDraw extends BoundaryDraw {
 
-    public FreeformDraw(ZCanvas canvas, boolean close, float strokeWidth, Color lineColor) {
-        super(canvas, close, strokeWidth, lineColor);
+    public FreeformDraw(ZCanvas canvas, boolean close, float strokeWidth, Color lineColor, ZElement.StrokeStyle lineStyle) {
+        super(canvas, close, strokeWidth, lineColor, lineStyle);
     }
 
     @Override

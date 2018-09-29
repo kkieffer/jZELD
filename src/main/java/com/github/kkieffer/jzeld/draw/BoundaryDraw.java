@@ -3,6 +3,7 @@ package com.github.kkieffer.jzeld.draw;
 
 import com.github.kkieffer.jzeld.ZCanvas;
 import com.github.kkieffer.jzeld.element.ZElement;
+import com.github.kkieffer.jzeld.element.ZElement.StrokeStyle;
 import com.github.kkieffer.jzeld.element.ZShape;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -72,12 +73,14 @@ public abstract class BoundaryDraw implements DrawClient, KeyListener {
     protected final boolean close;
     protected float strokeWidth;
     protected Color lineColor;
+    protected StrokeStyle lineStyle;
  
-    protected BoundaryDraw(ZCanvas canvas, boolean close, float strokeWidth, Color lineColor) {
+    protected BoundaryDraw(ZCanvas canvas, boolean close, float strokeWidth, Color lineColor, StrokeStyle lineStyle) {
         this.canvas = canvas;
         this.close = close;
         this.strokeWidth = strokeWidth;
         this.lineColor = lineColor;
+        this.lineStyle = lineStyle;
         this.canvas.addKeyListener(this);
     }
 
@@ -113,7 +116,7 @@ public abstract class BoundaryDraw implements DrawClient, KeyListener {
         
         Shape shape = path.createTransformedShape(AffineTransform.getTranslateInstance(-bounds2D.getX(), -bounds2D.getY()));
  
-        return new ZShape(bounds2D.getX(), bounds2D.getY(), shape, 0.0, true, true, true, strokeWidth, lineColor, null, null, null, null, ZElement.StrokeStyle.SQUARE);
+        return new ZShape(bounds2D.getX(), bounds2D.getY(), shape, 0.0, true, true, true, strokeWidth, lineColor, null, null, null, null, lineStyle);
         
     }
     
@@ -153,7 +156,7 @@ public abstract class BoundaryDraw implements DrawClient, KeyListener {
         
         Graphics2D g2d = (Graphics2D)g;
         
-        g2d.setStroke(new BasicStroke(strokeWidth));
+        g2d.setStroke(new BasicStroke(strokeWidth, lineStyle.getCapType(), lineStyle.getJoinType()));
         g2d.setColor(lineColor);
         
         //Draw lines interconnecting the first point to the last point

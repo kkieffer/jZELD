@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.draw;
 
 import com.github.kkieffer.jzeld.ZCanvas;
+import com.github.kkieffer.jzeld.element.ZElement.StrokeStyle;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
@@ -18,8 +19,8 @@ import java.awt.geom.Point2D;
  */
 public class OrthogonalLineDraw extends BoundaryDraw {
 
-    public OrthogonalLineDraw(ZCanvas canvas, boolean close, float strokeWidth, Color lineColor) {
-        super(canvas, close, strokeWidth, lineColor);
+    public OrthogonalLineDraw(ZCanvas canvas, boolean close, float strokeWidth, Color lineColor, StrokeStyle lineStyle) {
+        super(canvas, close, strokeWidth, lineColor, lineStyle);
     }
     
     private Point2D getDrawToPoint(Point2D mouse, Point2D last) {

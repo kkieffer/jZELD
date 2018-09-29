@@ -564,7 +564,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
          if (!isVisible())
             return;
          
-        textWidget.setBorder(BorderFactory.createLineBorder(this.borderColor, (int)borderThickness));
+        textWidget.setBorder(BorderFactory.createLineBorder(this.borderColor, (int)borderThickness, (borderStyle == StrokeStyle.ROUNDED)));
 
         textWidget.setSize(new Dimension((int)width, (int)height));
 
