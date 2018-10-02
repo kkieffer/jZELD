@@ -657,6 +657,19 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         return fields.unit;
     }
     
+    public Color getMouseCrosshairColor() {
+        return fields.mouseCursorColor;
+    }
+    
+    /**
+     * Set the color of the crosshair cursor 
+     * @param c the color to use, or null to remove
+     */
+    public void setMouseCrosshairColor(Color c) {
+        fields.mouseCursorColor = c;
+        repaint();
+    }
+    
     /**
      * Register an event listener with the canvas.  When an element is selected or other actions occur, the listener is notified.
      * @param l the listener to register, if already registered, fails silently
@@ -1835,6 +1848,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                         passThruElement = lastSelectedElement; 
                 }
 
+                setCurrentCursor(Cursor.getDefaultCursor());
 
                 
                 repaint();
@@ -1936,6 +1950,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         shiftPressed = false;
         altPressed = false;
         
+        setCurrentCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+
     }
     
     
