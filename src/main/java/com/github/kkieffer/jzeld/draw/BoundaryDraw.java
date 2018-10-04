@@ -205,6 +205,7 @@ public abstract class BoundaryDraw implements DrawClient, KeyListener {
             case KeyEvent.VK_ENTER:
                 complete();
                 break;
+            case KeyEvent.VK_ESCAPE:
             case KeyEvent.VK_DELETE:
             case KeyEvent.VK_BACK_SPACE:
                 drawStop();
