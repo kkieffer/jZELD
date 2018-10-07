@@ -299,6 +299,8 @@ public abstract class ZAbstractShape extends ZElement {
             }
         }
         
+        if (a.isEmpty())
+            return null;
                
         return a;
     }

@@ -65,6 +65,7 @@ import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.RepaintManager;
@@ -598,6 +599,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void setPageMargins(Rectangle2D margins) {
         fields.margins = margins == null ? null : new Rectangle2D.Double(margins.getX(), margins.getY(), margins.getWidth(), margins.getHeight());
+        repaint();     
     }
     
     /**
@@ -700,6 +702,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         
         super.reshape(x, y, width, height);
+        repaint();     
     }
     
     /**
@@ -969,6 +972,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         
         setLastMethod("resetShear", horiz);
+        repaint();     
 
     }
     
@@ -992,7 +996,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         
         setLastMethod("flip", horiz);
-        
+        repaint();     
+   
     }
 
     /**
@@ -1160,7 +1165,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                     
             }
         }
-        
+        repaint();     
+
     }
     
     
@@ -1248,11 +1254,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     /**
      * Merge the selected elements, starting with the lowest layer selected and applying the operation to each next layer selected.  Only elements that
-     * extend ZAbstractShape can be combined.
+     * extend ZAbstractShape can be combined, the others are ignored. The ZAbstractShapes are removed from the canvas, and merged into a new ZShape, which
+     * is added back to the canvas.
      * The attributes of the newly combined shape are those of the lowest layer selected ZAbstractShape.  
      * @param operation the operation to apply
      * @return the number of shapes combined including the first selected one. If there are no selected ZAbstractShape
      * elements, 0 is returned.  If only one ZAbstractShape is selected, zero is returned and it is not modified.
+     * If the combine operation results in a shape with no area, then -1 is returned.
      */
     public int combineSelectedElements(CombineOperation operation) {
                 
@@ -1283,16 +1291,23 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 else 
                     combineList.add(abs);  //add all others to our list
                
-                removeElement(abs);
-
             }
         }
         
         if (ref == null || combineList.isEmpty())  //nothing to merge
             return 0;
         
+        //Remove all abstract shapes to be merged from the canvas 
+        removeElement(ref);
+        for (ZElement e : combineList)
+            removeElement(e);
+        
         
         Shape mergedShape = ref.combineWith(operation, combineList);  //combine reference with list of other elements
+        if (mergedShape == null)  //combine resulted in shape with no area
+            return -1;
+           
+        
         Rectangle2D bounds = mergedShape.getBounds2D();  //find the new position of the joined object
 
         //Move back to zero position reference
@@ -1426,6 +1441,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             selectedElement.setFillColor(c);
         
         setLastMethod("setFillColor", c);
+        repaint();     
+
     }
     
     /**
@@ -1444,6 +1461,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             selectedElement.removeFill();
         
         setLastMethod("removeFill");
+        repaint();     
+
     }
    
     
@@ -1465,6 +1484,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         lastMethod = null;
         canvasModified = true;
+        repaint();     
+
         return true;
     }
     
@@ -1483,7 +1504,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
         canvasModified = true;
 
-        lastMethod = null; 
+        lastMethod = null;
+        repaint();     
+
     }
     
     /**
@@ -1502,7 +1525,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         replace.removedFrom(this);
         with.addedTo(this);
-        
+                
+        repaint();     
+
         return true;
     }
     
@@ -1951,6 +1976,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         altPressed = false;
         
         setCurrentCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+        repaint();     
 
     }
     

@@ -119,10 +119,15 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
                     int numSel = c.getSelectedElementsArray().length;
                     int combined = c.combineSelectedElements(g);
                 
-                    if (numSel != combined)
-                        JOptionPane.showMessageDialog(c, "Only " + combined + " element" + (combined != 1 ? "s" : "") + " combined.\nOther selected elements are not shapes and cannot be combined. ", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);
+                    if (combined < 0)
+                        JOptionPane.showMessageDialog(c, "Combine operation resulted in a shape with no area", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);
 
-                
+                    else if (numSel != combined) {
+                        if (combined == 0)
+                            JOptionPane.showMessageDialog(c, "No elements combined.\nOther selected elements are not shapes and cannot be combined. ", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);                         
+                        else
+                            JOptionPane.showMessageDialog(c, "Only " + combined + " elements combined.\nOther selected elements are not shapes and cannot be combined. ", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);
+                    }
                 }
             });
             combineMenu.add(m);

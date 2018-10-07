@@ -154,7 +154,6 @@ public final class ZGroupedElement extends ZElement {
             AffineTransform rotateInstance = AffineTransform.getRotateInstance(Math.toRadians(getRotation()));
             Point2D rotated = rotateInstance.transform(relativeE, null);
 
-            System.out.println(relativeE + " - > " + rotated);
             
             double xMove = rotated.getX() - relativeE.getX();
             double yMove = rotated.getY() - relativeE.getY();
