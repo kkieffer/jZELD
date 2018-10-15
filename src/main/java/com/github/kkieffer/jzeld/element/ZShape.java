@@ -153,6 +153,7 @@ public class ZShape extends ZAbstractShape {
      * @param fillColor color of the rectangle area, which can be null for transparent (but not in combination with a zero width border)
      * @param pA paint attributes
      * @param cS any custom stroke
+     * @param borderStyle the border style
      */
     public ZShape(double x, double y, Shape s, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, PaintAttributes pA, CustomStroke cS, StrokeStyle borderStyle) {
         super(x, y, s.getBounds2D().getWidth() == 0 ? MIN_SHAPE_DIMENSION : s.getBounds2D().getWidth(), 

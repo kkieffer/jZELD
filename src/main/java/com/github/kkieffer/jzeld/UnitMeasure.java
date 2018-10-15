@@ -107,7 +107,7 @@ public class UnitMeasure implements Serializable {
     
     /**
      * Format the value as a linear measurement 
-     * @param val the linear value
+     * @param val the linear value (in units) - this is multiplied by the UnitMeasure scale
      * @param withUnit true to append the unit name
      * @return the formatted value string
      */

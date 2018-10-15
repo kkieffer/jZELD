@@ -73,7 +73,7 @@ public class ZRoundedRectangle extends ZRectangle {
     
     /**
      * Adjust the radius
-     * @param r the value in units
+     * @param r the value in canvas units
      */
     public void setRadius(double r) {
         radius = r;
@@ -95,12 +95,14 @@ public class ZRoundedRectangle extends ZRectangle {
         
         Component parent = SwingUtilities.getRoot(canvas);
 
+        double unitScale = canvas.getUnit().getScale();
         
+        //Prompt for new radius, and prefill the old radius (scaled by the current unit)
         String rc = (String)JOptionPane.showInputDialog(parent, "Update Corner Radius (" + canvas.getUnit().getName() + ")", "Modify Rounded Rectangle", JOptionPane.QUESTION_MESSAGE, radiusIcon,
-                                                (Object[])null, (Object)String.valueOf(radius));
+                                                (Object[])null, (Object)String.valueOf(radius*unitScale));
         if (rc != null) {
             try {
-                 setRadius(Double.parseDouble(rc));
+                 setRadius(Double.parseDouble(rc)/unitScale);  //set the new radius in canvas units
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(canvas, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
             }
