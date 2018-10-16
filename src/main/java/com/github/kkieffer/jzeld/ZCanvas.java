@@ -46,10 +46,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
@@ -58,14 +54,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.UUID;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.RepaintManager;
@@ -812,6 +806,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZCanvasEventListener l : selectListeners)
             l.canvasHasDrawClient(false);
         
+        setCurrentCursor(Cursor.getDefaultCursor());
+
         repaint();
     }
     
@@ -1868,12 +1864,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 for (ZCanvasEventListener l : selectListeners)
                     l.elementSelected(e);
 
+                setCurrentCursor(Cursor.getDefaultCursor());
+
+                
                 if (passThru) {
                     if (lastSelectedElement.selectedForEdit(this))  //tell the element it was selected
                         passThruElement = lastSelectedElement; 
                 }
 
-                setCurrentCursor(Cursor.getDefaultCursor());
 
                 
                 repaint();
@@ -2573,80 +2571,18 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         return false;
     }
    
-    private static Class[] addDefaultClasses(List<Class<? extends ZElement>> elementClasses) {
-        
-        Class<?>[] cvsClasses = CanvasStore.getContextClasses();
-        Class[] contextClasses = new Class[elementClasses.size() + cvsClasses.length + 3]; 
-        elementClasses.toArray(contextClasses);
-
-        System.arraycopy(cvsClasses, 0, contextClasses, elementClasses.size(), cvsClasses.length);
-         
-        contextClasses[contextClasses.length-3] = ZAbstractShape.class;        
-        contextClasses[contextClasses.length-2] = ZCanvas.CanvasStore.class;
-        contextClasses[contextClasses.length-1] = ZElement.class;
-        return contextClasses;
-    }
+    
     
     /**
-     * Retrieves an array of required classes for storing a ZCanvas using a JAXB context.  Includes required classes plus all element classes for elements
+     * Retrieves ContextClasses object for storing a ZCanvas using a JAXB context.  Includes required classes plus all element classes for elements
      * that have been added to the canvas, and for any ZGroupedElements, the classes that it contains
      * @return 
      */
-    public Class[] getContextClasses() {
-        
-        ArrayList<Class<? extends ZElement>> elementTypes = new ArrayList<>();
-        for (ZElement e : fields.zElements) {         
-            if (!elementTypes.contains(e.getClass()))  //Add this class type to our list of types
-                 elementTypes.add(e.getClass());
-            
-            if (e instanceof ZGroupedElement)   //find classes contained within group
-                ((ZGroupedElement)e).addGroupedClasses(elementTypes);  
-            
-        }
-            
-        return addDefaultClasses(elementTypes);
-       
+    public ContextClasses getContextClasses() {   
+        return ContextClasses.getContextClasses(fields.zElements);
     }
     
-    /**
-     * Retrieves an array of required classes for loading a ZCanvas using a JAXB context.  Includes required classes plus all element classes for elements
-     * that are in the file
-     * @param f the file to search
-     * @return
-     * @throws java.io.IOException f cannot be found or read
-     * @throws java.lang.ClassNotFoundException if an Element defined in the file has no corresponding subclass of ZElement
-     */
-    public static Class[] getContextClasses(File f) throws IOException, ClassNotFoundException {
-        //First, look through the file to find all the specific Element classes
-        int lineNo = 1;
-        LinkedList<Class<? extends ZElement>> newElementClasses = new LinkedList<>(); 
-        BufferedReader b = new BufferedReader(new FileReader(f));
-        while (true) {
-            String line = b.readLine();
-            if (line == null)
-                break;
-            line = line.trim();
-            if (line.startsWith("<ZElement")) {  //start of an element, the element type
-                int i = line.indexOf("class=");
-                if (i < 0)
-                    throw new IOException("Failed to find \"class\" attribute for ZElement on line " + lineNo);
-                String[] split = line.substring(i).split("\"");
-                if (split.length != 3)
-                    throw new IOException("Malformed \"class\" attribute on line " + lineNo);
-                
-                String className = split[1];  //second piece, between quotes
-                Class c = Class.forName(className);
-                newElementClasses.add(c);
-            }
-            
-            lineNo++;
-        }
-        b.close();
-        
-  
-        return addDefaultClasses(newElementClasses);
-
-    }
+    
     
     /**
      * Retrieves an object that can be used to store the ZCanvas, in a custom format (if JAXB is not desired). The returned object is

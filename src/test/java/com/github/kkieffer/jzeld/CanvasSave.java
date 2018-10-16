@@ -19,8 +19,11 @@ public class CanvasSave {
     
     //Get classes to be saved from the canvas
     private static Class[] getContextClasses(ZCanvas c) {
+        
+        ContextClasses cc = c.getContextClasses();
+        
         ArrayList<Class> contextClasses = new ArrayList<>();
-        for (Class cl : c.getContextClasses()) {
+        for (Class cl : cc.getClasses()) {
             if (!contextClasses.contains(cl))
                 contextClasses.add(cl);    
         }
@@ -61,11 +64,19 @@ public class CanvasSave {
      * @return the loaded ZCanvas
      * @throws JAXBException on unmarshall error
      * @throws java.io.IOException f cannot be found or read
-     * @throws java.lang.ClassNotFoundException if an Element defined in the file has no corresponding subclass of ZElement
      */
-    public static ZCanvas fromFile(File f) throws JAXBException, IOException, ClassNotFoundException {
+    public static ZCanvas fromFile(File f) throws JAXBException, IOException {
        
-        Class[] fileClasses = ZCanvas.getContextClasses(f);  //get classes from the file
+        ContextClasses cc = ContextClasses.getContextClasses(f);
+        
+        String[] unknown = cc.getUnknownClasses();
+        if (unknown != null && unknown.length > 0) {
+            System.out.println("Note: the following classes are unknown in file " + f.getName() + ": ");
+            for (String s : unknown)
+                System.out.println(s);
+        }
+        
+        Class[] fileClasses = cc.getClasses();
         Class[] contextClasses = new Class[fileClasses.length + 1];
         
         System.arraycopy(fileClasses, 0, contextClasses, 0, fileClasses.length);        
