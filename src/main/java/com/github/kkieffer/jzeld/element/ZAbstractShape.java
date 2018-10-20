@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlRootElement(name = "ZAbstractShape")
 @XmlAccessorType(XmlAccessType.FIELD)
-public abstract class ZAbstractShape extends ZElement {
+public abstract class ZAbstractShape extends ZElement implements ShadowAttributes.ShadowInterface {
     
     
     @XmlJavaTypeAdapter(ColorAdapter.class)
@@ -202,6 +202,7 @@ public abstract class ZAbstractShape extends ZElement {
     }
     
     
+    @Override
     public ShadowAttributes getShadowAttributes() {
         return shadowAttributes;
     }
@@ -216,6 +217,7 @@ public abstract class ZAbstractShape extends ZElement {
         super.changed();
     }
     
+    @Override
     public void setShadowAttributes(ShadowAttributes s) {
         shadowAttributes = s;
         changed();
@@ -352,7 +354,7 @@ public abstract class ZAbstractShape extends ZElement {
                     
         }
         else {
-            return new Rectangle2D.Double(-ow, -ow, bounds.getWidth() + ow, bounds.getHeight() + ow);
+            return new Rectangle2D.Double(-ow, -ow, bounds.getWidth() + 2*ow, bounds.getHeight() + 2*ow);
         }
         
     }

@@ -1186,7 +1186,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         undoStack.suspendSave();  //don't push all the remove and add changes to the undo stack
         
         Collections.reverse(selectedElements); //the selected elements are ordered with top z plane first.  But the Grouped Element draws grouped elements in the order provided, so we need to reverse the list
-        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements, SCALE);  //create the group of elements
+        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements);  //create the group of elements
         
         for (ZElement e: selectedElements) //remove all selected
             removeElement(e);
@@ -2738,7 +2738,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return null;
         
         Collections.reverse(selectedElements); //the selected elements are ordered with top z plane first.  But the Grouped Element draws grouped elements in the order provided, so we need to reverse the list
-        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements, SCALE);  //create the group of elements
+        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements);  //create the group of elements
         
         group.reposition(0, 0); //no offset (not on canvas, painting to image
         

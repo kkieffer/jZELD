@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.element;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -20,7 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "ZGroupedElement")
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class ZGroupedElement extends ZElement {
+public final class ZGroupedElement extends ZElement implements TextAttributes.TextInterface, ShadowAttributes.ShadowInterface {
 
     @XmlElement(name="ZElement")        
     private ArrayList<ZElement> elements;
@@ -51,14 +52,7 @@ public final class ZGroupedElement extends ZElement {
               
     }
     
-    /**
-     * Groups the elements into a ZGroupedElement. Sub-elements are repositioned relative to the grouped element.  The grouped element
-     * position and size is set to bound all the sub-elements.
-     * @param elements
-     * @return 
-     */
-    public static ZGroupedElement createGroup(ArrayList<ZElement> elements, double scale) {
-        
+    protected static Rectangle2D getEnclosingBounds(ArrayList<ZElement> elements) {
         double left = Integer.MAX_VALUE;  //furthest left
         double top = Integer.MAX_VALUE;  //furthest top
         double right = 0;                 //furthest right
@@ -81,7 +75,20 @@ public final class ZGroupedElement extends ZElement {
   
         }    
         
-        return new ZGroupedElement(left, top, right-left, bottom-top, elements);
+        return new Rectangle2D.Double(left, top, right-left, bottom-top);
+        
+    }
+    
+    /**
+     * Groups the elements into a ZGroupedElement. Sub-elements are repositioned relative to the grouped element.  The grouped element
+     * position and size is set to bound all the sub-elements.
+     * @param elements
+     * @return 
+     */
+    public static ZGroupedElement createGroup(ArrayList<ZElement> elements) {
+        
+        Rectangle2D b = getEnclosingBounds(elements);
+        return new ZGroupedElement(b.getX(), b.getY(), b.getWidth(), b.getHeight(), elements);
     }
 
     
@@ -112,6 +119,14 @@ public final class ZGroupedElement extends ZElement {
     public ZGroupedElement copyOf(boolean forNew) {
         return new ZGroupedElement(this, forNew);
     }
+    
+    protected void regroup() {
+        Rectangle2D b = getEnclosingBounds(elements);
+        for (ZElement e : elements)
+            e.move(-b.getX(), -b.getY(), Double.MAX_VALUE, Double.MAX_VALUE);
+        super.setSize(b.getWidth(), b.getHeight(), 0, 1.0);
+    }
+    
     
     
     @Override
@@ -288,6 +303,52 @@ public final class ZGroupedElement extends ZElement {
         return false;
     }
     
+    
+    public void setCustomStroke(CustomStroke s) {
+        for (ZElement e : elements) {
+            if (e instanceof ZAbstractShape) {
+                ((ZAbstractShape)e).setCustomStroke(s);
+            }
+        } 
+        changed();
+    }
+    
+    public CustomStroke getCustomStroke() {
+        return null;
+    }
+    
+    /**
+     * Set the paint attributes for the element.  The paint attributes (linear, radial, or texture) are applied over the shape's fill color.
+     * @param p the paint attributes.  To remove, use null
+     */
+    public void setPaintAttributes(PaintAttributes p) {
+        for (ZElement e : elements) {
+            if (e instanceof ZAbstractShape) {
+                ((ZAbstractShape)e).setPaintAttributes(p);
+            }
+        } 
+        changed();
+    }
+    
+    
+    public PaintAttributes getPaintAttributes() {
+        return null;
+    }
+    
+    
+    /**
+     * When this group changes, send the change update to all the grouped elements
+     */
+    @Override
+    public void changed() {
+        for (ZElement e : elements) {
+            e.changed();
+        } 
+        regroup();
+        super.changed();
+    }
+    
+    
     //Override setSize for ZGroupedElement. In this case, find the radio of how much the group has increased,
     //and apply that ratio to the individual elements. Also determine for each element, the ratio of the x,y offset of the element 
     //from the group's position to the width and height of the group.  Apply that ratio to the new group size to find the new locatiin
@@ -368,5 +429,176 @@ public final class ZGroupedElement extends ZElement {
         return new Rectangle2D.Double(0, 0, b.getWidth(), b.getHeight()); //no additional margins
     }
 
+    
+    /* ------------- TEXT INTERFACE METHODS ---------------------- */
+    @Override
+    public void setFontSize(int size) {
+        for (ZElement e : elements) {
+            if (e instanceof TextAttributes.TextInterface) {
+                ((TextAttributes.TextInterface)e).setFontSize(size);
+            }
+        } 
+        changed();
+    }
+        
+        
+    @Override
+    public void setFont(Font f) {
+        for (ZElement e : elements) {
+            if (e instanceof TextAttributes.TextInterface) {
+                ((TextAttributes.TextInterface)e).setFont(f);
+            }
+        } 
+        changed();
+    }
+
+    @Override
+    public void setFontStyle(int style) {
+        for (ZElement e : elements) {
+            if (e instanceof TextAttributes.TextInterface) {
+                ((TextAttributes.TextInterface)e).setFontStyle(style);
+            }
+        }
+        changed();
+    }
+    
+   
+    @Override
+     public void setFontName(String name) {
+       for (ZElement e : elements) {
+            if (e instanceof TextAttributes.TextInterface) {
+                ((TextAttributes.TextInterface)e).setFontName(name);
+            }
+        }
+        changed();
+    }
+    
+    
+    @Override
+     public void setFontColor(Color c) {
+        for (ZElement e : elements) {
+            if (e instanceof TextAttributes.TextInterface) {
+                ((TextAttributes.TextInterface)e).setFontColor(c);
+            }
+        }
+        changed();
+    }
+    
+    @Override
+    public void setTextJustify(TextAttributes.HorizontalJustify j) {
+        for (ZElement e : elements) {
+            if (e instanceof TextAttributes.TextInterface) {
+                ((TextAttributes.TextInterface)e).setTextJustify(j);
+            }
+        }
+        changed();
+    }
+
+    @Override
+    public TextAttributes getTextAttributes() {
+        for (ZElement e : elements) {
+            if (e instanceof TextAttributes.TextInterface) {
+                return ((TextAttributes.TextInterface)e).getTextAttributes();
+            }
+        }
+        return null;  //none with text attributes
+    }
+    
+    /* ------------- SHADOW INTERFACE METHODS ---------------------- */
+
+    
+    @Override
+    public ShadowAttributes getShadowAttributes() {  //get the attributes of the first one, if any
+        for (ZElement e : elements) {
+            if (e instanceof ShadowAttributes.ShadowInterface) {
+                return ((ShadowAttributes.ShadowInterface)e).getShadowAttributes();
+            }
+        } 
+        return null;  //none with shadow attributes
+    }
+
+    @Override
+    public void setShadowAttributes(ShadowAttributes s) {
+        for (ZElement e : elements) {
+            if (e instanceof ShadowAttributes.ShadowInterface) {
+                ((ShadowAttributes.ShadowInterface)e).setShadowAttributes(s);
+            }
+        } 
+        changed();
+    }
+    
+    
+    
+    @Override
+    public void setEnabled(boolean en) {
+        for (ZElement e : elements) {
+            if (e instanceof ShadowAttributes.ShadowInterface) {
+                ((ShadowAttributes.ShadowInterface)e).setEnabled(en);
+            }
+        }
+        changed();
+    }
+    
+    @Override
+    public void setColor(Color c) {
+        for (ZElement e : elements) {
+            if (e instanceof ShadowAttributes.ShadowInterface) {
+                ((ShadowAttributes.ShadowInterface)e).setColor(c);
+            }
+        }
+        changed();
+    }
+
+    @Override
+    public void setRadius(int r) {
+        for (ZElement e : elements) {
+            if (e instanceof ShadowAttributes.ShadowInterface) {
+                ((ShadowAttributes.ShadowInterface)e).setRadius(r);
+            }
+        }
+        changed();    
+    }
+
+    @Override
+    public void setOpacity(float o) {
+        for (ZElement e : elements) {
+            if (e instanceof ShadowAttributes.ShadowInterface) {
+                ((ShadowAttributes.ShadowInterface)e).setOpacity(o);
+            }
+        }
+        changed();   
+    }
+
+    @Override
+    public void setXOffset(double x) {
+        for (ZElement e : elements) {
+            if (e instanceof ShadowAttributes.ShadowInterface) {
+                ((ShadowAttributes.ShadowInterface)e).setXOffset(x);
+            }
+        }
+        changed();  
+    }
+
+    @Override
+    public void setYOffset(double y) {
+        for (ZElement e : elements) {
+            if (e instanceof ShadowAttributes.ShadowInterface) {
+                ((ShadowAttributes.ShadowInterface)e).setYOffset(y);
+            }
+        }
+        changed();    
+    }
+
+    @Override
+    public void setSizeRatio(double s) {
+        for (ZElement e : elements) {
+            if (e instanceof ShadowAttributes.ShadowInterface) {
+                ((ShadowAttributes.ShadowInterface)e).setSizeRatio(s);
+            }
+        }
+        changed();   
+    }
+  
+    
     
 }

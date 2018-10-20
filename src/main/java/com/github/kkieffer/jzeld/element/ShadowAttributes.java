@@ -18,6 +18,43 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ShadowAttributes implements Serializable {
 
+    public interface ShadowInterface {
+        
+        public ShadowAttributes getShadowAttributes();
+        public void setShadowAttributes(ShadowAttributes s);    
+        
+        
+        default void setEnabled(boolean e) {
+            getShadowAttributes().setEnabled(e);
+        }
+    
+        default void setColor(Color c) {
+            getShadowAttributes().setColor(c);
+        }
+
+        default void setRadius(int r) {
+            getShadowAttributes().setRadius(r);     
+        }
+    
+        default void setOpacity(float o) {
+            getShadowAttributes().setOpacity(o);    
+        }
+    
+        default void setXOffset(double x) {
+            getShadowAttributes().setXOffset(x);    
+        }
+
+        default void setYOffset(double y) {
+            getShadowAttributes().setYOffset(y);    
+        }
+
+        default void setSizeRatio(double s) {
+            getShadowAttributes().setSizeRatio(s);    
+        }
+  
+    }
+    
+    
     private boolean enabled; //display the shadow, on or off
     
     private float opacity; //0.0 to 1.0
