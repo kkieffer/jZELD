@@ -18,7 +18,6 @@ import com.github.kkieffer.jzeld.element.TextAttributes;
 import com.github.kkieffer.jzeld.element.ZArc;
 import com.github.kkieffer.jzeld.element.ZArc.ArcType;
 import com.github.kkieffer.jzeld.element.ZCircle;
-import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZElement.StrokeStyle;
 import com.github.kkieffer.jzeld.element.ZEquilateralPolygon;
 import com.github.kkieffer.jzeld.element.ZGrid;

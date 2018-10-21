@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
@@ -439,7 +440,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     
      @Override
     public boolean supportsFlip() {
-        return false;
+        return true;
     }
     
     @Override
@@ -564,12 +565,21 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
          if (!isVisible())
             return;
          
+         AffineTransform af = g.getTransform();
+         if (flipHoriz || flipVert) {
+            AffineTransform scaleInstance = AffineTransform.getScaleInstance(flipHoriz ? -1.0 : 1.0, flipVert ? -1.0 : 1.0);  //scaling negative creates a mirror image the other direction
+            AffineTransform translateInstance = AffineTransform.getTranslateInstance(flipHoriz ? width : 0, flipVert ? height : 0);  //move back to where it was
+            g.transform(translateInstance);
+            g.transform(scaleInstance);
+         }
+         
         textWidget.setBorder(BorderFactory.createLineBorder(this.borderColor, (int)borderThickness, (borderStyle == StrokeStyle.ROUNDED)));
 
         textWidget.setSize(new Dimension((int)width, (int)height));
 
         textWidget.paint(g);  //paint the widget
             
+        g.setTransform(af);
     }
     
 

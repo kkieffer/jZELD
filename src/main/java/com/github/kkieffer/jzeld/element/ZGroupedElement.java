@@ -136,10 +136,9 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
         for (ZElement e : elements)
             group += e.getClass().getSimpleName() + "<br>";
         
-        return "<b>ZGroupedElement: A group of multiple elements that can be moved and transformed together.</b><br><br>The transformations " +
-                "are applied to the group as a whole, so if they are later ungrouped the elements will revert back to their original transforms. " +
-                "However, a ZGroupedElement has no intrinsic attributes such as fill color and line weight; applying those modifications change " +
-                "the individual elements and are retained after ungrouping.<br><br>" +
+        return "<b>ZGroupedElement: A group of multiple elements that are moved and transformed together.</b><br><br>Transformations " +
+                "are applied to the group as a whole, however, a ZGroupedElement has no intrinsic attributes such as fill color and line weight; applying those modifications change " +
+                "the individual elements and are retained after ungrouping. Note: transformations persist when elements are ungrouped with exception of shear.<br><br>" +
                 "This group contains the following elements: <br>" + group + "<br><br>" + super.getHtmlHelp();
    
     }
@@ -300,7 +299,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
 
     @Override
     public boolean supportsFlip() {
-        return false;
+        return true;
     }
     
     
@@ -346,6 +345,47 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
         } 
         regroup();
         super.changed();
+    }
+    
+    
+    @Override
+    public void flipHorizontal() {
+
+        Rectangle2D bounds = this.getBounds2D();
+
+        //Flip each element and reflect it across the group horizontal midpoint
+        for (ZElement e : this.elements) { 
+            
+            Point2D position = e.getPosition();
+
+            double relPositionX = position.getX() / bounds.getWidth();  //find relative position
+            relPositionX = (1.0 - relPositionX)*bounds.getWidth() - e.getBounds2D().getWidth(); //reflect about midpoint
+            e.reposition(relPositionX, position.getY()); //y is unchanged
+
+            e.flipHorizontal();
+           
+        }
+        
+    }
+    
+    @Override
+    public void flipVertical() {
+
+        Rectangle2D bounds = this.getBounds2D();
+
+        //Flip each element and reflect it across the group vertical midpoint
+        for (ZElement e : this.elements) { 
+            
+            Point2D position = e.getPosition();
+
+            double relPositionY = position.getY() / bounds.getHeight();  //find relative position
+            relPositionY = (1.0 - relPositionY)*bounds.getHeight() - e.getBounds2D().getHeight(); //reflect about midpoint
+            e.reposition(position.getX(), relPositionY); //x is unchanged
+
+            e.flipVertical();
+           
+        }
+        
     }
     
     
