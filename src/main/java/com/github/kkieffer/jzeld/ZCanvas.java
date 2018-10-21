@@ -1210,13 +1210,22 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (selectedElements.isEmpty() || passThruElement != null) 
             return;
 
+        int numGroups = 0;
+        Iterator<ZElement> it = selectedElements.iterator();
+        while (it.hasNext()) {   
+            if (it.next() instanceof ZGroupedElement)
+                numGroups++;
+        }
+        if (numGroups == 0) //nothing to ungroup
+            return;
+        
         undoStack.saveContext(fields.zElements);
 
         undoStack.suspendSave();  //don't push all the removed and restored element changes to the undo stack
 
         ArrayList<ZElement> restoredElements = new ArrayList<>();  //create a temporary list to hold all restored elements
 
-        Iterator<ZElement> it = selectedElements.iterator();
+        it = selectedElements.iterator();
         while (it.hasNext()) {
             
             ZElement e = it.next();
