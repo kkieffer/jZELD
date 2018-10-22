@@ -387,7 +387,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     }
     
     @Override
-    public final void setFont(Font f) {
+    public void setFont(Font f) {
         this.textAttributes.font = f;
         textWidget.setFont(f);
         validateSize();        
@@ -532,10 +532,10 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     }
 
     private void validateSize() {
-       
+    
         Rectangle2D bounds = this.getBounds2D();
         setSize(bounds.getWidth(), bounds.getHeight(), 0, 1); //validate size against text
-
+    
     }
     
     
