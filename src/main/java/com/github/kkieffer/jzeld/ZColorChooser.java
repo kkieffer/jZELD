@@ -15,7 +15,9 @@ import javax.swing.JDialog;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 
 /**
- *
+ * Singleton class that provides an upgrade to the JColorChooser to include the color history.  Uses reflection to access the color history swatch
+ * panel in the JColorChooser.  Class also maintains a bounded list of colors (when full, the oldest color is dropped). When selecting a color from
+ * the dialog, the color is added to the history.  Note that duplicate colors are never added to the history.
  * @author kkieffer
  */
 public class ZColorChooser {
@@ -23,25 +25,42 @@ public class ZColorChooser {
     private static final int MAX_HISTORY = 30;
     private static final LinkedList<Color> colorHistory = new LinkedList<>();
     
-    private ZColorChooser() {}
+    private ZColorChooser() {}  //no instantiation, all static
     
+    /**
+     * Retrieves the color history as an array
+     * @return array of colors, oldest color first
+     */
     public static Color[] getColorHistory() {
         Color[] array = new Color[colorHistory.size()];
         colorHistory.toArray(array);
         return array;
     }
     
+    /**
+     * Replaces the color history with the supplied array. Duplicate colors are not added to the history.
+     * @param history the color history, oldest color 
+     */
     public static void setColorHistory(Color[] history) {
         colorHistory.clear();
         addToColorHistory(history);
     }
     
+    /**
+     * Adds to the color history with the supplied array. Duplicate colors are not added to the history.
+     * @param history the color history, oldest color 
+     */
     public static void addToColorHistory(Color[] history) {
 
         if (history == null)
             return;
-        for (Color c : history)
-            colorHistory.addLast(c);
+        for (Color c : history) {
+            if (!colorHistory.contains(c))
+                colorHistory.addLast(c);
+        }
+        
+         while (colorHistory.size() > MAX_HISTORY)
+            colorHistory.removeFirst();
     }
     
     
@@ -63,7 +82,13 @@ public class ZColorChooser {
         }
     }
     
-    
+    /**
+     * Show the Color Chooser dialog. Selecting a Color and pressing "OK" will add the selected color to the color history.
+     * @param parent parent component
+     * @param title dialog title
+     * @param initialColor the initially selected color, if null, initial color will be set to WHITE
+     * @return the selected color, or null if "CANCEL" is pressed
+     */
     public static Color showDialog(Component parent, String title, Color initialColor) {
       
         //Create the chooser
@@ -107,10 +132,7 @@ public class ZColorChooser {
 
         Color c = ok.getColor();
         if (c != null)
-            colorHistory.addLast(c);
-        
-        while (colorHistory.size() > MAX_HISTORY)
-            colorHistory.removeFirst();
+            addToColorHistory(new Color[]{c});
         
         return ok.getColor();
     }
