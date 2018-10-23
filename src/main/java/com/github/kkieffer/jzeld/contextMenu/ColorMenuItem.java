@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.contextMenu;
 
 import com.github.kkieffer.jzeld.ZCanvas;
+import com.github.kkieffer.jzeld.ZColorChooser;
 import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -9,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JColorChooser;
 
 /**
  * Color Menu Item is a Menu item with a color wheel icon, that when selected brings up a color chooser panel.  It can be used for
@@ -54,7 +54,7 @@ public class ColorMenuItem extends AbstractContextMenu {
                 
                 
                 if (type != Type.CLEAR) {
-                    Color newColor = JColorChooser.showDialog(canvas, "Select " + type + " Color", oldColor);
+                    Color newColor = ZColorChooser.showDialog(canvas, "Select " + type + " Color", oldColor);
                     if (newColor == null)
                         return;
 
