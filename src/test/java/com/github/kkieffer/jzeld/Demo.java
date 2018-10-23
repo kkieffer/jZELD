@@ -18,6 +18,7 @@ import com.github.kkieffer.jzeld.element.TextAttributes;
 import com.github.kkieffer.jzeld.element.ZArc;
 import com.github.kkieffer.jzeld.element.ZArc.ArcType;
 import com.github.kkieffer.jzeld.element.ZCircle;
+import com.github.kkieffer.jzeld.element.ZEditableBoundedText;
 import com.github.kkieffer.jzeld.element.ZElement.StrokeStyle;
 import com.github.kkieffer.jzeld.element.ZEquilateralPolygon;
 import com.github.kkieffer.jzeld.element.ZGrid;
@@ -140,7 +141,7 @@ public class Demo extends javax.swing.JFrame {
         //Create some editable text
         Font f = new Font("SERIF", Font.BOLD, 22);
         TextAttributes t2 = new TextAttributes(HorizontalJustify.CENTER, f, Color.RED);
-        ZEditableText etxt = new ZEditableText(3.0, 6.0, .5, .5, 0.0, true, "MyEditableText", 0, Color.BLACK, Color.LIGHT_GRAY, StrokeStyle.SQUARE, t2);
+        ZEditableText etxt = new ZEditableBoundedText(3.0, 6.0, .5, .5, 0.0, true, "MyEditableText", 0, Color.BLACK, Color.LIGHT_GRAY, StrokeStyle.SQUARE, t2);
         c.addElement(etxt);
  
         c.enableUndoContextSave(true); //re-enable undo
