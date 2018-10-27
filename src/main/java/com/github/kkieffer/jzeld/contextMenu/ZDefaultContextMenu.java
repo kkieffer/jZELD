@@ -177,7 +177,7 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         deleteMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-               c.deleteSelected();
+               c.delete();
             }
         });
         

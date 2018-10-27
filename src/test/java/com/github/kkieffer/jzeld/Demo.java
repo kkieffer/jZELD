@@ -8,13 +8,28 @@ import com.github.kkieffer.jzeld.ZCanvas.Orientation;
 import com.github.kkieffer.jzeld.draw.FreeformDraw;
 import com.github.kkieffer.jzeld.draw.OrthogonalLineDraw;
 import com.github.kkieffer.jzeld.draw.StraightLineDraw;
-import com.github.kkieffer.jzeld.element.*;
+import com.github.kkieffer.jzeld.element.PaintAttributes;
 import com.github.kkieffer.jzeld.element.PaintAttributes.RadiusRelative;
+import com.github.kkieffer.jzeld.element.ShadowAttributes;
+import com.github.kkieffer.jzeld.element.ZCanvasRuler;
+import com.github.kkieffer.jzeld.element.ZEditableText;
 import com.github.kkieffer.jzeld.element.TextAttributes.HorizontalJustify;
+import com.github.kkieffer.jzeld.element.TextAttributes;
+import com.github.kkieffer.jzeld.element.ZArc;
 import com.github.kkieffer.jzeld.element.ZArc.ArcType;
+import com.github.kkieffer.jzeld.element.ZCircle;
+import com.github.kkieffer.jzeld.element.ZEditableBoundedText;
 import com.github.kkieffer.jzeld.element.ZElement.StrokeStyle;
+import com.github.kkieffer.jzeld.element.ZEquilateralPolygon;
+import com.github.kkieffer.jzeld.element.ZGrid;
+import com.github.kkieffer.jzeld.element.ZImage;
+import com.github.kkieffer.jzeld.element.ZLine;
+import com.github.kkieffer.jzeld.element.ZOval;
+import com.github.kkieffer.jzeld.element.ZQuadrilateral;
 import com.github.kkieffer.jzeld.element.ZQuadrilateral.QuadType;
-import com.github.kkieffer.jzeld.element.ZTriangle.TriType;
+import com.github.kkieffer.jzeld.element.ZRectangle;
+import com.github.kkieffer.jzeld.element.ZRightTriangle;
+import com.github.kkieffer.jzeld.element.ZRoundedRectangle;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -92,7 +107,7 @@ public class Demo extends javax.swing.JFrame {
         c.addElement(l);
         
         //Right triangle, yellow, big borders, immoveable
-        ZTriangle t = new ZTriangle(TriType.RIGHT, 1.0, 6.0, 1.0, 1.0, 0.0, true, true, false, 4, Color.BLACK, null, Color.YELLOW, StrokeStyle.SQUARE);
+        ZRightTriangle t = new ZRightTriangle(1.0, 6.0, 1.0, 1.0, 0.0, true, true, false, 4, Color.BLACK, null, Color.YELLOW, StrokeStyle.SQUARE);
         c.addElement(t);
         
         

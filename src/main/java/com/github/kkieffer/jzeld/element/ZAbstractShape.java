@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
- * An abstract shape, that has an outline and a fill color, dash pattern, stroke, paint and shadow attributes. 
+ * An abstract shape, that has an outline and a fill color
  * @author kkieffer
  */
 @XmlRootElement(name = "ZAbstractShape")
@@ -74,11 +74,6 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         String className = this.getClass().getSimpleName();
         return "<b>" + className + ": " + getShapeSummary() + "</b><br><br>" + getShapeDescription() + "<br><br>" + 
                 "Right-click on this element to set its attributes: line color and width, line dash pattern, and fill color.<br><br>" + super.getHtmlHelp();
-    }
-    
-    @Override
-    public boolean isMutable() {
-        return true;
     }
     
     /**

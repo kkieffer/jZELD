@@ -184,11 +184,6 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
     }
     
     @Override
-    public boolean isMutable() {
-        return true;
-    }
-    
-    @Override
     public boolean supportsEdit() {
         return false;
     };

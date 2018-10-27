@@ -230,10 +230,6 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         
     }
 
-    @Override
-    public boolean isMutable() {
-        return true;
-    }
     
     @Override
     public void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor, StrokeStyle outlineStyle) {

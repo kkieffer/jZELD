@@ -61,11 +61,6 @@ public final class ZCanvasRuler extends ZRectangle {
     
     
     @Override
-    public boolean isMutable() {
-        return false;
-    }
-    
-    @Override
     public void paint(Graphics2D g, double unitSize, double width, double height) {
         if (!isVisible())
             return;

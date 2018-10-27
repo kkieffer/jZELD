@@ -54,7 +54,7 @@ public class ZDefaultCanvasHotkeys {
         am.put("Delete", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                c.deleteSelected();
+                c.delete();
             }
         });      
        

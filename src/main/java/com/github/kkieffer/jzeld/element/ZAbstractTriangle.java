@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * A ZTriangle is a right or isoceles triangle with a border (that has color and thickness) and an interior color.  The 
+ * A ZAbstractTriangle is a right or isoceles triangle with a border (that has color and thickness) and an interior color.  The 
  * right triangle's top left corner is set within the bounds box such the top left corner of the triangle is at the object's position.  If rotated,
  * the rotation occurs about the center of the triangle.  The isoceles triangle has the point with the non-unique angle at the top center.
  * 
@@ -23,23 +23,22 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  * @author kkieffer
  */
-@XmlRootElement(name = "ZTriangle")
+@XmlRootElement(name = "ZAbstractTriangle")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ZTriangle extends ZPolygon {
-
+public abstract class ZAbstractTriangle extends ZPolygon {
 
     public enum TriType {RIGHT, ISOCELES}
     
     protected TriType type;
        
-    protected ZTriangle() {}
+    protected ZAbstractTriangle() {}
     
-    public ZTriangle(TriType t, double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, StrokeStyle borderStyle) {
+    protected ZAbstractTriangle(TriType t, double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, StrokeStyle borderStyle) {
         super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor, borderStyle);
         type = t;
     }
     
-    protected ZTriangle(ZTriangle copy, boolean forNew) {
+    protected ZAbstractTriangle(ZAbstractTriangle copy, boolean forNew) {
         super(copy, forNew);
         this.type = copy.type;
     }
@@ -53,17 +52,6 @@ public class ZTriangle extends ZPolygon {
     @Override
     protected String getShapeDescription() {
         return "";     
-    }
-    
-    @Override
-    public ZElement copyOf(boolean forNew) {
-        return new ZTriangle(this, forNew);
-    }
-
-
-    @Override
-    public boolean supportsEdit() {
-        return false;
     }
     
     

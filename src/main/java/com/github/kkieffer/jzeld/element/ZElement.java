@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "ZElement")
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ZElement implements Serializable {
- 
+    
     public enum StrokeStyle {ROUNDED(CAP_ROUND, JOIN_ROUND), 
                              SQUARE(CAP_BUTT, JOIN_MITER);
     
@@ -322,30 +322,15 @@ public abstract class ZElement implements Serializable {
         return resizable;
     }
     
-    /**
-     * True if the element can be moved about the canvas
-     * @return 
-     */
     public boolean isMoveable() {
         return canMove;
     }
-    
-    /**
-     * True if the element is mutable. A mutable object can be copied, deleted, grouped, and joined other elements. 
-     * Note that size, rotation, transformations, and positions have their own controls and aren't affected by this.
-     * @return 
-     */
-    public abstract boolean isMutable();
-   
     
     public void setMoveable(boolean move) {
         canMove = move;
     }
     
-    /**
-     * True if the element is visible on the canvas
-     * @return 
-     */
+    
     public boolean isVisible() {
         return visible;
     }
