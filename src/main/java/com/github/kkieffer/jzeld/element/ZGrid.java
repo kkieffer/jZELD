@@ -45,7 +45,10 @@ public final class ZGrid extends ZLine {
         return this;
     }
     
-
+    @Override
+    public boolean isMutable() {
+        return false;
+    }
     
     @Override
     protected void drawShape(Graphics2D g, double unitSize, double width, double height) {

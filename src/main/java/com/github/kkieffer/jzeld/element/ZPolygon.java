@@ -31,12 +31,11 @@ public abstract class ZPolygon extends ZAbstractShape {
     public ZPolygon(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, StrokeStyle borderStyle) {
         super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor, borderStyle);
     }
-    
+
     @Override
     public boolean supportsFlip() {
         return true;
     }
-    //protected abstract Path2D getPath2D(double width, double height); 
     
     @Override
     protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
