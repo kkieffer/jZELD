@@ -493,6 +493,26 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
+     * Cleanup the canvas, removing all elements.  Typically used when loading a new canvas or clearing out a canvas to be reused.
+     */
+    public void clearAll() {
+        
+        //Tell all they were removed (use array to avoid elements deleting other elements (concurrent mod issues)
+        ZElement[] elements = new ZElement[fields.zElements.size()];
+        fields.zElements.toArray(elements);
+        
+        fields.zElements.clear();
+
+        for (ZElement e : elements) 
+            e.removedFrom(this);
+        
+        uuidMap.clear();
+        repaint();
+ 
+    }
+    
+    
+    /**
      * Places the popup frame (container) to the right of the canvas's frame
      * @param c 
      */
@@ -905,7 +925,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private void restoreContext(LinkedList<ZElement> restoreContext) {
         if (restoreContext != null) {
             
-            deleteAll();
+            clearAll();  //clear out all elements
           
             fields.zElements = restoreContext;  //replace all the elements
 
@@ -1177,6 +1197,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public void groupSelectedElements() {
         
         ArrayList<ZElement> selectedElements = getSelectedElements();
+        Iterator<ZElement> it = selectedElements.iterator();
+        while (it.hasNext()) {  //remove any unmutable objects
+            if (!it.next().isMutable())
+                it.remove();
+        }
 
         if (selectedElements.size() <= 1 || passThruElement != null) 
             return;
@@ -1270,6 +1295,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public int combineSelectedElements(CombineOperation operation) {
                 
         ArrayList<ZElement> selectedElements = getSelectedElements();
+        Iterator<ZElement> it = selectedElements.iterator();
+        while (it.hasNext()) {  //remove any unmutable objects
+            if (!it.next().isMutable())
+                it.remove();
+        }
 
         if (selectedElements.size() <= 1 || passThruElement != null) 
             return 0;
@@ -1693,6 +1723,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public ZElement[] copy() {
 
         ArrayList<ZElement> selectedElements = getSelectedElements();
+        Iterator<ZElement> it = selectedElements.iterator();
+        while (it.hasNext()) {  //remove any unmutable objects
+            if (!it.next().isMutable())
+                it.remove();
+        }
+        
         if (selectedElements.size() > 0) {
             
             clipboard = new LinkedList<>();
@@ -1717,7 +1753,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public ZElement[] cut() {
         ZElement[] copied = copy();
         if (copied != null) {
-            delete();
+            deleteSelected();
             return copied;
         }
         else
@@ -1764,44 +1800,25 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         repaint();  
     }
     
-    public void deleteAllElements() {
-        undoStack.saveContext(fields.zElements);
-        deleteAll();
-    }
-    
-    /**
-     * Delete all elements on the canvas
-     */
-    private void deleteAll() {
-        
-        //Tell all they were removed (use array to avoid elements deleting other elements (concurrent mod issues)
-        ZElement[] elements = new ZElement[fields.zElements.size()];
-        fields.zElements.toArray(elements);
-        
-        fields.zElements.clear();
-
-        for (ZElement e : elements) 
-            e.removedFrom(this);
-        
-        uuidMap.clear();
-        repaint();
  
-    }
-    
-    
     /**
      * Deletes the selected elements. Does nothing if no element is selected or control is
      * currently with an element.
      */
-     public void delete() {
+     public void deleteSelected() {
         ArrayList<ZElement> selectedElements = getSelectedElements();
+        Iterator<ZElement> it = selectedElements.iterator();
+        while (it.hasNext()) {  //remove any unmutable objects
+            if (!it.next().isMutable())
+                it.remove();
+        }
 
         if (selectedElements.isEmpty() && passThruElement != null)
             return;
 
         undoStack.saveContext(fields.zElements);
 
-        Iterator<ZElement> it = selectedElements.iterator();
+        it = selectedElements.iterator();
         while (it.hasNext()) {
             ZElement e = it.next();
             fields.zElements.remove(e);
@@ -2198,8 +2215,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 
                 if (!o.isSelected()) {  //newly selected element
                     
-                    if (!shiftPressed)
-                        selectNone();  //no shift, so clear all others
+                    if (!shiftPressed && hasSelectedElements()) //no shift, so clear all others
+                        selectNone();  
                         
                     o.select();
                     repaint();
