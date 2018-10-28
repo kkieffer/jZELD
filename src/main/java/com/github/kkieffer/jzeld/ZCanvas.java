@@ -2678,16 +2678,22 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
-     * Print the canvas to a supplied Graphics2D context, the margins and grid are hidden
+     * Print the canvas to a supplied Graphics2D context, the margins, canvas rulers, and grid are hidden
      * @param g the context to draw on
      */
     public void paintToGraphicsContext(Graphics2D g) {
         
-        //Hide margins and grid
+        //Hide margins, ruler, and grid
         boolean marginsOn = areMarginsOn();
         marginsOn(false);
         ZGrid savedGrid = fields.grid; //save grid
+        ZCanvasRuler horizontalRuler = fields.horizontalRuler;
+        ZCanvasRuler verticalRuler = fields.verticalRuler;
+        
         setGrid(null);
+        setHorizontalRuler(null);
+        setVerticalRuler(null);
+        
         
         drawOff();
         resetView();
@@ -2706,9 +2712,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         printOn = false;
         
         
-        //Restore margins and grid
+        //Restore margins, ruler and grid
         marginsOn(marginsOn);
         setGrid(savedGrid);
+        setHorizontalRuler(horizontalRuler);
+        setVerticalRuler(verticalRuler);
+                
     }
     
     /**

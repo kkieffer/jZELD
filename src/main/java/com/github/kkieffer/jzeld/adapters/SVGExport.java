@@ -51,7 +51,7 @@ public class SVGExport {
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
-        // Ask the test to render into the SVG Graphics2D implementation.
+        // Ask the canvas to render into the SVG Graphics2D implementation.
         c.paintToGraphicsContext(g2d);
         
 
