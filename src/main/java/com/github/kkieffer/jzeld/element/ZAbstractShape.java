@@ -11,6 +11,8 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.FlatteningPathIterator;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -273,6 +275,117 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         return s;
     }
     
+    
+    private double integrate(Area a, double resolution) {
+
+        double area = 0.0;
+        
+        Rectangle2D bounds = a.getBounds2D();
+        if (bounds.getWidth() <= 0 || bounds.getHeight() <= 0)
+            return 0.0;
+        
+        //Create a vertical slice
+        Rectangle2D intersect = new Rectangle2D.Double(bounds.getX(), bounds.getY(), resolution, bounds.getHeight());
+        
+        //Integrate over the area
+        do {
+            Area piece = new Area(intersect);
+            piece.intersect(new Area(a)); //intersect with the slice
+            
+            Rectangle2D pieceBounds = piece.getBounds2D();
+            area += pieceBounds.getWidth() * pieceBounds.getHeight();
+          
+  
+            intersect = new Rectangle2D.Double(intersect.getX() + resolution, intersect.getY(), resolution, intersect.getHeight());
+      
+        } while (intersect.getX() < bounds.getX() + bounds.getWidth());
+        
+        return area;
+    }
+    
+    public interface ComputeProgress {
+        void progress(float percent);
+    }
+    
+    /**
+     * Compute the area of the shape using double-piecewise integration
+     * @param resolution the thickness of the integration slice, smaller numbers are more accurate but take longer
+     * @return the area, in square units
+     */
+    public final double computeArea(double resolution) {
+        
+        double area = 0.0;
+        
+        Area a = new Area(getShape());
+      
+        Rectangle2D bounds = a.getBounds2D();
+        if (bounds.getWidth() <= 0 || bounds.getHeight() <= 0)
+            return 0.0;
+        
+        //Create a horizontal slice
+        Rectangle2D intersect = new Rectangle2D.Double(bounds.getX(), bounds.getY(), bounds.getWidth(), resolution);
+        
+        //Intersect shape with the horizontal slice
+        do {
+            Area piece = new Area(intersect);
+            piece.intersect(new Area(a));
+            
+            area += integrate(piece, resolution);  //do vertical slice integration
+            
+            intersect = new Rectangle2D.Double(intersect.getX(), intersect.getY() + resolution, intersect.getWidth(), resolution);
+                
+        } while (intersect.getY() < bounds.getY() + bounds.getHeight());
+        
+        return area;
+        
+    }
+    
+    /**
+     * Compute the perimeter of the shape, approximating curve lengths
+     * @param resolution max distance from any point on to curve control point, smaller numbers are more accurate but take longer
+     * @return perimeter in units
+     */
+    public final double computePerimeter(double resolution) {
+        
+        double perimeter = 0.0;
+        
+        Shape shape = getShape();
+        
+        PathIterator it = new FlatteningPathIterator(shape.getPathIterator(null), resolution, 1024);
+                
+        float points[] = new float[6];
+        float lastX = 0, lastY = 0;
+        float thisX, thisY;
+
+        while (!it.isDone()) {
+            
+            switch (it.currentSegment(points)) {
+                
+                case PathIterator.SEG_MOVETO:
+                    lastX = points[0];
+                    lastY = points[1];             
+                    break;
+
+                case PathIterator.SEG_CLOSE:
+                    points[0] = lastX;
+                    points[1] = lastY;
+                    // Fall into....
+
+                case PathIterator.SEG_LINETO:
+                    thisX = points[0];
+                    thisY = points[1];
+                    float dx = thisX-lastX;
+                    float dy = thisY-lastY;
+                    perimeter += (float)Math.sqrt( dx*dx + dy*dy );
+                    lastX = thisX;
+                    lastY = thisY;
+                    break;
+            }
+            it.next();
+        }
+        return perimeter;
+
+    }
     
     
     /**
