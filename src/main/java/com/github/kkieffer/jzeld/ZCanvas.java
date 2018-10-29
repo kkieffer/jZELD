@@ -145,9 +145,31 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         @Override
         public String toString() {
-            String[] split = this.name().split("_");
-          
-            return split[0] + " " + (split.length > 1 ? split[1] : "");
+            return this.name().replace("_", " ");
+        }
+        
+        public String getHtmlHelp() {     
+            
+            switch (this) {
+                case Auto:
+                    return "Align element centers, either horizontally or vertically, whichever minimizes the movement.";
+                case Left_Edge:
+                    return "Aligns element left edges at the same horizontal (X) position";
+                case Top_Edge:
+                    return "Aligns element top edges at the same vertical (Y) position";
+                case Right_Edge:
+                    return "Aligns element right edges at the same horizontal (X) position";
+                case Bottom_Edge:
+                    return "Aligns element bottom edges at the same vertical (Y) position";
+                case Centered_Vertically:
+                    return "Centers the elements along a vertical (Y) axis";
+                case Centered_Horizontally:
+                    return "Centers the elements along a horizontal (X) axis";
+                case Centered_Both:
+                    return "Centers the elements to the same point";
+                default:
+                    throw new RuntimeException("Unhandled Align case");
+            }
         }
     
     }
@@ -972,7 +994,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
     }
     
-    public void resetShear(Boolean horiz) {
+    public void clearShear() {
+        setShear(true, 0.0);
+        setShear(false, 0.0);
+        setLastMethod("clearShear");
+
+    }
+    
+    public void setShear(Boolean horiz, Double ratio) {
         ArrayList<ZElement> selectedElements = getSelectedElements();
         
         if (selectedElements.isEmpty() || passThruElement != null) 
@@ -982,12 +1011,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         for (ZElement e : selectedElements) {
             if (horiz)
-                e.setShearX(0.0);
+                e.setShearX(ratio);
             else
-                e.setShearY(0.0);
+                e.setShearY(ratio);
         }
         
-        setLastMethod("resetShear", horiz);
+        setLastMethod("setShear", horiz, ratio);
         repaint();     
 
     }

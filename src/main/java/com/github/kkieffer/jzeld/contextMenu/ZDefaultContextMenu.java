@@ -8,11 +8,13 @@ import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.Component;
 import java.awt.Font;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 /**
@@ -22,10 +24,13 @@ import javax.swing.UIManager;
  */
 public class ZDefaultContextMenu implements ZCanvasContextMenu {
     
+    public static final ImageIcon shearIcon = new ImageIcon(ZCanvas.class.getResource("/shear.png")); 
+
+    
     protected JMenu rotateMenu;
     protected JMenuItem rotateCWMenuItem;
     protected JMenuItem rotateCCWMenuItem;
-    protected JMenu arrangeMenu;
+    protected JMenu orderMenu;
     protected JMenuItem sendToBackMenuItem;
     protected JMenuItem bringToFrontMenuItem;
     protected JMenuItem sendBackwardsMenuItem;
@@ -44,15 +49,17 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
     protected ColorMenuItem fillColorMenuItem;
     protected ColorMenuItem lineColorMenuItem;
     protected JMenu alignMenu;
+    protected JMenu flipMenu;
     protected JPopupMenu contextPopupMenu;
     protected final JMenu combineMenu;
-    protected final JMenuItem resetVerticalShearMenuItem;
-    protected final JMenuItem resetHorizontalShearMenuItem;
+    protected final JMenuItem clearShearMenuItem;
     protected final JMenu shearMenu;
     protected final ColorMenuItem removeFillMenuItem;
+    private final JMenuItem setHorizontalShearMenuItem;
+    private final JMenuItem setVerticalShearMenuItem;
     
     
-    public ZDefaultContextMenu(ZCanvas c) {
+    public ZDefaultContextMenu(ZCanvas canvas) {
         
         Font f = new Font("sans-serif", Font.PLAIN, 14);
         UIManager.put("Menu.font", f);
@@ -75,34 +82,39 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         rotateMenu.add(rotateCCWMenuItem);
         
         shearMenu = new JMenu("Shear");
-        resetHorizontalShearMenuItem = new JMenuItem("Reset Horizontal Shear");
-        resetVerticalShearMenuItem = new JMenuItem("Reset Vertical Shear");
-        shearMenu.add(resetHorizontalShearMenuItem);
-        shearMenu.add(resetVerticalShearMenuItem);
+        setHorizontalShearMenuItem = new JMenuItem("Set Horizontal Shear");
+        setVerticalShearMenuItem = new JMenuItem("Set Vertical Shear");
+        clearShearMenuItem = new JMenuItem("Zero Shear Values");
+        shearMenu.add(setHorizontalShearMenuItem);
+        shearMenu.add(setVerticalShearMenuItem);
+        shearMenu.add(clearShearMenuItem);
         
-        arrangeMenu = new JMenu("Arrange");
+        orderMenu = new JMenu("Order");
         sendToBackMenuItem = new JMenuItem("Send to Back");
         sendBackwardsMenuItem = new JMenuItem("Send Backward");
         bringToFrontMenuItem = new JMenuItem("Bring to Front");
         bringForwardsMenuItem = new JMenuItem("Bring Forward");
-        flipHorizMenuItem = new JMenuItem("Flip Horizontal");
-        flipVertMenuItem = new JMenuItem("Flip Vertical");
+       
         
-        arrangeMenu.add(sendToBackMenuItem);
-        arrangeMenu.add(sendBackwardsMenuItem);
-        arrangeMenu.add(bringToFrontMenuItem);
-        arrangeMenu.add(bringForwardsMenuItem);
-        arrangeMenu.addSeparator();
-        arrangeMenu.add(flipHorizMenuItem);
-        arrangeMenu.add(flipVertMenuItem);
+        orderMenu.add(sendToBackMenuItem);
+        orderMenu.add(sendBackwardsMenuItem);
+        orderMenu.add(bringToFrontMenuItem);
+        orderMenu.add(bringForwardsMenuItem);
+               
+        flipMenu = new JMenu("Flip");
+        flipHorizMenuItem = new JMenuItem("Horizontal");
+        flipVertMenuItem = new JMenuItem("Vertical");
+        flipMenu.add(flipHorizMenuItem);
+        flipMenu.add(flipVertMenuItem);
         
         alignMenu = new JMenu("Align");
         for (ZCanvas.Alignment a : ZCanvas.Alignment.values()) {
             JMenuItem m = new JMenuItem(a.toString());
+            m.setName(a.name());
             m.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                   c.align(a);
+                   canvas.align(a);
                 }
             });
             alignMenu.add(m);
@@ -116,17 +128,17 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
             m.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    int numSel = c.getSelectedElementsArray().length;
-                    int combined = c.combineSelectedElements(g);
+                    int numSel = canvas.getSelectedElementsArray().length;
+                    int combined = canvas.combineSelectedElements(g);
                 
                     if (combined < 0)
-                        JOptionPane.showMessageDialog(c, "Combine operation resulted in a shape with no area", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);
+                        JOptionPane.showMessageDialog(canvas, "Combine operation resulted in a shape with no area", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);
 
                     else if (numSel != combined) {
                         if (combined == 0)
-                            JOptionPane.showMessageDialog(c, "No elements combined.\nOther selected elements are not shapes and cannot be combined. ", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);                         
+                            JOptionPane.showMessageDialog(canvas, "No elements combined.\nOther selected elements are not shapes and cannot be combined. ", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);                         
                         else
-                            JOptionPane.showMessageDialog(c, "Only " + combined + " elements combined.\nOther selected elements are not shapes and cannot be combined. ", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);
+                            JOptionPane.showMessageDialog(canvas, "Only " + combined + " elements combined.\nOther selected elements are not shapes and cannot be combined. ", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);
                     }
                 }
             });
@@ -136,16 +148,16 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         
                 
         attributesMenu = new JMenu("Attributes");
-        lineWeightMenu = new LineBorderMenu("Line Weight", c, LineBorderMenu.Type.WEIGHT);
-        lineDashMenu = new LineBorderMenu("Dash Pattern", c, LineBorderMenu.Type.DASH);
-        lineStyleMenu = new LineStyleMenu("Line Style", c);
+        lineWeightMenu = new LineBorderMenu("Line Weight", canvas, LineBorderMenu.Type.WEIGHT);
+        lineDashMenu = new LineBorderMenu("Dash Pattern", canvas, LineBorderMenu.Type.DASH);
+        lineStyleMenu = new LineStyleMenu("Line Style", canvas);
         colorMenu = new JMenu("Color");
-        lineColorMenuItem = new ColorMenuItem("Line Color", c, ColorMenuItem.Type.LINE);
+        lineColorMenuItem = new ColorMenuItem("Line Color", canvas, ColorMenuItem.Type.LINE);
         colorMenu.add(lineColorMenuItem);
-        fillColorMenuItem = new ColorMenuItem("Fill Color", c, ColorMenuItem.Type.FILL);
+        fillColorMenuItem = new ColorMenuItem("Fill Color", canvas, ColorMenuItem.Type.FILL);
         colorMenu.add(fillColorMenuItem);
 
-        removeFillMenuItem = new ColorMenuItem("Remove Fill Color", c, ColorMenuItem.Type.CLEAR);
+        removeFillMenuItem = new ColorMenuItem("Remove Fill Color", canvas, ColorMenuItem.Type.CLEAR);
         colorMenu.add(removeFillMenuItem);
         
         attributesMenu.add(lineWeightMenu);
@@ -156,7 +168,8 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         contextPopupMenu.add(editMenu);
         contextPopupMenu.add(rotateMenu);
         contextPopupMenu.add(shearMenu);
-        contextPopupMenu.add(arrangeMenu);
+        contextPopupMenu.add(orderMenu);
+        contextPopupMenu.add(flipMenu);
         contextPopupMenu.add(attributesMenu);
         contextPopupMenu.add(new JSeparator());
         contextPopupMenu.add(combineMenu);
@@ -165,98 +178,136 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         copyMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-               c.copy();
+               canvas.copy();
             }
         });
         pasteMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-               c.paste();
+               canvas.paste();
             }
         });
         deleteMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-               c.deleteSelected();
+               canvas.deleteSelected();
             }
         });
         
         rotateCWMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                c.rotate90CW();
+                canvas.rotate90CW();
             }
         });
         
         rotateCCWMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                c.rotate90CCW();
+                canvas.rotate90CCW();
             }
         });  
         
         sendToBackMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                c.moveToBack();
+                canvas.moveToBack();
             }
         }); 
         
         sendBackwardsMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                c.moveBackward();
+                canvas.moveBackward();
             }
         }); 
         
         bringToFrontMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                c.moveToFront();
+                canvas.moveToFront();
             }
         }); 
         
         bringForwardsMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                c.moveForward();
+                canvas.moveForward();
             }
         }); 
         
         flipHorizMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                c.flip(true);
+                canvas.flip(true);
             }
         }); 
         
         flipVertMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                c.flip(false);
+                canvas.flip(false);
             }
         }); 
-        
-        resetHorizontalShearMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                c.resetShear(true);
-            }
-        });
-        resetVerticalShearMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                c.resetShear(false);
-            }
-        });
+         
         removeFillMenuItem.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                c.removeFill();
+                canvas.removeFill();
             }
         });
         
         
+        clearShearMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                canvas.clearShear();
+            }
+        });
+       
+        this.setHorizontalShearMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                Component parent = SwingUtilities.getRoot(canvas);
+
+                ZElement e = canvas.getLastSelectedElement();
+                
+                //Prompt for new radius, and prefill the old radius (scaled by the current unit)
+                String rc = (String)JOptionPane.showInputDialog(parent, "Horizontal Shear Ratio", "Modify Horizontal Shear", JOptionPane.QUESTION_MESSAGE, shearIcon,
+                                                        (Object[])null, (Object)String.valueOf(e.getShearX()));
+                if (rc != null) {
+                    try {
+                         canvas.setShear(true, Double.parseDouble(rc)); 
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(canvas, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
+                    }
+                }
+
+            }
+        });
+        
+        this.setVerticalShearMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                Component parent = SwingUtilities.getRoot(canvas);
+      
+                ZElement e = canvas.getLastSelectedElement();
+                
+                //Prompt for new radius, and prefill the old radius (scaled by the current unit)
+                String rc = (String)JOptionPane.showInputDialog(parent, "Vertical Shear Ratio", "Modify clearShearMenuItem Shear", JOptionPane.QUESTION_MESSAGE, shearIcon,
+                                                        (Object[])null, (Object)String.valueOf(e.getShearY()));
+                if (rc != null) {
+                    try {
+                         canvas.setShear(false, Double.parseDouble(rc));
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(canvas, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
+                    }
+                }
+
+            }
+        });
                 
     }
 
