@@ -878,10 +878,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
-     * Zooms out, as far as 1:1 
+     * Zooms out, as far as 1:1.5 
      */
     public void zoomOut() {
-        if (fields.zoom > 1.0)
+        if (fields.zoom > 0.75)
             fields.zoom -= .25;
         
         updatePreferredSize();
