@@ -1887,14 +1887,20 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 g2d.draw(new Rectangle2D.Double(-margin, -margin, r.getWidth()+margin*2, r.getHeight()+margin*2)); 
  
                 g2d.setColor(Color.WHITE);
-                g2d.draw(new Rectangle2D.Double(-margin-1, -margin-1, 2+r.getWidth()+margin*2, 2+r.getHeight()+margin*2)); 
+                margin+=pixScale/fields.zoom;
+                g2d.draw(new Rectangle2D.Double(-margin, -margin, r.getWidth()+margin*2, r.getHeight()+margin*2)); 
                 
                 //draw drag box in the corner, if resizable and the 
                 if (o.isResizable() && passThruElement == null) {  
-                    g2d.setColor(Color.BLACK);  
                     double dragBoxWidth = DRAG_BOX_SIZE * pixScale/fields.zoom;
-                    if (dragBoxWidth*2 < r.getWidth() || dragBoxWidth*2 < r.getHeight()) //dont' draw drag box if shape is too small
-                        g2d.fill(new Rectangle2D.Double(r.getWidth()-dragBoxWidth, r.getHeight()-dragBoxWidth, dragBoxWidth, dragBoxWidth));
+                    if (dragBoxWidth*2 < r.getWidth() || dragBoxWidth*2 < r.getHeight()) { //dont' draw drag box if shape is too small
+                        Rectangle2D box = new Rectangle2D.Double(r.getWidth()-dragBoxWidth, r.getHeight()-dragBoxWidth, dragBoxWidth, dragBoxWidth);
+                        g2d.setStroke(new BasicStroke(1.0f * pixScale/(float)fields.zoom));
+                        g2d.setColor(Color.BLACK);  
+                        g2d.fill(box);
+                        g2d.setColor(Color.WHITE);  
+                        g2d.draw(box);                      
+                    }
                 }
                                
             }
