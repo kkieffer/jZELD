@@ -432,10 +432,18 @@ public abstract class ZElement implements Serializable {
      * Reposition top left corner of the element 
      * @param x position in units
      * @param y position in units
+     * @param xLimit the furthest x
+     * @param yLimit the furthest y
      */
-    public void reposition(double x, double y) {
+    public void reposition(double x, double y, double xLimit, double yLimit) {
         
         if (!canMove)
+            return;
+        
+        if (x + bounds.width <= 0 || y + bounds.height <= 0)  //too far left or top
+            return;
+        
+        if (x >= xLimit || y >= yLimit) //too far right or bottom
             return;
         
         position.x = x;
@@ -456,10 +464,10 @@ public abstract class ZElement implements Serializable {
         if (!canMove)
             return;
         
-        if (position.x + x < xLimit && position.x + x + bounds.width > 0)   
+        if (position.x + x <= xLimit && position.x + x + bounds.width >= 0)   
             position.x += x;
         
-        if (position.y + y < yLimit && position.y + y + bounds.height > 0)
+        if (position.y + y <= yLimit && position.y + y + bounds.height >= 0)
             position.y += y;
     
         hasChanges = true;

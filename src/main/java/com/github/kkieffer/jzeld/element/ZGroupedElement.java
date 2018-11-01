@@ -365,7 +365,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
 
             double relPositionX = position.getX() / bounds.getWidth();  //find relative position
             relPositionX = (1.0 - relPositionX)*bounds.getWidth() - e.getBounds2D().getWidth(); //reflect about midpoint
-            e.reposition(relPositionX, position.getY()); //y is unchanged
+            e.reposition(relPositionX, position.getY(), Double.MAX_VALUE, Double.MAX_VALUE); //y is unchanged
 
             e.flipHorizontal();
            
@@ -385,7 +385,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
 
             double relPositionY = position.getY() / bounds.getHeight();  //find relative position
             relPositionY = (1.0 - relPositionY)*bounds.getHeight() - e.getBounds2D().getHeight(); //reflect about midpoint
-            e.reposition(position.getX(), relPositionY); //x is unchanged
+            e.reposition(position.getX(), relPositionY, Double.MAX_VALUE, Double.MAX_VALUE); //x is unchanged
 
             e.flipVertical();
            
@@ -414,7 +414,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
             double relPositionY = position.getY() / bounds.getHeight();
             double newX = relPositionX * w;
             double newY = relPositionY * h;
-            e.reposition(newX/scale, newY/scale);
+            e.reposition(newX/scale, newY/scale, Double.MAX_VALUE, Double.MAX_VALUE);
         }
         
         super.setSize(w, h, minSize, scale);
