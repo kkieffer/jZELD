@@ -256,7 +256,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     private final float[] dashedBorder = new float[]{0.0f, pixScale*5.0f, pixScale*5.0f};
     private final float[] altDashedBorder = new float[]{pixScale*5.0f};
-    private final float[] whiteBorder = new float[]{0.0f, pixScale*10.0f};
 
     private final int DRAG_BOX_SIZE = (int)(10 * pixScale);
     
@@ -409,13 +408,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         am.put("Plus", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                zoomIn();
+                if (passThruElement == null)  //don't zoom if another element is pass thru (might be using the keyboard)
+                    zoomIn();
             }
         });
         am.put("Minus", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                zoomOut();
+                if (passThruElement == null)  //don't zoom if another element is pass thru (might be using the keyboard)
+                    zoomOut();
             }
         });
         am.put("ShiftPressed", new AbstractAction(){

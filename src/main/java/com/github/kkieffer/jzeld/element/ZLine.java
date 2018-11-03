@@ -46,10 +46,10 @@ public class ZLine extends ZPolygon {
         super(x, y, width, MIN_SHAPE_DIMENSION, rotation, canSelect, canResize, canMove, lineThickness, lineColor, dashPattern, null, borderStyle);                     
 
         if (lineColor == null)
-            throw new IllegalArgumentException("Line color cannot be null");
+            setOutlineColor(Color.BLACK);
         
         if (lineThickness <= 0)
-            throw new IllegalArgumentException("Line thickness must be positive");
+            this.setOutlineWidth(1.0f);
   
     }
     
