@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.UnitMeasure;
+import com.github.kkieffer.jzeld.ZCanvas;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
@@ -21,7 +22,9 @@ public final class ZGrid extends ZLine {
 
     private UnitMeasure unit;
     private int majorTickStep;
-
+    private float outlineWidth = 0.5f;
+    
+    private transient ZCanvas canvas;
     
     protected ZGrid() {}
     
@@ -37,6 +40,7 @@ public final class ZGrid extends ZLine {
         super(0, 0, -1, 0.0, false, true, false, thickness, color, dashPattern, StrokeStyle.SQUARE);
         this.unit = unit;
         this.majorTickStep = majorTickStep;
+        this.outlineWidth = thickness;
         setSize(-1, -1, -1, 1);
     }
     
@@ -46,6 +50,12 @@ public final class ZGrid extends ZLine {
     }
     
 
+    
+    @Override
+    public void paint(Graphics2D g, double unitSize, double width, double height) {
+        setOutlineWidth(outlineWidth/(float)canvas.getZoomFactor());
+        super.paint(g, unitSize, width, height);
+    }
     
     @Override
     protected void drawShape(Graphics2D g, double unitSize, double width, double height) {
@@ -64,8 +74,16 @@ public final class ZGrid extends ZLine {
             g.draw(new Line2D.Double(0, jnc, width, jnc)); 
         }
     }
+
+    @Override
+    public void addedTo(ZCanvas c) {
+        canvas = c;
+    }
     
+    @Override
+    public void removedFrom(ZCanvas c) {
+        canvas = null;
+    }
     
-    
-  
+   
 }

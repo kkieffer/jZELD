@@ -8,6 +8,7 @@ import com.github.kkieffer.jzeld.adapters.JAXBAdapter.FontAdapter;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.PointAdapter;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.Rectangle2DAdapter;
 import com.github.kkieffer.jzeld.draw.DrawClient;
+import com.github.kkieffer.jzeld.element.PaintAttributes;
 import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZAbstractShape;
 import com.github.kkieffer.jzeld.element.ZCanvasRuler;
@@ -662,11 +663,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param g the grid to use, or null to remove
      */
     public void setGrid(ZGrid g) {
-        fields.grid = g;
-         if (fields.grid != null && fields.pageSize != null)
-            fields.grid.changeSize(fields.pageSize.width, fields.pageSize.height, .0001, SCALE);
-       
+        if (g == null && fields.grid != null) 
+            fields.grid.removedFrom(this);
         
+            
+        fields.grid = g;
+        if (fields.grid != null)
+            fields.grid.addedTo(this);
+        
+        if (fields.grid != null && fields.pageSize != null) 
+            fields.grid.changeSize(fields.pageSize.width, fields.pageSize.height, .0001, SCALE);
+            
         canvasModified = true;
         repaint();
     }
@@ -1213,6 +1220,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             }
         }
         repaint();     
+        setLastMethod("align", atype);
 
     }
     
@@ -2688,6 +2696,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             it.next().addedTo(c);
         }
         
+        c.setGrid(c.fields.grid);
         
         c.canvasModified = false;
         c.init();
