@@ -8,7 +8,6 @@ import com.github.kkieffer.jzeld.adapters.JAXBAdapter.FontAdapter;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.PointAdapter;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.Rectangle2DAdapter;
 import com.github.kkieffer.jzeld.draw.DrawClient;
-import com.github.kkieffer.jzeld.element.PaintAttributes;
 import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZAbstractShape;
 import com.github.kkieffer.jzeld.element.ZCanvasRuler;
@@ -124,13 +123,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
             switch (this) {
                 case Join:
-                    return "Joins multiple shapes into a single shape.  All parts of the shapes are included, both overlapping and non-overlapping." + common;
+                    return "Joins multiple shapes into a single shape.  All parts of the selected shapes are included, both overlapping and non-overlapping." + common;
                 case Subtract:
-                    return "Subtracts from the first selected shape the overlapping areas in the other selected shapes" + common;
+                    return "Subtracts from the first selected shape the overlapping areas from all the other selected shapes" + common;
                 case Intersect:
                     return "Creates a shape from only the overlapping parts of the selected shapes." + common;
                 case Exclusive_Join:
-                    return "Joins multiple shapes into a single shape.  All parts of the shapes are included except the ones that overlap with each other." + common;
+                    return "Joins multiple shapes into a single shape.  All parts of the selected shapes are included except the ones that overlap with each other." + common;
                 default:
                     throw new RuntimeException("Unhandled CombineOperation case");
             }
@@ -287,6 +286,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
     private boolean selectedAlternateBorder;
     private Method lastMethod = null;
+    private String lastMethodName = null;
     private Object[] lastMethodParams;
 
     private boolean canvasModified;  //tracks any changes to the Z-plane order of the elements
@@ -308,7 +308,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     private final HashMap<UUID, ZElement> uuidMap = new HashMap<>();  //quick lookup of UUID 
     
-    private final ArrayList<ZCanvasEventListener> selectListeners = new ArrayList<>();
+    private final ArrayList<ZCanvasEventListener> canvasEventListeners = new ArrayList<>();
 
     //For restoration by JAXB
     private ZCanvas() {
@@ -721,17 +721,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Register an event listener with the canvas.  When an element is selected or other actions occur, the listener is notified.
      * @param l the listener to register, if already registered, fails silently
      */
-    public void registerSelectListener(ZCanvasEventListener l) {
-        if (!selectListeners.contains(l))
-            selectListeners.add(l);
+    public void registerEventListener(ZCanvasEventListener l) {
+        if (!canvasEventListeners.contains(l))
+            canvasEventListeners.add(l);
     }
     
     /**
      * Deregisters an event listener 
      * @param l the listener to deregister, if not registered, fails silently
      */
-    public void deRegisterSelectListener(ZCanvasEventListener l) {
-        selectListeners.remove(l);
+    public void deRegisterEventListener(ZCanvasEventListener l) {
+        canvasEventListeners.remove(l);
     }
     
     
@@ -843,7 +843,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return false;
         
         drawClient = c;
-        for (ZCanvasEventListener l : selectListeners)
+        for (ZCanvasEventListener l : canvasEventListeners)
             l.canvasHasDrawClient(true);
         
         return true;
@@ -854,7 +854,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void drawOff() {
         drawClient = null;
-        for (ZCanvasEventListener l : selectListeners)
+        for (ZCanvasEventListener l : canvasEventListeners)
             l.canvasHasDrawClient(false);
         
         setCurrentCursor(Cursor.getDefaultCursor());
@@ -867,7 +867,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void resetView() {
         fields.zoom = 1.0;
+        updatePreferredSize();
         repaint();
+        for (ZCanvasEventListener l : canvasEventListeners)
+            l.canvasChangedZoom();
     }
     
     
@@ -879,22 +882,28 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Zoom in, to 4:1
      */
     public void zoomIn() {
-        if (fields.zoom < 8.0)
+        if (fields.zoom < 8.0) {
             fields.zoom += .25;
-        
-        updatePreferredSize();
-        repaint();
+         
+            updatePreferredSize();
+            repaint();
+            for (ZCanvasEventListener l : canvasEventListeners)
+                l.canvasChangedZoom();
+        }
     }
     
     /**
      * Zooms out, as far as 1:1.5 
      */
     public void zoomOut() {
-        if (fields.zoom > 0.5)
+        if (fields.zoom > 0.5) {
             fields.zoom -= .25;
         
-        updatePreferredSize();
-        repaint();
+            updatePreferredSize();
+            repaint();
+            for (ZCanvasEventListener l : canvasEventListeners)
+                l.canvasChangedZoom();
+        }
     }
     
     /**
@@ -920,18 +929,27 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
    
-    private void setLastMethod(String name, Object... params) {
+    private void setLastMethod(String methodName, String friendlyName, Object... params) {
         try {
             Class[] classes = new Class[params.length];
             for (int i=0; i<params.length; i++)
                 classes[i] = params[i].getClass();
             
-            lastMethod = ZCanvas.class.getMethod(name, classes);  
+            lastMethod = ZCanvas.class.getMethod(methodName, classes); 
+            lastMethodName = friendlyName;
             lastMethodParams = params;
         } catch (NoSuchMethodException |SecurityException ex) {
             throw new RuntimeException(ex);
         }
     }
+    
+    public String getLastRepeatOperation() {
+        if (lastMethod == null)
+            return null;
+        else
+            return lastMethodName;            
+    }
+    
 
     /**
      * Saves the canvas context to the undo stack.  Useful when modifications to elements occur outside the ZCanvas class
@@ -1006,7 +1024,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public void clearShear() {
         setShear(true, 0.0);
         setShear(false, 0.0);
-        setLastMethod("clearShear");
+        setLastMethod("clearShear", "Clear Shear");
 
     }
     
@@ -1025,7 +1043,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 e.setShearY(ratio);
         }
         
-        setLastMethod("setShear", horiz, ratio);
+        setLastMethod("setShear", "Set Shear", horiz, ratio);
         repaint();     
 
     }
@@ -1049,7 +1067,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 e.flipVertical();
         }
         
-        setLastMethod("flip", horiz);
+        setLastMethod("flip", "Flip " + (horiz ? "Horizontal" : "Vertical"), horiz);
         repaint();     
    
     }
@@ -1059,7 +1077,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void rotate90CW() {
         rotate90(true);
-        setLastMethod("rotate90CW");
+        setLastMethod("rotate90CW", "Rotate Clockwise");
     }
     
     /**
@@ -1067,7 +1085,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void rotate90CCW() {
         rotate90(false);
-        setLastMethod("rotate90CCW");
+        setLastMethod("rotate90CCW", "Rotate Counter-clockwise");
     }
     
     /**
@@ -1220,7 +1238,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             }
         }
         repaint();     
-        setLastMethod("align", atype);
+        setLastMethod("align", "Align " + atype.toString().replace("_", " "), atype);
 
     }
     
@@ -1432,7 +1450,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZElement selectedElement : selectedElements)
             selectedElement.setOutlineWidth(width);
         
-        setLastMethod("setOutlineWidth", width);
+        setLastMethod("setOutlineWidth", "Line Width", width);
         repaint();
         
     }
@@ -1448,7 +1466,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZElement selectedElement : selectedElements)
             selectedElement.setOutlineStyle(borderStyle);
         
-        setLastMethod("setOutlineStyle", borderStyle);
+        setLastMethod("setOutlineStyle", "Line Style", borderStyle);
         repaint();
     }
     
@@ -1466,7 +1484,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         undoStack.saveContext(fields.zElements);
     
-        setLastMethod("setDashPattern", (Object)dash);
+        setLastMethod("setDashPattern", "Dash Pattern", (Object)dash);
         
         if (dash.length == 0)
             dash = null;
@@ -1494,7 +1512,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZElement selectedElement : selectedElements)
             selectedElement.setOutlineColor(c);
         
-        setLastMethod("setOutlineColor", c);
+        setLastMethod("setOutlineColor", "Line Color", c);
         repaint();
     }
     
@@ -1514,7 +1532,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZElement selectedElement : selectedElements)
             selectedElement.setFillColor(c);
         
-        setLastMethod("setFillColor", c);
+        setLastMethod("setFillColor", "Fill Color", c);
         repaint();     
 
     }
@@ -1534,7 +1552,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZElement selectedElement : selectedElements)
             selectedElement.removeFill();
         
-        setLastMethod("removeFill");
+        setLastMethod("removeFill", "Remove Fill");
         repaint();     
 
     }
@@ -1624,7 +1642,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         canvasModified = true;
 
-        setLastMethod("moveToBack");
+        setLastMethod("moveToBack", "Move To Back");
         repaint();     
     }
     
@@ -1646,7 +1664,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         canvasModified = true;
 
-        setLastMethod("moveToFront");
+        setLastMethod("moveToFront", "Move To Front");
         repaint();
 
     }
@@ -1674,7 +1692,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         canvasModified = true;
 
-        setLastMethod("moveBackward");
+        setLastMethod("moveBackward", "Move Backward");
         repaint();
         
     }
@@ -1703,7 +1721,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         canvasModified = true;
 
-        setLastMethod("moveForward");
+        setLastMethod("moveForward", "Move Forward");
         repaint();
     }
     
@@ -1935,7 +1953,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 
                 e.select();
                 lastSelectedElement = e;   
-                for (ZCanvasEventListener l : selectListeners)
+                for (ZCanvasEventListener l : canvasEventListeners)
                     l.elementSelected(e);
 
                 setCurrentCursor(Cursor.getDefaultCursor());
@@ -2015,7 +2033,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (e.isSelectable()) {
                 e.select();
                 lastSelectedElement = e;
-                for (ZCanvasEventListener l : selectListeners)
+                for (ZCanvasEventListener l : canvasEventListeners)
                     l.elementSelected(e);   
             }
         }
@@ -2039,7 +2057,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         selectedResizeElement = null;
         lastSelectedElement = null;
-        for (ZCanvasEventListener l : selectListeners)
+        for (ZCanvasEventListener l : canvasEventListeners)
             l.elementSelected(null);
 
         shearXPressed = false;
@@ -2208,7 +2226,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             drawClient.drawClientPaint(g, mouseIn);
         }
         
-        for (ZCanvasEventListener l : selectListeners)
+        for (ZCanvasEventListener l : canvasEventListeners)
             l.canvasRepainted();
         
         
@@ -2228,7 +2246,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         
          
-        for (ZCanvasEventListener l : selectListeners)
+        for (ZCanvasEventListener l : canvasEventListeners)
             l.elementEdited(lastSelectedElement, lastSelectedElement.supportsEdit());
         
         selectedElementResizeOn = false;    
@@ -2290,7 +2308,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 if (contextMenu != null)
                     contextMenu.newSelections(lastSelectedElement, getSelectedElements());
                
-                for (ZCanvasEventListener l : selectListeners)
+                for (ZCanvasEventListener l : canvasEventListeners)
                     l.elementSelected(o);
        
                 Point2D location = o.getPosition(SCALE);  //get the upper left, find the mouse offset from the upper left

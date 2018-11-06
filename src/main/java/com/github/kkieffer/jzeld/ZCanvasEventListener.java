@@ -37,4 +37,9 @@ public interface ZCanvasEventListener {
      */
     public void canvasRepainted();
     
+    /**
+     * Called whenever the canvas has been zoomed in or out
+     */
+    public void canvasChangedZoom();
+    
 }
