@@ -259,15 +259,15 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         //Move to its center
         AffineTransform ctr = AffineTransform.getTranslateInstance(-bounds.getWidth()/2, -bounds.getHeight()/2);
         s = ctr.createTransformedShape(s);
-        
-        //Rotate it
-        AffineTransform rotate = AffineTransform.getRotateInstance(Math.toRadians(this.getRotation()));
-        s = rotate.createTransformedShape(s);
-        
+   
         //Shear it
         AffineTransform shear = AffineTransform.getShearInstance(this.getShearX(), this.getShearY());
         s = shear.createTransformedShape(s);
         
+        //Rotate it
+        AffineTransform rotate = AffineTransform.getRotateInstance(Math.toRadians(this.getRotation()));
+        s = rotate.createTransformedShape(s);
+          
         //Move to its position
         AffineTransform pos = AffineTransform.getTranslateInstance(bounds.getWidth()/2 + bounds.getX(), bounds.getHeight()/2  + bounds.getY());
         s = pos.createTransformedShape(s);
