@@ -134,9 +134,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                     throw new RuntimeException("Unhandled CombineOperation case");
             }
         }
-        
-        
-        
     }
     
     public enum Orientation {LANDSCAPE, PORTRAIT, REVERSE_LANDSCAPE}  //The ordinals conform to the PageFormat integer defines
@@ -288,7 +285,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private Method lastMethod = null;
     private String lastMethodName = null;
     private Object[] lastMethodParams;
-
+    private boolean zoomEnabled = true;
+    
     private boolean canvasModified;  //tracks any changes to the Z-plane order of the elements
     private boolean printOn = false;  //if printing is turned on (hides some pieces during paint)
     
@@ -866,6 +864,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Restore the view to the default of no zoom and 0,0 at the top left corner
      */
     public void resetView() {
+        
+        if (!zoomEnabled)
+            return;
+               
         fields.zoom = 1.0;
         updatePreferredSize();
         repaint();
@@ -878,10 +880,31 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         return fields.zoom;
     }
     
+    
+    /**
+     * Turns the zoom capability on and off
+     * @param e true if zoom is allowed, false otherwise
+     */
+    public void zoomEnabled(boolean e) {
+        zoomEnabled = e;
+    }
+    
+    /**
+     * Returns the state of the zoom enable.  Note: the zoom enable is not saved in the CanvasStore
+     * @return 
+     */
+    public boolean zoomEnabled() {
+        return zoomEnabled;
+    }
+    
     /**
      * Zoom in, to 4:1
      */
     public void zoomIn() {
+        
+        if (!zoomEnabled)
+            return;
+        
         if (fields.zoom < 8.0) {
             fields.zoom += .25;
          
@@ -896,6 +919,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * Zooms out, as far as 1:1.5 
      */
     public void zoomOut() {
+        
+        if (!zoomEnabled)
+            return;
+        
         if (fields.zoom > 0.5) {
             fields.zoom -= .25;
         
