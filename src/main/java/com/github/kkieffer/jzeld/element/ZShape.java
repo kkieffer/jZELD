@@ -76,6 +76,11 @@ public class ZShape extends ZAbstractShape {
             
             StringBuilder b = new StringBuilder();
             Path2D.Double path = new Path2D.Double(s);
+
+            if (path.getWindingRule() == Path2D.WIND_NON_ZERO)
+                b.append(("WIND_NON_ZERO "));
+            else
+                b.append("WIND_EVEN_ODD ");
             
             PathIterator pi = path.getPathIterator(null);
             while (!pi.isDone()) {
@@ -98,9 +103,20 @@ public class ZShape extends ZAbstractShape {
 
         @Override
         public Shape unmarshal(String v) throws Exception {
-                        
-            String[] segments = v.trim().split(";");  //Get all segments separated by semicolons
+
             Path2D path = new Path2D.Double();
+            
+            //The string may or may not start with a winding rule, if so set it and remove it from the string. Default if not set is NON_ZERO
+            if (v.startsWith("WIND_NON_ZERO")) {
+                path.setWindingRule(Path2D.WIND_NON_ZERO);
+                v = v.substring("WIND_NON_ZERO".length());
+            }
+            else if (v.startsWith("WIND_EVEN_ODD")) {
+                path.setWindingRule(Path2D.WIND_EVEN_ODD);
+                v = v.substring("WIND_EVEN_ODD".length());
+            }
+            
+            String[] segments = v.trim().split(";");  //Get all segments separated by semicolons
             
             for (String seg : segments) {
                 

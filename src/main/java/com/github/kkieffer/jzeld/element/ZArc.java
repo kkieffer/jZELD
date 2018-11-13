@@ -2,19 +2,26 @@
 package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.ZCanvas;
+import com.github.kkieffer.jzeld.adapters.DialogUtils;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Arc2D;
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.WindowConstants;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -32,6 +39,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZArc extends ZRectangle {
 
+    public static final ImageIcon arcIcon = new ImageIcon(ZCanvas.class.getResource("/arc.png")); 
 
     public enum ArcType {
         OPEN (Arc2D.OPEN), 
@@ -254,12 +262,23 @@ public class ZArc extends ZRectangle {
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             p.add(typeCombo, gridBagConstraints);
 
-            getContentPane().add(p, java.awt.BorderLayout.CENTER);
+            Container main = getContentPane();
+            main.setLayout(new BorderLayout());
+            
+            main.add(p, BorderLayout.CENTER);
+            JLabel icon = new JLabel();
+            icon.setIcon(arcIcon);
+            Border margin = new EmptyBorder(0,15,0,15);
+            icon.setBorder(new CompoundBorder(icon.getBorder(), margin));
+            main.add(icon, BorderLayout.WEST);
 
             pack();
-            Dimension d = new Dimension(300, 275);
+            Dimension d = new Dimension(340, 225);
             setMinimumSize(d);
             setPreferredSize(d);
+            
+            DialogUtils.addShortcutAndIcon(p, "dispose");
+            
         }
     }
         
