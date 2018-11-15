@@ -7,6 +7,7 @@ import com.jhlabs.image.ShadowFilter;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
@@ -429,6 +430,11 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
     protected void setSize(double w, double h, double minSize, double scale) {
         super.setSize(w, h, minSize, scale);
         changed();
+    }
+    
+    @Override
+    public Image getShadowImage() {
+        return shadowImage;
     }
     
     

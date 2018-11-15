@@ -4,6 +4,7 @@ package com.github.kkieffer.jzeld.element;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter;
 import com.jhlabs.image.ShadowFilter;
 import java.awt.Color;
+import java.awt.Image;
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -23,7 +24,7 @@ public class ShadowAttributes implements Serializable {
         public ShadowAttributes getShadowAttributes();
         public void setShadowAttributes(ShadowAttributes s);    
         public void changed();
-
+        public Image getShadowImage();
         
         default void setEnabled(boolean e) {
             getShadowAttributes().setEnabled(e);

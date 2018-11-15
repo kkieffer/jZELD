@@ -4,6 +4,7 @@ package com.github.kkieffer.jzeld.element;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -551,6 +552,11 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
     
     /* ------------- SHADOW INTERFACE METHODS ---------------------- */
 
+    
+    @Override
+    public Image getShadowImage() {
+        return null;
+    }
     
     @Override
     public ShadowAttributes getShadowAttributes() {  //get the attributes of the first one, if any
