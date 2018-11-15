@@ -40,16 +40,8 @@ public class OrthogonalLineDraw extends BoundaryDraw {
         }
         
 
-        if (e.getClickCount() > 1) {  //connect to first orthogonally 
-            
-            Point2D first = mousePoints.get(0);
-            Point2D last = mousePoints.get(mousePoints.size()-1);
-            
-            //last point needed orthogonal to first
-            Point2D p = getDrawToPoint(last, first);
-            this.addPoint(p);
-           
-            
+        if (e.getClickCount() > 1) {  
+  
             complete();
         
         } else {
@@ -62,6 +54,20 @@ public class OrthogonalLineDraw extends BoundaryDraw {
         }
     }
 
+    @Override
+    public void complete() {
+        if (close) {   //connect to first orthogonally, to close 
+            Point2D first = mousePoints.get(0);
+            Point2D last = mousePoints.get(mousePoints.size()-1);
+
+            //last point needed orthogonal to first
+            Point2D p = getDrawToPoint(last, first);
+            this.addPoint(p);
+        }
+        super.complete();
+    }
+    
+    
     @Override
     protected void drawToMouse(Graphics2D g, Point2D last, Point2D mouse) {
         if (last == null || mouse == null)
