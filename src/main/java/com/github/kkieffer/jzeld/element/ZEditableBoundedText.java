@@ -69,6 +69,9 @@ public class ZEditableBoundedText extends ZEditableText {
         
         
         Dimension d = textWidget.getPreferredSize();  //preferred size is the size that it should be based on the amount of characters     
+        if (d.width == 0)  //break out on zero characters
+            return true;
+        
         double textMinWidth = d.getWidth()/72;
         double textMinHeight = d.getHeight()/72;
         
