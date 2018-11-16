@@ -1396,7 +1396,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         ZAbstractShape ref = null;
         ArrayList<ZAbstractShape> combineList = new ArrayList<>();
         
-        for (int i=selectedElements.size()-1; i>=0; i--) {
+        for (int i=selectedElements.size()-1; i>=0; i--) {  //go backward, from the one at the bottom of the Z stack first
             
             ZElement e = selectedElements.get(i);
             
@@ -1416,8 +1416,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (ref == null || combineList.isEmpty())  //nothing to merge
             return 0;
         
-        //Remove all abstract shapes to be merged from the canvas 
-        removeElement(ref);
+        //Remove all abstract shapes to be merged from the canvas - except the reference (it will be replaced) 
         for (ZElement e : combineList)
             removeElement(e);
         
@@ -1436,7 +1435,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         ZShape shape = new ZShape(bounds.getX(), bounds.getY(), mergedShape, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes(), ref.getCustomStroke(), ref.getOutlineStyle());               
         
-        addElement(shape);  //add the merged shape
+        this.replaceElement(ref, shape);
+        
         lastMethod = null;
         selectNone();
         selectElement(shape, false);
