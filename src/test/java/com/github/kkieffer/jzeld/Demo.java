@@ -284,7 +284,7 @@ public class Demo extends javax.swing.JFrame {
                 }   
             }
         });
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "SaveSVG");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.ALT_DOWN_MASK), "SaveSVG");
         am.put("SaveSVG", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {

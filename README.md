@@ -91,7 +91,7 @@ additional hotkeys.
 4.  Create a straight-line drawing (Ctrl-D) and close, or (Ctrl-L) not to close
 5.  Create a orthogonal-line drawing (Ctrl-O)
 6.  Copy the selected element as an image to a png file (Ctrl-E)
-7.  Export to an svg file (Ctrl-G)
+7.  Export to an svg file (Alt-G)
 
 When starting the demo, if a previous instance was saved with Ctrl-S, it can be loaded.  If the user chooses not to load, a default ZCanvas is loaded with a collection
 of demo ZElements.  The default Demo is shown below.
