@@ -116,7 +116,7 @@ Java JRE 1.8 is required.  Other dependencies are provided in the pom.xml file:
 
 The third-party source files below have been incorporated directly:
 
-* An [extension to the batik library](https://gist.github.com/msteiger/4509119) as modified by Marco Hutter (see comments on github page) 
+* An [extension to the batik library](https://github.com/javagl/SvgGraphics) as modified by Marco Hutter (see comments on github page) 
 * The ConicalGradientPaint class from the [SteelSeries-Canvas Project](https://github.com/HanSolo/SteelSeries-Canvas) from Gerrit Grunwald) 
 
 ## Extending
