@@ -1,5 +1,5 @@
 
-package com.github.kkieffer.jzeld.element;
+package com.github.kkieffer.jzeld.attributes;
 
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter;
 import com.jhlabs.image.ShadowFilter;

@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.element;
 
 
+import com.github.kkieffer.jzeld.attributes.TextAttributes;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;

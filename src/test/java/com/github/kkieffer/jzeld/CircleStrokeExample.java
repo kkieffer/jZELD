@@ -1,7 +1,7 @@
 
 package com.github.kkieffer.jzeld;
 
-import com.github.kkieffer.jzeld.element.CustomStroke;
+import com.github.kkieffer.jzeld.attributes.CustomStroke;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Shape;

@@ -1,6 +1,10 @@
 
 package com.github.kkieffer.jzeld.element;
 
+import com.github.kkieffer.jzeld.attributes.CustomStroke;
+import com.github.kkieffer.jzeld.attributes.ShadowAttributes;
+import com.github.kkieffer.jzeld.attributes.TextAttributes;
+import com.github.kkieffer.jzeld.attributes.PaintAttributes;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;

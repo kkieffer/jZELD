@@ -1,5 +1,5 @@
 
-package com.github.kkieffer.jzeld.element;
+package com.github.kkieffer.jzeld.attributes;
 
 import java.awt.Color;
 import java.awt.Stroke;

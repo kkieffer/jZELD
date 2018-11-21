@@ -2,6 +2,9 @@ package com.github.kkieffer.jzeld;
 
 
 
+import com.github.kkieffer.jzeld.attributes.PaintAttributes;
+import com.github.kkieffer.jzeld.attributes.ShadowAttributes;
+import com.github.kkieffer.jzeld.attributes.TextAttributes;
 import com.github.kkieffer.jzeld.adapters.SVGExport;
 import com.github.kkieffer.jzeld.contextMenu.ZDefaultContextMenu;
 import com.github.kkieffer.jzeld.ZCanvas.Orientation;
@@ -9,8 +12,8 @@ import com.github.kkieffer.jzeld.draw.FreeformDraw;
 import com.github.kkieffer.jzeld.draw.OrthogonalLineDraw;
 import com.github.kkieffer.jzeld.draw.StraightLineDraw;
 import com.github.kkieffer.jzeld.element.*;
-import com.github.kkieffer.jzeld.element.PaintAttributes.RadiusRelative;
-import com.github.kkieffer.jzeld.element.TextAttributes.HorizontalJustify;
+import com.github.kkieffer.jzeld.attributes.PaintAttributes.RadiusRelative;
+import com.github.kkieffer.jzeld.attributes.TextAttributes.HorizontalJustify;
 import com.github.kkieffer.jzeld.element.ZArc.ArcType;
 import com.github.kkieffer.jzeld.element.ZElement.StrokeStyle;
 import com.github.kkieffer.jzeld.element.ZQuadrilateral.QuadType;
@@ -122,6 +125,12 @@ public class Demo extends javax.swing.JFrame {
         PaintAttributes textPaint = PaintAttributes.createTexturePaintAttribute(image, .4f, .4f);
         r4.setPaintAttributes(textPaint);
         c.addElement(r4);
+        
+        
+        ZRectangle r5 = new ZRectangle(6, 0, 2.0, 1.0, 0.0, true, true, true, 3, Color.BLACK, null, Color.RED, StrokeStyle.SQUARE);
+        PaintAttributes conPaint = PaintAttributes.createConicalPaintAttribute(new Point2D.Double(.25, .25), new float[]{0.0f, 0.25f, 0.5f, 0.6f, 0.75f}, new Color[]{Color.RED, Color.BLUE, Color.WHITE, Color.BLACK, Color.GREEN});
+        r5.setPaintAttributes(conPaint);
+        c.addElement(r5);
         
         //Create some editable text
         Font f = new Font("SERIF", Font.BOLD, 22);

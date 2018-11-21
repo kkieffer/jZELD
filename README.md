@@ -111,7 +111,13 @@ Java JRE 1.8 is required.  Other dependencies are provided in the pom.xml file:
 
 * The [filters library from jhlabs](http://www.jhlabs.com/ip/filters/download.html) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
 * The [batik library from Apache](https://xmlgraphics.apache.org/batik/) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
-* The source code also contains an [extension to the batik library](https://gist.github.com/msteiger/4509119) as modified by Marco Hutter (see comments on github page) 
+
+## Additional Third Party Code:
+
+The third-party source files below have been incorporated directly:
+
+* An [extension to the batik library](https://gist.github.com/msteiger/4509119) as modified by Marco Hutter (see comments on github page) 
+* The ConicalGradientPaint class from the [SteelSeries-Canvas Project](https://github.com/HanSolo/SteelSeries-Canvas) from Gerrit Grunwald) 
 
 ## Extending
 
@@ -130,7 +136,8 @@ Here are some ideas for using jZELD in a larger application:
 
 ## License
 
-This project is licensed under the LGPL License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the LGPL License - see the [LICENSE.md](LICENSE.md) file for details. All third party libraries and source code retain their Copyright and license
+as specified in their license or source comments (see links above).
 
 
 

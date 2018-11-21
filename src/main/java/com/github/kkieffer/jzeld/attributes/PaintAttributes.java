@@ -1,5 +1,5 @@
 
-package com.github.kkieffer.jzeld.element;
+package com.github.kkieffer.jzeld.attributes;
 
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter;
 import com.github.kkieffer.jzeld.adapters.SerializableImage;
@@ -14,6 +14,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
+import java.util.Arrays;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -26,7 +27,7 @@ public class PaintAttributes implements Serializable {
 
     public enum RadiusRelative {WIDTH, HEIGHT, LONGEST, SHORTEST};
     
-    private enum PaintType {LINEAR, RADIAL, PATTERN};
+    private enum PaintType {LINEAR, RADIAL, CONICAL, PATTERN};
     
     private PaintType type;
     private CycleMethod cycleMethod;
@@ -47,6 +48,13 @@ public class PaintAttributes implements Serializable {
     private float imgWidth;
     private float imgHeight;
     
+    //Cached values below to avoid creating new Paint unless the attributes change
+    private transient Paint paint = null;
+    private transient Double width = null;
+    private transient Double height = null;
+    private transient Boolean flipHoriz = null;
+    private transient Boolean flipVert = null;
+    
     private PaintAttributes() {}
     
     public PaintAttributes(PaintAttributes src) {
@@ -58,6 +66,9 @@ public class PaintAttributes implements Serializable {
                 start = new Point2D.Float((float)src.start.getX(), (float)src.start.getY());
                 finish = new Point2D.Float((float)src.finish.getX(), (float)src.finish.getY());
                 break;
+            case CONICAL:    
+                center = new Point2D.Float((float)src.center.getX(), (float)src.center.getY());
+                break;              
             case RADIAL:       
                 center = new Point2D.Float((float)src.center.getX(), (float)src.center.getY());
                 focus = new Point2D.Float((float)src.focus.getX(), (float)src.focus.getY());
@@ -76,21 +87,36 @@ public class PaintAttributes implements Serializable {
             colors = src.colors.clone();
             cycleMethod = src.cycleMethod;
         }
+        
+        paint = null; 
     }
     
-    public void applyPaintAttribute(Graphics2D g2d, double width, double height, double unitSize, boolean flipHoriz, boolean flipVert) {
+    public void applyPaintAttribute(Graphics2D g2d, double width, double height, double unitSize, boolean flipH, boolean flipV) {
         
+        if (paint != null) {  //existing paint exists, nothing changed
+            if (width == this.width && height == this.height && flipH == this.flipHoriz && flipV == this.flipVert) {
+                g2d.setPaint(paint);
+                return;
+            }         
+        }
+        
+        //Refresh paint
+        this.width = width;
+        this.height = height;
+        this.flipHoriz = flipH;
+        this.flipVert = flipV;
+              
         float w = (float)width;
         float h = (float)height;
         
-        Paint p = null;
+        
         switch (type) {
             case LINEAR:
                 
                 Point2D.Float theStart = new Point2D.Float(flipHoriz ? 1.0f-start.x : start.x, flipVert ? 1.0f-start.y : start.y);
                 Point2D.Float theEnd = new Point2D.Float(flipHoriz ? 1.0f-finish.x : finish.x, flipVert ? 1.0f-finish.y : finish.y);
              
-                p = new LinearGradientPaint(w * theStart.x, h * theStart.y, w * theEnd.x, h * theEnd.y, dist, colors, cycleMethod);
+                paint = new LinearGradientPaint(w * theStart.x, h * theStart.y, w * theEnd.x, h * theEnd.y, dist, colors, cycleMethod);
                 break;
             case RADIAL:
                                 
@@ -113,17 +139,57 @@ public class PaintAttributes implements Serializable {
                 Point2D.Float theCenter = new Point2D.Float(flipHoriz ? 1.0f-center.x : center.x, flipVert ? 1.0f-center.y : center.y);
                 Point2D.Float theFocus = new Point2D.Float(flipHoriz ? 1.0f-focus.x : focus.x, flipVert ? 1.0f-focus.y : focus.y);
 
-                
-                p = new RadialGradientPaint(w * theCenter.x, h * theCenter.y, radiusVal, w * theFocus.x, h * theFocus.y, dist, colors, cycleMethod);
-                break;
 
+                paint = new RadialGradientPaint(w * theCenter.x, h * theCenter.y, radiusVal, w * theFocus.x, h * theFocus.y, dist, colors, cycleMethod);
+                break;
+                
+            case CONICAL:
+                theCenter = new Point2D.Float(w * (flipHoriz ? 1.0f-center.x : center.x), h * (flipVert ? 1.0f-center.y : center.y));
+                
+                //To handle horizontal flips, each dist (angle) gets negated, which flips left to right.  For vertical flips, each angle is subtracted from 180 degrees (0.5).  Then
+                //any negative value or > 1.0 is reset to its correct position on the 0->1 circle.
+                float[] distFlip = Arrays.copyOf(dist, dist.length);
+                for (int i=0; i<distFlip.length; i++) {
+                    if (flipHoriz)
+                        distFlip[i] = -distFlip[i];
+                    if (flipVert)
+                        distFlip[i] = 0.5f - distFlip[i];
+                    
+                    if (distFlip[i] < 0.0f)
+                        distFlip[i] = 1.0f + distFlip[i];
+                    else if (distFlip[i] > 1.0f)
+                        distFlip[i] -= 1.0f;
+                    
+                }
+                
+                Color[] colorFlip = Arrays.copyOf(colors, colors.length);
+
+                //ConicalGradientPaint doesn't like out of order dist arrays, so resort them according to ascending dist values                          
+                //Use Bubble Sort algorithm, and when a dist value moves indicies, move the cooresponding Color
+                for (int n = 0; n < distFlip.length; n++) {
+                    for (int m = 0; m < distFlip.length-1 - n; m++) {
+                        if (distFlip[m] > distFlip[m+1]) {
+                            float swapDist = distFlip[m];
+                            distFlip[m] = distFlip[m + 1];
+                            distFlip[m + 1] = swapDist;
+                            Color swapColor = colorFlip[m];
+                            colorFlip[m] = colorFlip[m + 1];
+                            colorFlip[m + 1] = swapColor;
+                        }
+                    }
+                }
+                
+                
+                paint = new ConicalGradientPaint(theCenter, distFlip, colorFlip);
+                break;
+    
             case PATTERN:
                                 
-                p = new TexturePaint((BufferedImage)patternImage.getImage(), new Rectangle2D.Double(0, 0, imgWidth * unitSize * (flipHoriz ? -1 : 1), imgHeight * unitSize * (flipVert ? -1 : 1)));
+                paint = new TexturePaint((BufferedImage)patternImage.getImage(), new Rectangle2D.Double(0, 0, imgWidth * unitSize * (flipHoriz ? -1 : 1), imgHeight * unitSize * (flipVert ? -1 : 1)));
                 break;
                 
         }
-        g2d.setPaint(p);
+        g2d.setPaint(paint);
     }
     
     
@@ -131,7 +197,7 @@ public class PaintAttributes implements Serializable {
      * Create a linear gradient paint attribute set
      * @param start the starting point, relative to the element bounds (x and y range from 0 to 1.0)
      * @param finish the finish point, relative to the element bounds (x and y range from 0 to 1.0)
-     * @param dist the color distribution points
+     * @param dist the color distribution points, from start (0) to finish (1.0)
      * @param colors the colors at the distribution points
      * @param cycle how to paint outside start and finish
      * @return 
@@ -157,7 +223,7 @@ public class PaintAttributes implements Serializable {
      * @param focus the focus point, relative to the element bounds (x and y range from 0 to 1.0).  If focus is null, the focus is the center
      * @param radius the radius to which the endpoint lies, relative to the bounds specified by the rr parameter
      * @param rr determines how to compute the radius, if WIDTH, the radius is relative to the width (0 to 1.0), likewise for height.  If LONGEST, radius is relative to the longer side.  Likewise for SHORTEST.
-     * @param dist the color distribution points
+     * @param dist the color distribution points, 0 (center) to 1.0 (radius)
      * @param colors the colors at the distribution points
      * @param cycle how to paint outside start and finish
      * @return 
@@ -181,6 +247,27 @@ public class PaintAttributes implements Serializable {
         a.cycleMethod = cycle;
         return a;
     }
+    
+    
+    /**
+     * Create a radial gradient paint attribute set
+     * @param center the starting point, relative to the element bounds (x and y range from 0 to 1.0, 0.5,0.5 is centered in shape)
+     * @param dist the color distribution points, from 0 (top dead center) to 1.0 (clockwise around, to top dead center)
+     * @param colors the colors at the distribution points
+     * @return 
+     */
+    public static PaintAttributes createConicalPaintAttribute(Point2D center, float[] dist, Color[] colors) {
+        
+        PaintAttributes a = new PaintAttributes();
+        
+        a.type = PaintType.CONICAL;
+        
+        a.center = new Point2D.Float((float)center.getX(), (float)center.getY());
+        a.dist = dist.clone();
+        a.colors = colors.clone();
+        return a;
+    }
+    
     
     /**
      * Create a texture pattern paint attribute set
