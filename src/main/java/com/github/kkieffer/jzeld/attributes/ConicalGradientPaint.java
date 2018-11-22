@@ -32,6 +32,7 @@ package com.github.kkieffer.jzeld.attributes;
  *  1. Added caches for the PaintContext and the Rasters, to speed up repaints when nothing has changed
  *  2. Apply the inverse trasform prior to calcuating the angle - this allows graphics transforms (such as rotations, shears) to affect the angle
  *  3. Replace the Pythag + arcos calculation with an arctan calcuation
+ *  4. Adjust the colors at 0.0, 1.0 (top dead center) to blend the first and last defined color (rather than setting them to the first color)
  */
 
 import java.awt.Color;
@@ -186,17 +187,23 @@ public final class ConicalGradientPaint implements Paint {
         final java.util.List<Color> colorList = new java.util.ArrayList<Color>(GIVEN_COLORS.length);
         colorList.addAll(java.util.Arrays.asList(GIVEN_COLORS));
 
+        //KK: Calculate the Color at the top dead center (mix between first and last)
+        Color start = colorList.get(0);
+        Color last = colorList.get(colorList.size()-1);
+        float centerVal = 1.0f - fractionList.get(fractionList.size()-1);
+        float lastToStartRange = centerVal + fractionList.get(0);
+        Color centerColor = getColorFromFraction(last, start, (int)(lastToStartRange * 10000), (int)(centerVal * 10000));            
+        
         // Assure that fractions start with 0.0f
         if (fractionList.get(0) != 0.0f) {
             fractionList.add(0, 0.0f);
-            final Color TMP_COLOR = colorList.get(0);
-            colorList.add(0, TMP_COLOR);
+            colorList.add(0, centerColor);
         }
 
         // Assure that fractions end with 1.0f
         if (fractionList.get(fractionList.size() - 1) != 1.0f) {
             fractionList.add(1.0f);
-            colorList.add(GIVEN_COLORS[0]);
+            colorList.add(centerColor);
         }
 
         // Recalculate the fractions and colors with the given offset

@@ -128,7 +128,7 @@ public class Demo extends javax.swing.JFrame {
         
         
         ZRectangle r5 = new ZRectangle(6, 0, 2.0, 1.0, 0.0, true, true, true, 3, Color.BLACK, null, Color.RED, StrokeStyle.SQUARE);
-        PaintAttributes conPaint = PaintAttributes.createConicalPaintAttribute(new Point2D.Double(.25, .25), new float[]{0.0f, 0.25f, 0.5f, 0.6f, 0.75f}, new Color[]{Color.RED, Color.BLUE, Color.WHITE, Color.BLACK, Color.GREEN});
+        PaintAttributes conPaint = PaintAttributes.createConicalPaintAttribute(new Point2D.Double(.25, .25), new float[]{0.25f, 0.5f, 0.6f, 0.75f}, new Color[]{Color.BLUE, Color.WHITE, Color.BLACK, Color.GREEN});
         r5.setPaintAttributes(conPaint);
         c.addElement(r5);
         
