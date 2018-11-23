@@ -33,25 +33,10 @@ public class OrthogonalLineDraw extends BoundaryDraw {
 
     @Override
     public void drawClientMouseClicked(Point2D mouse, MouseEvent e) {
-        
-        if (mousePoints.isEmpty()) { //first point
-            this.addPoint(mouse);
-            return;
-        }
-        
-
-        if (e.getClickCount() > 1) {  
-  
+    
+        if (e.getClickCount() > 1)  
             complete();
         
-        } else {
-            
-            Point2D last = mousePoints.get(mousePoints.size()-1);
-       
-            Point2D p = getDrawToPoint(mouse, last);
-            this.addPoint(p);
- 
-        }
     }
 
     @Override
@@ -82,15 +67,23 @@ public class OrthogonalLineDraw extends BoundaryDraw {
     
     
     @Override
-    public void drawClientMousePressed(Point2D mouse) {
+    public void drawClientMousePressed(Point2D mouse, MouseEvent e) {
     }
 
     @Override
-    public void drawClientMouseReleased(Point2D mouse) {
+    public void drawClientMouseReleased(Point2D mouse, MouseEvent e) {
+        if (mousePoints.isEmpty()) { //first point
+            this.addPoint(mouse);
+            return;
+        }
+        
+        Point2D last = mousePoints.get(mousePoints.size()-1);
+        Point2D p = getDrawToPoint(mouse, last);
+        this.addPoint(p);
     }
 
     @Override
-    public void drawClientMouseDragged(Point2D mouse) {
+    public void drawClientMouseDragged(Point2D mouse, MouseEvent e) {
     }
     
 }

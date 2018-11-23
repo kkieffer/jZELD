@@ -39,19 +39,22 @@ public interface DrawClient {
     /**
      * The mouse was pressed down on the canvas
      * @param mouse mouse location on the canvas, taking into account the zoom and origin offset
+     * @param e the original mouse event
      */
-    public void drawClientMousePressed(Point2D mouse);
+    public void drawClientMousePressed(Point2D mouse, MouseEvent e);
 
     /**
      * The mouse was released on the canvas
      * @param mouse mouse location on the canvas, taking into account the zoom and origin offset
+     * @param e the original mouse event
      */
-    public void drawClientMouseReleased(Point2D mouse);
+    public void drawClientMouseReleased(Point2D mouse, MouseEvent e);
 
     /**
      * The mouse was dragged on the canvas
      * @param mouse mouse location on the canvas, taking into account the zoom and origin offset
+     * @param e the original mouse event
      */
-    public void drawClientMouseDragged(Point2D mouse);
+    public void drawClientMouseDragged(Point2D mouse, MouseEvent e);
     
 }

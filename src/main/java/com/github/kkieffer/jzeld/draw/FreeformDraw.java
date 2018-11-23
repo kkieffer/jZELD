@@ -25,17 +25,17 @@ public class FreeformDraw extends BoundaryDraw {
     }
 
     @Override
-    public void drawClientMousePressed(Point2D mouse) {
+    public void drawClientMousePressed(Point2D mouse, MouseEvent e) {
         this.addPoint(mouse);
     }
 
     @Override
-    public void drawClientMouseReleased(Point2D mouse) {
+    public void drawClientMouseReleased(Point2D mouse, MouseEvent e) {
         complete();
     }
 
     @Override
-    public void drawClientMouseDragged(Point2D mouse) {
+    public void drawClientMouseDragged(Point2D mouse, MouseEvent e) {
         this.addPoint(mouse);
     }
     

@@ -22,22 +22,22 @@ public class StraightLineDraw extends BoundaryDraw {
 
     @Override
     public void drawClientMouseClicked(Point2D mouse, MouseEvent e) {
-        this.addPoint(mouse);
         
         if (e.getClickCount() > 1) 
             complete();
     }
 
     @Override
-    public void drawClientMousePressed(Point2D mouse) {
+    public void drawClientMousePressed(Point2D mouse, MouseEvent e) {
     }
 
     @Override
-    public void drawClientMouseReleased(Point2D mouse) {
+    public void drawClientMouseReleased(Point2D mouse, MouseEvent e) {
+        this.addPoint(mouse);
     }
 
     @Override
-    public void drawClientMouseDragged(Point2D mouse) {
+    public void drawClientMouseDragged(Point2D mouse, MouseEvent e) {
     }
     
 }

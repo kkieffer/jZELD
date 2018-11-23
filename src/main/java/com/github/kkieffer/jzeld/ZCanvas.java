@@ -2387,13 +2387,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         return swallowed;
     }
     
-    
+    private int click = 0;
     
     @Override
     public void mouseClicked(MouseEvent e) {
                         
         if (drawClient != null) {
             drawClient.drawClientMouseClicked(getScaledMouse(e), e);
+            System.out.println("click! " + click);
+            click++;
             repaint();
             return;
         }
@@ -2476,7 +2478,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         mousePress = mouseLoc;
         
         if (drawClient != null) {
-            drawClient.drawClientMousePressed(mouseLoc);
+            drawClient.drawClientMousePressed(mouseLoc, e);
             repaint();
             return;
         }
@@ -2514,7 +2516,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public void mouseReleased(MouseEvent e) {
         
         if (drawClient != null) {
-            drawClient.drawClientMouseReleased(getScaledMouse(e));
+            drawClient.drawClientMouseReleased(getScaledMouse(e), e);
             repaint();
             return;
         }
@@ -2581,7 +2583,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         selectedMousePress = null;
  
         if (drawClient != null) {
-            drawClient.drawClientMouseDragged(getScaledMouse(e));
+            drawClient.drawClientMouseDragged(getScaledMouse(e), e);
             repaint();
             return;
         }
