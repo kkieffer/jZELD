@@ -112,12 +112,12 @@ Java JRE 1.8 is required.  Other dependencies are provided in the pom.xml file:
 * The [filters library from jhlabs](http://www.jhlabs.com/ip/filters/download.html) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
 * The [batik library from Apache](https://xmlgraphics.apache.org/batik/) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
 
-## Additional Third Party Code:
+## Additional Third Party Code
 
-The third-party source files below have been incorporated directly:
+The third-party source files below have been incorporated directly, with copyright and license in the source file:
 
 * An [extension to the batik library](https://github.com/javagl/SvgGraphics) as modified by Marco Hutter (see comments on github page) 
-* The ConicalGradientPaint class from the [SteelSeries-Canvas Project](https://github.com/HanSolo/SteelSeries-Canvas) from Gerrit Grunwald) 
+* The ConicalGradientPaint class from the [SteelSeries-Canvas Project](https://github.com/HanSolo/SteelSeries-Canvas) from Gerrit Grunwald 
 
 ## Extending
 
