@@ -156,7 +156,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
         return "<b>ZGroupedElement: A group of multiple elements that are moved and transformed together.</b><br><br>Transformations " +
                 "are applied to the group as a whole, however, a ZGroupedElement has no intrinsic attributes such as fill color and line weight; applying those modifications change " +
                 "the individual elements and are retained after ungrouping. Note: transformations persist when elements are ungrouped with exception of shear.<br><br>" +
-                "This group contains the following elements: <br>" + group + "<br><br>" + super.getHtmlHelp();
+                "This group contains the following elements: <br>" + group + "<br><br>" + super.getBaseElementHtmlHelp();
    
     }
     

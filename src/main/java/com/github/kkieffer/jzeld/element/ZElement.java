@@ -141,11 +141,13 @@ public abstract class ZElement implements Serializable {
         return this.uuid;
     }
     
+    public abstract String getHtmlHelp();
+    
     /**
      * Return html formatted help about the Element.  Note: do not use <html> and </html> tags, as this will interfere with including superclass help.
      * @return 
      */
-    public String getHtmlHelp() {
+    public String getBaseElementHtmlHelp() {
         return (resizable ? "Resize the element by clicking and dragging the resize box in the lower right corner.<br><br>" : "") +
                (canMove ? "Move the element by selecting it and dragging it to the new position or use the arrow keys.<br><br>" : "This element cannot be moved.<br><br>") +
                (resizable ? "Resize the element, maintaining its aspect ratio, by selecting it and using the mouse wheel or press <i>CTRL + or CTRL -</i><br><br>" : 
