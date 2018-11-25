@@ -1764,7 +1764,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     /**
      * Return all the elements that are instances of the classType.
-     * @param classType the classType to match, elements must be equal, subclasses of, or implement the classType
+     * @param classType the classType to match, elements must be equal, subclasses of, or implement the classType. Use ZElement for all types
      * @return 
      */
     public ZElement[] getElementsByClass(Class<? extends ZElement> classType) {

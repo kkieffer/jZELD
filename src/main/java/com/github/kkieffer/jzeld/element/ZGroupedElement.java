@@ -125,6 +125,18 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
         return new ZGroupedElement(this, forNew);
     }
     
+    /**
+     * Get the array of elements contained in this group. Use this with caution, generally it is better to call
+     * the set attribute method directly on the ZGroupedElement, which will set it in all the grouped elements.
+     * @return an array of elements in the group
+     */
+    public ZElement[] getGroupedElements() {
+        ZElement[] arr = new ZElement[elements.size()];
+        elements.toArray(arr);
+        return arr;
+    }
+    
+    
     protected void regroup() {
         Rectangle2D b = getEnclosingBounds(elements);
         for (ZElement e : elements)
