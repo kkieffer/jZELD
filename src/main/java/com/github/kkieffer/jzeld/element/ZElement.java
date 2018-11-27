@@ -401,14 +401,21 @@ public abstract class ZElement implements Serializable {
         setRotation(rotation + angle);
     }
     
+    /**
+     * Adjust the shear in the X direction, adding the given shear amount (to the right)
+     * @param s 
+     */
     public void shearX(double s) {
         shearX += s;
         hasChanges = true;
     }
     
-    
-    public void shearY(double d) {
-        shearY += d;
+    /**
+     * Adjust the shear in the Y direction, adding the given shear amount (to the up)
+     * @param s 
+     */
+    public void shearY(double s) {
+        shearY += s;
         hasChanges = true;
     }
 

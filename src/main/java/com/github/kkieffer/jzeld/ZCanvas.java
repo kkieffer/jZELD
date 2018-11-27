@@ -290,6 +290,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private boolean canvasModified;  //tracks any changes to the Z-plane order of the elements
     private boolean printOn = false;  //if printing is turned on (hides some pieces during paint)
     
+    private boolean wheelOn = true;  //true if the mouse wheel is enabled
     private long mouseWheelLastMoved = -1;
     private long mouseFirstPressed = -1;
     private DrawClient drawClient = null;
@@ -396,6 +397,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "MoveDown");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.META_DOWN_MASK), "Increase");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.META_DOWN_MASK), "Decrease");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK), "ShearLeft");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK), "ShearRight");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.ALT_DOWN_MASK), "ShearUp");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.ALT_DOWN_MASK), "ShearDown");
  
        
         am.put("Tab", new AbstractAction(){
@@ -481,6 +486,31 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             @Override
             public void actionPerformed(ActionEvent e) {
                 moveSelected(0, 1/SCALE);
+            }
+        });
+        
+        am.put("ShearLeft", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                shearSelected(0.1, 0);
+            }
+        });
+        am.put("ShearRight", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                shearSelected(-0.1, 0);
+            }
+        });
+        am.put("ShearUp", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                shearSelected(0, -0.1);
+            }
+        });
+        am.put("ShearDown", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                shearSelected(0, 0.1);
             }
         });
         
@@ -700,6 +730,22 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     public UnitMeasure getUnit() {
         return fields.unit;
+    }
+    
+    /**
+     * Returns true if the mouse wheel action is on, false otherwise
+     * @return 
+     */
+    public boolean isWheelOn() {
+        return wheelOn;
+    }
+    
+    /**
+     * Turn the mouse wheel action on or off. 
+     * @param on true to turn on, false for off
+     */
+    public void wheelOn(boolean on) {
+        wheelOn = on;
     }
     
     public Color getMouseCrosshairColor() {
@@ -1154,6 +1200,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
          
         for (ZElement e : getSelectedElements()) {
            e.move(x, y, getMaxXPosition()/SCALE, getMaxYPosition()/SCALE);
+        }
+        repaint();
+    }
+    
+    public void shearSelected(double x, double y) {
+         
+        for (ZElement e : getSelectedElements()) {
+           e.shearX(x);
+           e.shearY(y);
         }
         repaint();
     }
@@ -2657,6 +2712,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             passThroughMouse(e);
             return;
         } 
+        
+        if (!isWheelOn())
+            return;
             
         ArrayList<ZElement> selectedElements = getSelectedElements();
     
