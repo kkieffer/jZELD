@@ -2436,8 +2436,18 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         double xOffset = transformedMouse.getX() - position.getX();
         double yOffset = transformedMouse.getY() - position.getY();
         
-        MouseEvent m = new MouseEvent(this, e.getID(), e.getWhen(), e.getModifiers(), (int)Math.round(xOffset), (int)Math.round(yOffset), e.getClickCount(), false, e.getButton());
-        boolean swallowed = passThruElement.mouseEvent(this, m);  //tell the element about the mouse                  
+        MouseEvent copy;
+        
+        if (e instanceof MouseWheelEvent) {
+            MouseWheelEvent w = (MouseWheelEvent)e;
+            copy = new MouseWheelEvent(this, e.getID(), e.getWhen(), e.getModifiers(), (int)Math.round(xOffset), (int)Math.round(yOffset), e.getClickCount(), false, 
+                                 w.getScrollType(), w.getScrollAmount(), w.getWheelRotation());
+            
+        }
+        else 
+            copy = new MouseEvent(this, e.getID(), e.getWhen(), e.getModifiers(), (int)Math.round(xOffset), (int)Math.round(yOffset), e.getClickCount(), false, e.getButton());
+        
+        boolean swallowed = passThruElement.mouseEvent(this, copy);  //tell the element about the mouse                  
         repaint();
         return swallowed;
     }

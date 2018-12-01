@@ -157,7 +157,7 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         fillColorMenuItem = new ColorMenuItem("Fill Color", canvas, ColorMenuItem.Type.FILL);
         colorMenu.add(fillColorMenuItem);
 
-        removeFillMenuItem = new ColorMenuItem("Remove Fill Color", canvas, ColorMenuItem.Type.CLEAR);
+        removeFillMenuItem = new ColorMenuItem("Remove Fill", canvas, ColorMenuItem.Type.CLEAR);
         colorMenu.add(removeFillMenuItem);
         
         attributesMenu.add(lineWeightMenu);

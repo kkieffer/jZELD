@@ -495,6 +495,9 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         if (!isSelected) 
             return false;
         
+        if (!e.getClass().isAssignableFrom(MouseEvent.class))  //text widget will not get subclasses of MouseEvent
+            return false;
+        
         MouseEvent m = new MouseEvent(textWidget, e.getID(), e.getWhen(), e.getModifiers(), e.getX() , e.getY(), e.getClickCount(), false, e.getButton());
         textWidget.dispatchEvent(m); //send mouse events to the text widget
         canvas.setCurrentCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR)); 
