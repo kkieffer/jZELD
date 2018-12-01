@@ -405,6 +405,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK), "IncreaseSize");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK), "DecreaseSize");
         
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.META_DOWN_MASK), "DecreaseWidth");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.META_DOWN_MASK), "IncreaseWidth");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.META_DOWN_MASK), "IncreaseHeight");  //reversed, because increase is down
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.META_DOWN_MASK), "DecreaseHeight");
         
         am.put("Tab", new AbstractAction(){
             @Override
@@ -535,7 +539,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 for (ZElement e : getSelectedElements()) {
                     boolean r = e.isResizable();
                     e.setResizable(true);  //override resizable
-                    e.increaseSizeMaintainAspect(0.5, 1, SCALE);
+                    e.increaseSizeMaintainAspect(0.5, 1, SCALE*getZoomFactor());
                     e.setResizable(r);
                 }
             }
@@ -546,9 +550,34 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 for (ZElement e : getSelectedElements()) {
                     boolean r = e.isResizable();
                     e.setResizable(true);  //override resizable
-                    e.increaseSizeMaintainAspect(-0.5, 1, SCALE);
+                    e.increaseSizeMaintainAspect(-0.5, 1, SCALE*getZoomFactor());
                     e.setResizable(r);
                 }
+            }
+        });
+        
+        am.put("IncreaseWidth", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sizeSelected(1, 0);
+            }
+        });
+        am.put("DecreaseWidth", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sizeSelected(-1, 0);
+            }
+        });
+        am.put("IncreaseHeight", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sizeSelected(0, 1);
+            }
+        });
+        am.put("DecreaseHeight", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sizeSelected(0, -1);
             }
         });
         
@@ -1224,6 +1253,19 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZElement e : getSelectedElements()) {
            e.shearX(x);
            e.shearY(y);
+        }
+        repaint();
+    }
+    
+    /**
+     * Change the size of selected elements
+     * @param w num pixels width
+     * @param h num pixels height
+     */
+    public void sizeSelected(double w, double h) {
+         
+        for (ZElement e : getSelectedElements()) {
+           e.increaseSize(w, h, 1, SCALE*getZoomFactor());
         }
         repaint();
     }
