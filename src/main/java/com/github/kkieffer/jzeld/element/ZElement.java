@@ -149,9 +149,9 @@ public abstract class ZElement implements Serializable {
      */
     public String getBaseElementHtmlHelp() {
         return (resizable ? "Resize the element by clicking and dragging the resize box in the lower right corner.<br><br>" : "") +
-               (canMove ? "Move the element by selecting it and dragging it to the new position or use the arrow keys.<br><br>" : "This element cannot be moved.<br><br>") +
+               (canMove ? "Move the element by selecting it and dragging it to the new position.<br><br>" : "This element cannot be moved.<br><br>") +
                (resizable ? "Resize the element, maintaining its aspect ratio, by selecting it and using the mouse wheel or press <i>CTRL + or CTRL -</i><br><br>" : 
-                "This element cannot be resized but pressing <i>CTRL + or CTRL - </i>will force a resize.<br><br>") +
+                "This element cannot be resized but pressing <i>SHIFT-LeftArrow or SHIFT-RightArrow</i> will force a resize.<br><br>") +
                "Rotate the element by selecting it and using the mouse wheel while holding Shift. Rotations to 90 degree positions are available in the right-click context menu.<br><br>" +
                "Shear the element horizontally by selecting it and using the mouse wheel while pressing keys Alt-S.<br><br>" +
                "Shear the element vertically by selecting it and using the mouse wheel while pressing keys Alt-Shift-S.<br><br>" +

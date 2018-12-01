@@ -395,14 +395,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "MoveRight");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "MoveUp");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "MoveDown");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.META_DOWN_MASK), "Increase");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.META_DOWN_MASK), "Decrease");
+
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK), "ShearLeft");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK), "ShearRight");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.ALT_DOWN_MASK), "ShearUp");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.ALT_DOWN_MASK), "ShearDown");
- 
-       
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), "RotateLeft");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK), "RotateRight");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK), "IncreaseSize");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK), "DecreaseSize");
+        
+        
         am.put("Tab", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -492,46 +495,58 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         am.put("ShearLeft", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                shearSelected(0.1, 0);
+                shearSelected(0.01, 0);
             }
         });
         am.put("ShearRight", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                shearSelected(-0.1, 0);
+                shearSelected(-0.01, 0);
             }
         });
         am.put("ShearUp", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                shearSelected(0, -0.1);
+                shearSelected(0, -0.01);
             }
         });
         am.put("ShearDown", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                shearSelected(0, 0.1);
+                shearSelected(0, 0.01);
+            }
+        });
+        am.put("RotateLeft", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                rotateSelected(-0.1);
+            }
+        });
+        am.put("RotateRight", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                rotateSelected(0.1);
             }
         });
         
-        am.put("Increase", new AbstractAction(){
+        am.put("IncreaseSize", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent a) {
                 for (ZElement e : getSelectedElements()) {
                     boolean r = e.isResizable();
                     e.setResizable(true);  //override resizable
-                    e.increaseSizeMaintainAspect(1, 1, SCALE);
+                    e.increaseSizeMaintainAspect(0.5, 1, SCALE);
                     e.setResizable(r);
                 }
             }
         });
-        am.put("Decrease", new AbstractAction(){
+        am.put("DecreaseSize", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent a) {
                 for (ZElement e : getSelectedElements()) {
                     boolean r = e.isResizable();
                     e.setResizable(true);  //override resizable
-                    e.increaseSizeMaintainAspect(-1, 1, SCALE);
+                    e.increaseSizeMaintainAspect(-0.5, 1, SCALE);
                     e.setResizable(r);
                 }
             }
@@ -1209,6 +1224,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZElement e : getSelectedElements()) {
            e.shearX(x);
            e.shearY(y);
+        }
+        repaint();
+    }
+    
+    public void rotateSelected(double angle) {
+        for (ZElement e : getSelectedElements()) {
+           e.rotate(angle);
         }
         repaint();
     }
