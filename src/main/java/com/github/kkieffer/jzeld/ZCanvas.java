@@ -385,6 +385,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "Tab");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "Plus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "Minus");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.META_DOWN_MASK), "MetaPlus");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.META_DOWN_MASK), "MetaMinus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, KeyEvent.SHIFT_DOWN_MASK), "ShiftPressed");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ALT, KeyEvent.ALT_DOWN_MASK), "AltPressed");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 0, true), "ShiftReleased");
@@ -428,6 +430,18 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             public void actionPerformed(ActionEvent e) {
                 if (passThruElement == null)  //don't zoom if another element is pass thru (might be using the keyboard)
                     zoomOut();
+            }
+        });
+        am.put("MetaPlus", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                moveForward();
+            }
+        });
+        am.put("MetaMinus", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                moveBackward();
             }
         });
         am.put("ShiftPressed", new AbstractAction(){
@@ -1258,14 +1272,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
-     * Change the size of selected elements
+     * Change the size of selected elements, overriding resizable
      * @param w num pixels width
      * @param h num pixels height
      */
     public void sizeSelected(double w, double h) {
          
         for (ZElement e : getSelectedElements()) {
-           e.increaseSize(w, h, 1, SCALE*getZoomFactor());
+            boolean r = e.isResizable();
+            e.setResizable(true);  //override resizable                
+            e.increaseSize(w, h, 1, SCALE*getZoomFactor());
+            e.setResizable(r);
         }
         repaint();
     }

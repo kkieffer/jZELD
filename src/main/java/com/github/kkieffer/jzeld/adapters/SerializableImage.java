@@ -61,6 +61,12 @@ public class SerializableImage implements Serializable {
      * @return the rescaled image
      */
     public static BufferedImage resizeImage(Image original, int newWidth, int newHeight, int newType, int x, int y, int w, int h) {
+        
+        if (newType == 0) {
+            boolean hasAlpha = ((BufferedImage)original).getColorModel().hasAlpha();
+            newType = hasAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
+        }
+        
         BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, newType);
         Graphics2D g = resizedImage.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
