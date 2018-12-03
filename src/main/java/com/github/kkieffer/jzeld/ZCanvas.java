@@ -2033,7 +2033,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 it.remove();
         }
 
-        if (selectedElements.isEmpty() && passThruElement != null)
+        if (selectedElements.isEmpty() || passThruElement != null)
             return;
 
         undoStack.saveContext(fields.zElements);
@@ -2294,7 +2294,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZElement s : selectedElements)
             paintElement(g2d, s, true); //apply highlights to selected elements
         
-        Font mouseFont = new Font(fields.mouseCoordFont.getFontName(), fields.mouseCoordFont.getStyle(), (int)Math.ceil(fields.mouseCoordFont.getSize2D()*pixScale/fields.zoom));
+        Font mouseFont = fields.mouseCoordFont.deriveFont((float)(fields.mouseCoordFont.getSize2D()*pixScale/fields.zoom));
         FontMetrics fontMetrics = g2d.getFontMetrics(mouseFont);
         g2d.setFont(mouseFont);
    
