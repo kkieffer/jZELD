@@ -3,6 +3,7 @@ package com.github.kkieffer.jzeld.draw;
 
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 
 /**
@@ -15,8 +16,7 @@ import java.awt.geom.Point2D;
  */
 public interface DrawClient {
 
- 
-    
+
      /**
       * Stop drawing
       */
@@ -56,5 +56,13 @@ public interface DrawClient {
      * @param e the original mouse event
      */
     public void drawClientMouseDragged(Point2D mouse, MouseEvent e);
+
+    
+    /**
+     * The mouse wheel was rotated
+     * @param scaledMouse mouse location on the canvas, taking into account the zoom and origin offset
+     * @param e the original mouse event
+     */
+    public void drawClientMouseWheelMoved(Point2D scaledMouse, MouseWheelEvent e);
     
 }

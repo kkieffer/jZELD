@@ -2795,8 +2795,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         
-        if (drawClient != null)
+         if (drawClient != null) {
+            drawClient.drawClientMouseWheelMoved(getScaledMouse(e), e);
+            repaint();
             return;
+        }
         
         
         if (passThruElement != null) { 

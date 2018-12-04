@@ -5,6 +5,7 @@ import com.github.kkieffer.jzeld.ZCanvas;
 import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 
 /**
@@ -38,6 +39,10 @@ public class StraightLineDraw extends BoundaryDraw {
 
     @Override
     public void drawClientMouseDragged(Point2D mouse, MouseEvent e) {
+    }
+    
+    @Override
+    public void drawClientMouseWheelMoved(Point2D scaledMouse, MouseWheelEvent e) {  //no op
     }
     
 }

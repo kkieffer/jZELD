@@ -6,6 +6,7 @@ import com.github.kkieffer.jzeld.element.ZElement.StrokeStyle;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
@@ -86,4 +87,7 @@ public class OrthogonalLineDraw extends BoundaryDraw {
     public void drawClientMouseDragged(Point2D mouse, MouseEvent e) {
     }
     
+    @Override
+    public void drawClientMouseWheelMoved(Point2D scaledMouse, MouseWheelEvent e) {  //no op
+    }
 }
