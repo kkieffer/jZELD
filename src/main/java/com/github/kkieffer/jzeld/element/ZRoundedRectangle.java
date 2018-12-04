@@ -2,14 +2,26 @@
 package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.ZCanvas;
-import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
+import com.github.kkieffer.jzeld.adapters.DialogUtils;
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.WindowConstants;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -28,6 +40,9 @@ public class ZRoundedRectangle extends ZRectangle {
     
     protected double radius;
 
+    transient private RoundedRectDialog dialog;
+
+    
     protected ZRoundedRectangle(){}
     
      /**
@@ -79,6 +94,10 @@ public class ZRoundedRectangle extends ZRectangle {
         radius = r;
         changed();
     }
+    
+    public double getRadius() {
+        return radius;
+    }
      
     @Override
     protected Shape getPolygon(double width, double height, double scale) {
@@ -93,22 +112,93 @@ public class ZRoundedRectangle extends ZRectangle {
     @Override
     public boolean selectedForEdit(ZCanvas canvas) {
         
-        Component parent = SwingUtilities.getRoot(canvas);
-
-        double unitScale = canvas.getUnit().getScale();
-        
-        //Prompt for new radius, and prefill the old radius (scaled by the current unit)
-        String rc = (String)JOptionPane.showInputDialog(parent, "Update Corner Radius (" + canvas.getUnit().getName() + ")", "Modify Rounded Rectangle", JOptionPane.QUESTION_MESSAGE, radiusIcon,
-                                                (Object[])null, (Object)String.valueOf(radius*unitScale));
-        if (rc != null) {
-            try {
-                 setRadius(Double.parseDouble(rc)/unitScale);  //set the new radius in canvas units
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(canvas, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
-            }
-        }
-        
+        dialog = new RoundedRectDialog(this, canvas);
+        canvas.arrangePopup(dialog);
+        dialog.setVisible(true);
         return false;
+    }
+    
+    @Override
+    public void deselectedForEdit() {
+
+        if (dialog != null) {
+            dialog.dispose();
+            dialog = null;
+        }
+    }
+    
+    
+    
+    private static class RoundedRectDialog extends JFrame {
+
+        private final ZRoundedRectangle rect;
+        
+        private RoundedRectDialog(ZRoundedRectangle r, ZCanvas canvas) {
+            super("Modify Rounded Rectangle");
+            rect = r;        
+            double unitScale = canvas.getUnit().getScale();
+
+            
+            Rectangle2D b = rect.getBounds2D();
+            double max = b.getWidth() > b.getHeight() ? b.getWidth() : b.getHeight();
+            
+            max *= unitScale/2;  //half the max, and convert to unit
+
+            JPanel p = new JPanel();
+            
+            JLabel cornerLabel = new JLabel("Corner Radius (" + canvas.getUnit().getName() + ")");
+            JSpinner cornerRadiusSpinner = new JSpinner();
+            cornerRadiusSpinner.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, max, max/100));
+            cornerRadiusSpinner.setValue(rect.getRadius()*unitScale);
+ 
+            cornerRadiusSpinner.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    double rad = (double)cornerRadiusSpinner.getValue();
+                    rect.setRadius(rad/unitScale);  //set the new radius in canvas units
+                }
+            });
+            
+            
+            
+            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+            java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
+            layout.columnWidths = new int[] {0, 10, 0, 40, 0};
+            layout.rowHeights = new int[] {0, 10, 0};
+            p.setLayout(layout);
+        
+            GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            p.add(cornerLabel, gridBagConstraints);
+
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = 0;
+            p.add(cornerRadiusSpinner, gridBagConstraints);
+
+            cornerRadiusSpinner.setPreferredSize(new Dimension(100, 26));
+            Container main = getContentPane();
+            main.setLayout(new BorderLayout());
+            
+            main.add(p, BorderLayout.CENTER);
+            JLabel icon = new JLabel();
+            icon.setIcon(radiusIcon);
+            Border margin = new EmptyBorder(0,15,0,15);
+            icon.setBorder(new CompoundBorder(icon.getBorder(), margin));
+            main.add(icon, BorderLayout.WEST);
+
+            pack();
+            Dimension d = new Dimension(340, 175);
+            setMinimumSize(d);
+            setPreferredSize(d);
+            
+            DialogUtils.addShortcutAndIcon(p, "dispose");
+            
+        }
     }
    
 

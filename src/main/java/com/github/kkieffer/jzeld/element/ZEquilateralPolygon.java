@@ -104,7 +104,7 @@ public class ZEquilateralPolygon extends ZPolygon {
                     throw new NumberFormatException("Sides must be greater than 2");
                 setSides(numSides);
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(canvas, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
+                JOptionPane.showMessageDialog(parent, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
             }
         }
         

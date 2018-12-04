@@ -2,21 +2,31 @@
 package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.ZCanvas;
-import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
+import com.github.kkieffer.jzeld.adapters.DialogUtils;
 import com.github.kkieffer.jzeld.draw.BoundaryDraw;
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.WindowConstants;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * 
@@ -26,18 +36,19 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ZQuadrilateral extends ZPolygon {
 
-    public static final ImageIcon radiusIcon = new ImageIcon(ZCanvas.class.getResource("/skew.png")); 
+    public static final ImageIcon skewIcon = new ImageIcon(ZCanvas.class.getResource("/skew.png")); 
      
     public enum QuadType {SQUARE, PARALLELOGRAM, TRAPEZOID, RHOMBUS, DIAMOND}
     
     protected QuadType type;
-    protected int percent;
+    protected double percent;
 
-    @XmlTransient
-    double[] x = new double[4];  //x verticies
+    private transient double[] x = new double[4];  //x verticies
+    private transient double[] y = new double[4];  //y verticies
     
-    @XmlTransient
-    double[] y = new double[4];  //y verticies
+ 
+    private transient QuadrilateralDialog dialog;
+
     
     protected ZQuadrilateral(){}
     
@@ -59,10 +70,11 @@ public class ZQuadrilateral extends ZPolygon {
      * @param borderStyle
      * @param percent the percent of skew from 0 (rectangle) to 100 (maximum angle in bounds)
      */
-    public ZQuadrilateral(QuadType type, double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, StrokeStyle borderStyle, int percent) {
+    public ZQuadrilateral(QuadType type, double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove, float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, StrokeStyle borderStyle, double percent) {
         super(x, y, width, height, rotation, canSelect, canResize, canMove, borderWidth, borderColor, dashPattern, fillColor, borderStyle);
         this.type = type;
         this.percent = percent;
+        this.setName("ZQuadr:" + type.name());
     }
     
     
@@ -92,54 +104,21 @@ public class ZQuadrilateral extends ZPolygon {
      * Adjust the number of percent of slope (meaning depends on shape)
      * @param p the percent, from 0 to 100
      */
-    public void setPercent(int p) {
+    public void setPercent(double p) {
         if (p < 0 || p > 100)
             throw new IllegalArgumentException("Percent must be between 0 and 100");
         percent = p;
         changed();
+    }
+    
+    public double getPercent() {
+        return percent;
     }
      
     @Override
     public boolean supportsEdit() {
         return true;
     };
-    
-    @Override
-    public boolean selectedForEdit(ZCanvas canvas) {
-            
-        if (type != QuadType.SQUARE) {
-            
-            Component parent = SwingUtilities.getRoot(canvas);
-
-            String rc = (String)JOptionPane.showInputDialog(parent, "Update Percent of Maximum Skew", "Modify Quadrilateral", JOptionPane.QUESTION_MESSAGE, radiusIcon,
-                                                    (Object[])null, (Object)String.valueOf(percent));
-            if (rc != null) {
-                try {
-                    int pc = Integer.parseInt(rc);
-                    if (pc < 0 || pc > 100)
-                        throw new NumberFormatException("Percent must be between 0 and 100");
-                    setPercent(pc);
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(canvas, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
-                }
-            }
-        }
-        
-        if (type == QuadType.SQUARE || type == QuadType.RHOMBUS) {
-            Rectangle2D bounds = this.getBounds2D(canvas.getScale());
-            double w = bounds.getWidth();
-            double h = bounds.getHeight();
-                
-            double s = w > h ? h : w;
-            setSize(s, s, 0.0, canvas.getScale());
-        }
-        
-        
-        return false;
-    }
-    
-    
-    
     
     
     @Override
@@ -198,22 +177,22 @@ public class ZQuadrilateral extends ZPolygon {
     }
        
     private void getParallelogram(double w, double h) {            
-        x[0] = (double)w * ((double)percent / 100.0);
+        x[0] = (double)w * (percent / 100.0);
         x[2] = w - x[0];
 
     }
 
     private void getTrapezoid(double w, double h) {
-        x[0] = (double)w * ((double)percent / 200.0);
+        x[0] = (double)w * (percent / 200.0);
         x[1] = w - x[0];
     }
     
     
     private void getDiamond(double w, double h) {
-        x[0] = (double)w * ((double)percent / 100.0);
+        x[0] = (double)w * (percent / 100.0);
         x[2] = w - x[0];
         
-        y[1] = (double)h * ((double)percent / 100.0);
+        y[1] = (double)h * (percent / 100.0);
         y[2] = h;
         y[3] = h - y[1];
     }
@@ -225,7 +204,7 @@ public class ZQuadrilateral extends ZPolygon {
         double shorter = w > h ? h : w;
         
  
-        x[0] = (double)shorter * ((double)percent / 200.0);
+        x[0] = (double)shorter * (percent / 200.0);
         x[1] = shorter;
         x[2] = x[1] - x[0];
         double hypotenuse = x[1] - x[0];
@@ -233,6 +212,110 @@ public class ZQuadrilateral extends ZPolygon {
         y[2] = Math.sqrt(Math.pow(hypotenuse, 2) - Math.pow(x[0], 2));
         y[3] = y[2];
         
+    }
+    
+    
+    @Override
+    public boolean selectedForEdit(ZCanvas canvas) {
+            
+        if (type != QuadType.SQUARE) {
+            
+            dialog = new QuadrilateralDialog(this);
+            canvas.arrangePopup(dialog);
+            dialog.setVisible(true);
+            return false;
+        }
+        
+        if (type == QuadType.SQUARE || type == QuadType.RHOMBUS) {  //just reduce the bounds to fit
+            Rectangle2D bounds = this.getBounds2D(canvas.getScale());
+            double w = bounds.getWidth();
+            double h = bounds.getHeight();
+                
+            double s = w > h ? h : w;
+            setSize(s, s, 0.0, canvas.getScale());
+        }
+        
+        
+        return false;
+    }
+    
+    
+   
+    
+    @Override
+    public void deselectedForEdit() {
+
+        if (dialog != null) {
+            dialog.dispose();
+            dialog = null;
+        }
+    }
+    
+    
+    
+    private static class QuadrilateralDialog extends JFrame {
+
+        private final ZQuadrilateral quad;
+        
+        private QuadrilateralDialog(ZQuadrilateral r) {
+            super("Modify Quadrilateral");
+            quad = r;        
+
+           
+            JPanel p = new JPanel();
+            
+            JLabel skewLabel = new JLabel("Percent of Maximum Skew");
+            JSpinner percentSkewSpinner = new JSpinner();
+            percentSkewSpinner.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, 100.0d, 1.0d));
+            percentSkewSpinner.setValue(quad.getPercent());
+ 
+            percentSkewSpinner.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    quad.setPercent((double)percentSkewSpinner.getValue());  
+                }
+            });
+            
+            
+            
+            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+            java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
+            layout.columnWidths = new int[] {0, 10, 0, 40, 0};
+            layout.rowHeights = new int[] {0, 10, 0};
+            p.setLayout(layout);
+        
+            GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            p.add(skewLabel, gridBagConstraints);
+
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = 0;
+            p.add(percentSkewSpinner, gridBagConstraints);
+
+            percentSkewSpinner.setPreferredSize(new Dimension(100, 26));
+            Container main = getContentPane();
+            main.setLayout(new BorderLayout());
+            
+            main.add(p, BorderLayout.CENTER);
+            JLabel icon = new JLabel();
+            icon.setIcon(skewIcon);
+            Border margin = new EmptyBorder(0,15,0,15);
+            icon.setBorder(new CompoundBorder(icon.getBorder(), margin));
+            main.add(icon, BorderLayout.WEST);
+
+            pack();
+            Dimension d = new Dimension(340, 175);
+            setMinimumSize(d);
+            setPreferredSize(d);
+            
+            DialogUtils.addShortcutAndIcon(p, "dispose");
+            
+        }
     }
 
 }
