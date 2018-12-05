@@ -17,6 +17,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.FlatteningPathIterator;
 import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -391,6 +392,23 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
 
     }
     
+    /**
+     * Determines if a point (plus some margin) intersects or is within the shape boundaries.
+     * @param p the point to check
+     * @param margin the square margin around the point, which is checked for intersection with the shape
+     * @param scale value to which the point and margin are scaled (divided) by
+     * @return true if the point plus its margin is enclosed by or intersect the shape boundaries
+     */
+    public boolean contains(Point2D p, double margin, double scale) {
+        
+        double x = p.getX()/scale;
+        double y = p.getY()/scale;
+        double b = margin/scale;
+        
+        //Create a square bounds around the point
+        Rectangle2D rect = new Rectangle2D.Double(x-b/2, y-b/2, b, b);
+        return getShape().intersects(rect);
+    } 
     
     /**
      * Combine this shape with the provided list of ZAbstractShapes. The 

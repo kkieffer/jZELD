@@ -255,6 +255,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     private final float[] altDashedBorder = new float[]{pixScale*5.0f};
 
     private final int DRAG_BOX_SIZE = (int)(10 * pixScale);
+    private final int SHAPE_SELECT_MARGIN = (int)(10 * pixScale);
     
     
     //private final ArrayList<ZElement> selectedElements = new ArrayList<>();
@@ -2437,10 +2438,29 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
             Point2D lowerRightCorner = new Point2D.Double(boundsBox.getX() + boundsBox.getWidth(), boundsBox.getY() + boundsBox.getHeight());
             AffineTransform t = o.getElementTransform(SCALE, false);
-            Shape s = t.createTransformedShape(boundsBox);
-            Point2D lowerRightTransformed = t.transform(lowerRightCorner, null);  //also transform the lower right corner
-      
-            if (s.contains(mouseLoc)) {  //see if the mouse point is in the shape
+                       
+            Shape boundsShape = t.createTransformedShape(boundsBox);  //not a shape, see if the bounds box contains it            
+
+            if (boundsShape.contains(mouseLoc)) {  //see if the mouse point is in the element bounds
+                                
+                Point2D lowerRightTransformed = t.transform(lowerRightCorner, null);  //also transform the lower right corne
+                             
+                boolean isOnDragBox = false;
+                
+                if (lowerRightTransformed.distance(mouseLoc)/pixScale < DRAG_BOX_SIZE)  //see if its within the drag box
+                    isOnDragBox = true;
+                
+                /**
+                 * Special case for shapes - if the mouse wasn't on the shape and wasn't on the drag box, consider it not selected
+                 */
+                if (o instanceof ZAbstractShape) {
+                    double margin = Math.ceil(o.getOutlineWidth()) + SHAPE_SELECT_MARGIN;  //add the outline width, plus some margin
+
+                    boolean containsMousePoint = ((ZAbstractShape)o).contains(mouseIn, margin, SCALE);  //see if the actual shape contains it                    
+                    if (!containsMousePoint && !isOnDragBox)
+                        continue;
+                    
+                }
                 
                 if (!o.isSelected()) {  //newly selected element
                     
@@ -2485,7 +2505,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 selectedObj_yOffset_toRightCorner = lowerRightTransformed.getY() - mouseLoc.getY();
                 
                 //Check if the mouse was within the drag box
-                if (o.isResizable() && lowerRightTransformed.distance(mouseLoc)/pixScale < DRAG_BOX_SIZE) { 
+                if (o.isResizable() && isOnDragBox) { 
                     selectedElementResizeOn = true;
                     selectedResizeElement = o;
                     selectedResizeElementOrigDim = selectedResizeElement.getBounds2D(SCALE);
