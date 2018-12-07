@@ -6,6 +6,7 @@ import com.github.kkieffer.jzeld.attributes.TextAttributes;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.ColorAdapter;
 import com.github.kkieffer.jzeld.ZCanvas;
 import com.github.kkieffer.jzeld.attributes.TextAttributes.HorizontalJustify;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -26,6 +27,9 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.SimpleAttributeSet;
@@ -157,7 +161,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     protected ZEditableText() {}
 
     protected void afterUnmarshal(Unmarshaller u, Object parent) {
-        textPanel = new JPanel();
+        textPanel = new JPanel(new BorderLayout());
         setTextAttributes(textAttributes);
         setAttributes(borderThickness, borderColor, null, backgroundColor, borderStyle);
         setup();
@@ -188,7 +192,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         super(x, y, width, height, rotation, selectable, selectable, selectable);  //unknown bounds, height and width until we have a graphics context
                
         
-        textPanel = new JPanel();
+        textPanel = new JPanel(new BorderLayout());
         textWidget = new JTextPane();
         
         textAttributes = new TextAttributes();
@@ -204,7 +208,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     protected ZEditableText(ZEditableText copy, boolean forNew) {
         super(copy, forNew);
         
-        textPanel = new JPanel();
+        textPanel = new JPanel(new BorderLayout());
         textWidget = new JTextPane();
         
         textAttributes = new TextAttributes();
@@ -275,6 +279,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     @Override
     public void setOutlineColor(Color outlineColor) {
         this.borderColor = outlineColor;
+        validateSize();        
         changed();
     }
     
@@ -286,6 +291,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     @Override
     public void setOutlineStyle(StrokeStyle style) {
         this.borderStyle = style;
+        validateSize();        
         changed();
     }
     
@@ -516,28 +522,6 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         
    
     
-    
-    /**
-     * Checks to see if the text string will fit in the bounds of the element without resizing it
-     * @param text the test string
-     * @param font the font to try, if null, use the currently set font attribute
-     * @param scale the canvas scale
-     * @return true if the text will fit, false otherwise
-     */
-    public boolean checkTextFit(String text, Font font, double scale) {
-                
-        JTextPane testPane = new JTextPane();
-        testPane.setFont(font == null ? textAttributes.font : font);
-        testPane.setText(text);
-
-        Dimension d = testPane.getPreferredSize();  //preferred size is the size that it should be based on the amount of characters
-        Rectangle2D b = super.getBounds2D(scale);
-        
-        if (d.width > b.getWidth() || d.height > b.getHeight())
-            return false;
-        else
-            return true;
-    }
 
     private void validateSize() {
     
@@ -549,7 +533,14 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     
     @Override
     protected void setSize(double w, double h, double minSize, double scale) {
-             
+
+        Border outerBorder = BorderFactory.createLineBorder(this.borderColor, (int)borderThickness, (borderStyle == StrokeStyle.ROUNDED));
+               
+        int m = (int)borderThickness/2;       
+        Border marginBorder = new EmptyBorder(m, m, m, m);
+    
+        textWidget.setBorder(new CompoundBorder(outerBorder, marginBorder));
+                
         Dimension d = textWidget.getPreferredSize();  //preferred size is the size that it should be based on the amount of characters
         
         double textMinWidth = d.getWidth() * scale/72;
@@ -562,7 +553,7 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         if (textMinHeight > h) 
             h = textMinHeight;
   
-        super.setSize(w, h, minSize, scale);        
+        super.setSize(w, h, minSize, scale);
     }
        
     
@@ -581,7 +572,6 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
             g.transform(scaleInstance);
          }
          
-        textWidget.setBorder(BorderFactory.createLineBorder(this.borderColor, (int)borderThickness, (borderStyle == StrokeStyle.ROUNDED)));
 
         textWidget.setSize(new Dimension((int)width, (int)height));
 
