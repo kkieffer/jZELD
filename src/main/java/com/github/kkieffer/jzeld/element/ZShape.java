@@ -255,14 +255,16 @@ public class ZShape extends ZAbstractShape {
 
     @Override
     protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
-        g.fill(scaledShape);
+        if (scaledShape != null)
+            g.fill(scaledShape);
     }
 
    
     
     @Override
     protected void drawShape(Graphics2D g, double unitSize, double width, double height) {        
-        g.draw(scaledShape);
+        if (scaledShape != null)
+            g.draw(scaledShape);
     }
 
     @Override
