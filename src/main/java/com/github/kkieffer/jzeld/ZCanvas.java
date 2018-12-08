@@ -258,7 +258,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     
     //private final ArrayList<ZElement> selectedElements = new ArrayList<>();
-    private LinkedList<ZElement> clipboard;
+    private LinkedList<ZElement> clipboard = new LinkedList<>();
 
     private UndoStack undoStack;
 
@@ -603,6 +603,16 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
     }
     
+    public void dispose() {
+        clearAll();
+        undoStack.clear();
+        clipboard.clear();
+        contextMenu.dispose();
+        removeMouseListener(this);	
+        removeMouseMotionListener(this);    
+        removeMouseWheelListener(this);
+    }
+    
     /**
      * Cleanup the canvas, removing all elements.  Typically used when loading a new canvas or clearing out a canvas to be reused.
      */
@@ -619,10 +629,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         uuidMap.clear();
         repaint();
- 
+
     }
     
-    
+       
     /**
      * Places the popup frame (container) to the right of the canvas's frame
      * @param c 
@@ -943,6 +953,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public boolean drawOn(DrawClient c) {
         if (drawClient != null)
             return false;
+        
+        selectNone();
         
         drawClient = c;
         for (ZCanvasEventListener l : canvasEventListeners)
@@ -1950,8 +1962,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
         
         if (selectedElements.size() > 0) {
+                
+            clipboard.clear();
             
-            clipboard = new LinkedList<>();
             ZElement[] externalCopy = new ZElement[selectedElements.size()];
             int i=0;
             for (ZElement e : selectedElements) {

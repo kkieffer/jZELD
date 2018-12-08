@@ -317,6 +317,13 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
     }
 
     @Override
+    public void dispose() {      
+        contextPopupMenu.setVisible(false);
+        contextPopupMenu.setInvoker(null);
+    }
+    
+    
+    @Override
     public void newSelections(ZElement lastSelected, ArrayList<ZElement> selectedElements) {
         
         if (lastSelected == null)

@@ -26,6 +26,10 @@ public interface ZCanvasContextMenu {
      * @param selectedElements all the selected elements, which must contain lastSelected if not empty
      */
     public void newSelections(ZElement lastSelected, ArrayList<ZElement> selectedElements);
-    
-    
+
+    /**
+     * Hides and disposes of this menu
+     */
+    public void dispose();
+      
 }

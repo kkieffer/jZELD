@@ -108,6 +108,12 @@ public class UndoStack {
         suspend = false;
     }
     
-    
+    /**
+     * Clear all history
+     */
+    public void clear() {
+        redoHistory.clear();
+        undoHistory.clear();
+    }
     
 }
