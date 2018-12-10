@@ -315,11 +315,12 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
     public void show(Component component, int x, int y) {
         contextPopupMenu.show(component, x, y);
     }
-
+    
     @Override
     public void dispose() {      
         contextPopupMenu.setVisible(false);
         contextPopupMenu.setInvoker(null);
+        contextPopupMenu.removeAll();
     }
     
     

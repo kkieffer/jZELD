@@ -247,7 +247,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     /*----------------------------------------------------------------------*/
     
-    CanvasStore fields = new CanvasStore();
+    private CanvasStore fields = new CanvasStore();
         
     
     private final float[] dashedBorder = new float[]{0.0f, 5.0f, 5.0f};
@@ -258,7 +258,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     
     //private final ArrayList<ZElement> selectedElements = new ArrayList<>();
-    private LinkedList<ZElement> clipboard = new LinkedList<>();
+    private final LinkedList<ZElement> clipboard = new LinkedList<>();
 
     private UndoStack undoStack;
 
@@ -603,18 +603,25 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
     }
     
+    /**
+     * Disposes of a canvas and frees all memory and resources. Should be called when the canvas is no longer needed,
+     * and once this is called the canvas should not be used again.
+     */
     public void dispose() {
-        clearAll();
-        undoStack.clear();
+        clearAll();   //remove all elements and clear UUID map
+        removeAll();  //remove all subcomponents and listeners
+        undoStack.clear();  
         clipboard.clear();
-        contextMenu.dispose();
+        contextMenu.dispose();   //clear context menu and listeners
+        animationTimer.stop();
+        canvasEventListeners.clear();
         removeMouseListener(this);	
         removeMouseMotionListener(this);    
         removeMouseWheelListener(this);
     }
     
     /**
-     * Cleanup the canvas, removing all elements.  Typically used when loading a new canvas or clearing out a canvas to be reused.
+     * Cleanup the canvas, removing all elements.  Typically used when clearing out a canvas to be reused.
      */
     public void clearAll() {
         

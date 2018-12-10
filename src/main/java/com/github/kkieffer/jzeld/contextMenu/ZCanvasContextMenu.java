@@ -28,7 +28,7 @@ public interface ZCanvasContextMenu {
     public void newSelections(ZElement lastSelected, ArrayList<ZElement> selectedElements);
 
     /**
-     * Hides and disposes of this menu
+     * Hides and disposes of this menu and all its children, including all listeners
      */
     public void dispose();
       
