@@ -150,7 +150,7 @@ public class ZArc extends ZRectangle {
     @Override
     public boolean selectedForEdit(ZCanvas canvas) {
         
-        dialog = new ArcDialog(this);
+        dialog = new ArcDialog(this, canvas);
         canvas.arrangePopup(dialog);
         dialog.setVisible(true);
 
@@ -176,7 +176,7 @@ public class ZArc extends ZRectangle {
 
         private final ZArc arc;
         
-        private ArcDialog(ZArc a) {
+        private ArcDialog(ZArc a, ZCanvas canvas) {
             super("Modify Arc");
             arc = a;
 
@@ -201,6 +201,7 @@ public class ZArc extends ZRectangle {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     arc.setArcType((ArcType)typeCombo.getSelectedItem());
+                    canvas.repaint();
                 }
                 
             });
@@ -209,12 +210,14 @@ public class ZArc extends ZRectangle {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     arc.setStartAngle((Double)startAngleSpinner.getValue());
+                    canvas.repaint();
                 }
             });
             arcAngleSpinner.addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     arc.setArcAngle((Double)arcAngleSpinner.getValue());
+                    canvas.repaint();
                 }
             });
             

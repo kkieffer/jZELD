@@ -220,7 +220,7 @@ public class ZQuadrilateral extends ZPolygon {
             
         if (type != QuadType.SQUARE) {
             
-            dialog = new QuadrilateralDialog(this);
+            dialog = new QuadrilateralDialog(this, canvas);
             canvas.arrangePopup(dialog);
             dialog.setVisible(true);
             return false;
@@ -257,7 +257,7 @@ public class ZQuadrilateral extends ZPolygon {
 
         private final ZQuadrilateral quad;
         
-        private QuadrilateralDialog(ZQuadrilateral r) {
+        private QuadrilateralDialog(ZQuadrilateral r, ZCanvas canvas) {
             super("Modify Quadrilateral");
             quad = r;        
 
@@ -273,7 +273,8 @@ public class ZQuadrilateral extends ZPolygon {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     quad.setPercent((double)percentSkewSpinner.getValue());  
-                }
+                    canvas.repaint();
+               }
             });
             
             

@@ -156,7 +156,8 @@ public class ZRoundedRectangle extends ZRectangle {
                 public void stateChanged(ChangeEvent e) {
                     double rad = (double)cornerRadiusSpinner.getValue();
                     rect.setRadius(rad/unitScale);  //set the new radius in canvas units
-                }
+                    canvas.repaint();
+               }
             });
             
             

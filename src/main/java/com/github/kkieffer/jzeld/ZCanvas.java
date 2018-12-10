@@ -2025,7 +2025,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
-     * Pastes an external ZElement to the top Z-plane and selects it
+     * Pastes a ZElement to the top Z-plane and selects it
      * @param e the element to paste 
      */
     public void paste(ZElement e) {
@@ -2036,6 +2036,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         addElement(toPaste);
         toPaste.select();
+        lastSelectedElement = toPaste;
 
         repaint();  
     }
