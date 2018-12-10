@@ -1123,7 +1123,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     private void restoreContext(LinkedList<ZElement> restoreContext) {
         if (restoreContext != null) {
-            
+
             clearAll();  //clear out all elements
           
             fields.zElements = restoreContext;  //replace all the elements
@@ -1457,7 +1457,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         addElement(group);  //add the group element
         selectNone();
-        group.select();
+        elementSelected(group);
         
         undoStack.resumeSave();
 
@@ -1513,7 +1513,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         selectNone();
         for (ZElement e : restoredElements) {  //added back in the z-plane order such that the top zplane is last in list
             this.addElement(e);
-            e.select();
+            elementSelected(e);
         }
          
         undoStack.resumeSave();
@@ -2035,10 +2035,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         ZElement toPaste = e.copyOf(true);  //make a copy to paste, for multiple pastes
         
         addElement(toPaste);
-        toPaste.select();
-        lastSelectedElement = toPaste;
-
-        repaint();  
+        elementSelected(toPaste);
     }
     
  
@@ -2121,6 +2118,18 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         } 
     }
     
+    
+    private void elementSelected(ZElement e) {
+        e.select();
+        lastSelectedElement = e;   
+        for (ZCanvasEventListener l : canvasEventListeners)
+            l.elementSelected(e);
+
+        setCurrentCursor(Cursor.getDefaultCursor());
+
+        repaint();
+    }
+    
     /**
      * Select  an element, if the element is on the canvas
      * @param toSel the element to select
@@ -2135,21 +2144,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZElement e : fields.zElements) {
             if (e.equals(toSel)) {
                 
-                e.select();
-                lastSelectedElement = e;   
-                for (ZCanvasEventListener l : canvasEventListeners)
-                    l.elementSelected(e);
-
-                setCurrentCursor(Cursor.getDefaultCursor());
-
-                
+                elementSelected(e);
                 if (passThru) {
                     if (lastSelectedElement.selectedForEdit(this))  //tell the element it was selected
                         passThruElement = lastSelectedElement; 
                 }
 
-
-                
                 repaint();
                 return true;
             }

@@ -44,6 +44,16 @@ public class UndoStack {
     }
 
     
+    private LinkedList<ZElement> copyOf(LinkedList<ZElement> src) {
+        
+        LinkedList<ZElement> copy = new LinkedList<>();
+        Iterator<ZElement> it = src.iterator();
+        while (it.hasNext()) 
+            copy.addLast(it.next().copyOf(false));
+        
+        return copy;
+    }
+    
     private void saveContext(LinkedList<ZElement> ctx, boolean clearRedo) {
 
         if (suspend)
@@ -51,13 +61,8 @@ public class UndoStack {
         
         if (undoHistory.size() == stackDepth)  //remove oldest, if reached capacity limit
             undoHistory.removeLast();
-        
-        LinkedList<ZElement> copy = new LinkedList<>();
-        Iterator<ZElement> it = ctx.iterator();
-        while (it.hasNext()) 
-            copy.addLast(it.next().copyOf(false));
-        
-        undoHistory.addFirst(copy);  //push a copy to the stack
+                
+        undoHistory.addFirst(copyOf(ctx));  //push a copy to the stack
         
         if (clearRedo)
             redoHistory.clear(); //clear all redo because this is a new context
@@ -75,13 +80,8 @@ public class UndoStack {
         
         if (redoHistory.size() == stackDepth)
             redoHistory.removeLast();
-        
-        LinkedList<ZElement> copy = new LinkedList<>();
-        Iterator<ZElement> it = ctx.iterator();
-        while (it.hasNext()) 
-            copy.addLast(it.next().copyOf(false));
-        
-        redoHistory.addFirst(copy);
+                
+        redoHistory.addFirst(copyOf(ctx));
         
         return undoHistory.removeFirst();
         
