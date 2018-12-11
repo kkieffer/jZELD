@@ -50,28 +50,33 @@ public abstract class ZPolygon extends ZAbstractShape {
     
     
     protected abstract Shape getPolygon(double width, double height, double scale);
-   
+    
+    private Shape getTransformedPolygon(double width, double height, double scale) {
+        
+        Shape polygon = getPolygon(width, height, scale);
+        
+        if (flipHoriz || flipVert) {
+            AffineTransform scaleInstance = AffineTransform.getScaleInstance(flipHoriz ? -1.0 : 1.0, flipVert ? -1.0 : 1.0);  //scaling negative creates a mirror image the other direction
+            polygon = scaleInstance.createTransformedShape(polygon);
+            AffineTransform translateInstance = AffineTransform.getTranslateInstance(flipHoriz ? width : 0, flipVert ? height : 0);  //move back to where it was
+            polygon = translateInstance.createTransformedShape(polygon);
+        }
+        return polygon;
+    }
+    
+    
     @Override
     protected Shape getAbstractShape() {
         Rectangle2D r = getBounds2D();
-        return getPolygon(r.getWidth(), r.getHeight(), 1.0);
+        return getTransformedPolygon(r.getWidth(), r.getHeight(), 1.0);
     }
 
     
     @Override
     public void paint(Graphics2D g, double unitSize, double width, double height) {
  
-       Shape polygon = getPolygon(width, height, unitSize);
-       
-       if (flipHoriz || flipVert) {
-            AffineTransform scaleInstance = AffineTransform.getScaleInstance(flipHoriz ? -1.0 : 1.0, flipVert ? -1.0 : 1.0);  //scaling negative creates a mirror image the other direction
-            shape = scaleInstance.createTransformedShape(polygon);
-            AffineTransform translateInstance = AffineTransform.getTranslateInstance(flipHoriz ? width : 0, flipVert ? height : 0);  //move back to where it was
-            shape = translateInstance.createTransformedShape(shape);
-       }
-       else
-           shape = polygon;  //optimize
-    
+       shape = getTransformedPolygon(width, height, unitSize);
+  
        super.paint(g, unitSize, width, height);
     }
 
