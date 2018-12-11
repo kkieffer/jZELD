@@ -26,37 +26,37 @@ public class ShadowAttributes implements Serializable {
         public void changed();
         public Image getShadowImage();
         
-        default void setEnabled(boolean e) {
+        default void setShadowEnabled(boolean e) {
             getShadowAttributes().setEnabled(e);
             changed();
         }
     
-        default void setColor(Color c) {
+        default void setShadowColor(Color c) {
             getShadowAttributes().setColor(c);
             changed();
         }
 
-        default void setRadius(int r) {
+        default void setShadowRadius(int r) {
             getShadowAttributes().setRadius(r);     
             changed();
         }
     
-        default void setOpacity(float o) {
+        default void setShadowOpacity(float o) {
             getShadowAttributes().setOpacity(o);    
             changed();
         }
     
-        default void setXOffset(double x) {
+        default void setShadowXOffset(double x) {
             getShadowAttributes().setXOffset(x);    
             changed();
         }
 
-        default void setYOffset(double y) {
+        default void setShadowYOffset(double y) {
             getShadowAttributes().setYOffset(y);    
             changed();
         }
 
-        default void setSizeRatio(double s) {
+        default void setShadowSizeRatio(double s) {
             getShadowAttributes().setSizeRatio(s);    
             changed();
         }

@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.adapters.SerializableImage;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -138,8 +139,10 @@ public class ZImage extends ZRectangle {
             int w = flipHoriz ? (int)-width : (int)width;
             int y = flipVert ? (int)height : 0;
             int h = flipVert ? (int)-height : (int)height;
-            
+
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getOpacity()));
             paintImage(g, image.getImage(), x, y, w, h);
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         }
     }
     

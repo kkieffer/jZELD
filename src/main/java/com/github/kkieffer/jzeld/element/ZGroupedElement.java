@@ -230,6 +230,14 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
     }
     
     @Override
+    public void setOpacity(float o) {
+        for (ZElement e : elements) {
+            e.setOpacity(o);
+        } 
+        changed();
+    }
+    
+    @Override
     public void setOutlineStyle(StrokeStyle borderStyle) {
          for (ZElement e : elements) {
             if (e.hasOutline()) {
@@ -418,6 +426,11 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
     @Override
     protected void setSize(double w, double h, double minSize, double scale) {
         
+        if (w <= 0)
+            w = minSize;  //don't go to zero
+        if (h <= 0)
+            h = minSize; //don't go to zero
+        
         Rectangle2D bounds = this.getBounds2D(scale);
         double scaleX = w / bounds.getWidth(); 
         double scaleY = h / bounds.getHeight(); 
@@ -597,70 +610,70 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
     
     
     @Override
-    public void setEnabled(boolean en) {
+    public void setShadowEnabled(boolean en) {
         for (ZElement e : elements) {
             if (e instanceof ShadowAttributes.ShadowInterface) {
-                ((ShadowAttributes.ShadowInterface)e).setEnabled(en);
+                ((ShadowAttributes.ShadowInterface)e).setShadowEnabled(en);
             }
         }
         changed();
     }
     
     @Override
-    public void setColor(Color c) {
+    public void setShadowColor(Color c) {
         for (ZElement e : elements) {
             if (e instanceof ShadowAttributes.ShadowInterface) {
-                ((ShadowAttributes.ShadowInterface)e).setColor(c);
+                ((ShadowAttributes.ShadowInterface)e).setShadowColor(c);
             }
         }
         changed();
     }
 
     @Override
-    public void setRadius(int r) {
+    public void setShadowRadius(int r) {
         for (ZElement e : elements) {
             if (e instanceof ShadowAttributes.ShadowInterface) {
-                ((ShadowAttributes.ShadowInterface)e).setRadius(r);
+                ((ShadowAttributes.ShadowInterface)e).setShadowRadius(r);
             }
         }
         changed();    
     }
 
     @Override
-    public void setOpacity(float o) {
+    public void setShadowOpacity(float o) {
         for (ZElement e : elements) {
             if (e instanceof ShadowAttributes.ShadowInterface) {
-                ((ShadowAttributes.ShadowInterface)e).setOpacity(o);
+                ((ShadowAttributes.ShadowInterface)e).setShadowOpacity(o);
             }
         }
         changed();   
     }
 
     @Override
-    public void setXOffset(double x) {
+    public void setShadowXOffset(double x) {
         for (ZElement e : elements) {
             if (e instanceof ShadowAttributes.ShadowInterface) {
-                ((ShadowAttributes.ShadowInterface)e).setXOffset(x);
+                ((ShadowAttributes.ShadowInterface)e).setShadowXOffset(x);
             }
         }
         changed();  
     }
 
     @Override
-    public void setYOffset(double y) {
+    public void setShadowYOffset(double y) {
         for (ZElement e : elements) {
             if (e instanceof ShadowAttributes.ShadowInterface) {
-                ((ShadowAttributes.ShadowInterface)e).setYOffset(y);
+                ((ShadowAttributes.ShadowInterface)e).setShadowYOffset(y);
             }
         }
         changed();    
     }
 
     @Override
-    public void setSizeRatio(double s) {
+    public void setShadowSizeRatio(double s) {
         for (ZElement e : elements) {
             if (e instanceof ShadowAttributes.ShadowInterface) {
-                ((ShadowAttributes.ShadowInterface)e).setSizeRatio(s);
+                ((ShadowAttributes.ShadowInterface)e).setShadowSizeRatio(s);
             }
         }
         changed();   

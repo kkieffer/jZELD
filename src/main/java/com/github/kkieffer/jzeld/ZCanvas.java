@@ -945,7 +945,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
-     * If the canvas is being drawn usign a draw client, return true, else false
+     * If the canvas is being drawn using a draw client, return true, else false
      * @return 
      */
     public boolean usingDrawClient() {
@@ -1269,6 +1269,19 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
             }
             selectedElement.setRotation(newRotation);
+        }
+        repaint();
+    }
+    
+    
+    /**
+     * Set the opacity for all selected selements
+     * @param o the opacity, from 0.0 (transparent) to 1.0 (opaque) 
+     */
+     public void setOpacity(float o) {
+         
+        for (ZElement e : getSelectedElements()) {
+           e.setOpacity(o);
         }
         repaint();
     }

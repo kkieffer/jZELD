@@ -61,6 +61,7 @@ public abstract class ZElement implements Serializable {
     private double rotation;  //degrees
     private double shearX; //ratio
     private double shearY; 
+    private float opacity = 1.0f;
     private boolean canSelect;
     private boolean resizable;
     private boolean canMove;
@@ -127,9 +128,10 @@ public abstract class ZElement implements Serializable {
         this.canMove = src.canMove;
         this.visible = src.visible;
         this.name = src.name; 
-        flipHoriz = src.flipHoriz;
-        flipVert = src.flipVert;
-        className = src.className;
+        this.opacity = src.opacity;
+        this.flipHoriz = src.flipHoriz;
+        this.flipVert = src.flipVert;
+        this.className = src.className;
         
         if (forNew)
             this.uuid = UUID.randomUUID();  //new one 
@@ -200,6 +202,16 @@ public abstract class ZElement implements Serializable {
     public void deselect() {
         selected = false;
     }
+    
+    public void setOpacity(float o) {
+        opacity = o;
+        hasChanges = true;
+    }
+    
+    public float getOpacity() {
+        return opacity;
+    }
+    
     
     /**
      * Sets the attributes of an element.  An Element does not need to support all or any of these fields.

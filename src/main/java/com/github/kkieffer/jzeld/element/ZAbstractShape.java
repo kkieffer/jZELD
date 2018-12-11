@@ -7,6 +7,7 @@ import com.github.kkieffer.jzeld.attributes.PaintAttributes;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.ColorAdapter;
 import com.github.kkieffer.jzeld.ZCanvas.CombineOperation;
 import com.jhlabs.image.ShadowFilter;
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -550,7 +551,7 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      
+
         //If the element has a shadow, create the shadow image (if needed), and place it at the desired offset
         if (shadowAttributes != null && shadowAttributes.isEnabled()) {
             if (shadowImage == null) 
@@ -563,6 +564,9 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
                 
             g.drawImage(shadowImage, (int)(shadowAttributes.getXOffset()*unitSize - margin/2), (int)(shadowAttributes.getYOffset()*unitSize - margin/2), shadW, shadH, null);
         }
+        
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getOpacity()));
+
 
         if (backgroundColor != null) {
             g.setColor(backgroundColor);
@@ -595,7 +599,9 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
             g.setColor(borderColor);
             drawShape(g, unitSize, width, height);
        }
-              
+                   
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));  //back to full opaque
+
     }
 
     

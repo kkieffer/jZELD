@@ -6,6 +6,7 @@ import com.github.kkieffer.jzeld.attributes.TextAttributes;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.ColorAdapter;
 import com.github.kkieffer.jzeld.ZCanvas;
 import com.github.kkieffer.jzeld.attributes.TextAttributes.HorizontalJustify;
+import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -574,9 +575,11 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
          
 
         textWidget.setSize(new Dimension((int)width, (int)height));
-
+        
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getOpacity()));
         textWidget.paint(g);  //paint the widget
-            
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));  //back to full opaque
+     
         g.setTransform(af);
     }
     
