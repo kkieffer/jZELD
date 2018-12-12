@@ -2,7 +2,6 @@
 package com.github.kkieffer.jzeld.contextMenu;
 
 import com.github.kkieffer.jzeld.ZCanvas;
-import com.github.kkieffer.jzeld.ZCanvas.CombineOperation;
 import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
 import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.Component;
@@ -121,32 +120,8 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         }
         
         
-        combineMenu = new JMenu("Combine");
-        for (CombineOperation g : CombineOperation.values()) {
-            JMenuItem m = new JMenuItem(g.toString());
-            m.setName(g.name());
-            m.addActionListener(new java.awt.event.ActionListener() {
-                @Override
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    int numSel = canvas.getSelectedElementsArray().length;
-                    int combined = canvas.combineSelectedElements(g);
-                
-                    if (combined < 0)
-                        JOptionPane.showMessageDialog(canvas, "Combine operation resulted in a shape with no area", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);
-
-                    else if (numSel != combined) {
-                        if (combined == 0)
-                            JOptionPane.showMessageDialog(canvas, "No elements combined.\nOther selected elements are not shapes and cannot be combined. ", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);                         
-                        else
-                            JOptionPane.showMessageDialog(canvas, "Only " + combined + " elements combined.\nOther selected elements are not shapes and cannot be combined. ", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);
-                    }
-                }
-            });
-            combineMenu.add(m);
-            
-        }        
-        
-                
+        combineMenu = new CombineMenu("Combine", canvas);
+           
         attributesMenu = new JMenu("Attributes");
         lineWeightMenu = new LineBorderMenu("Line Weight", canvas, LineBorderMenu.Type.WEIGHT);
         lineDashMenu = new LineBorderMenu("Dash Pattern", canvas, LineBorderMenu.Type.DASH);

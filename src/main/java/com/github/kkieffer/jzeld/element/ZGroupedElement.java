@@ -105,8 +105,11 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
         elements = copyElements(srcElements);
         
         //Remove the x,y offset from each element's position
-        for (ZElement e : this.elements) 
+        for (ZElement e : this.elements) {
+            e.setMoveable(true);
+            e.setResizable(true);
             e.move(-x, -y, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        }
         
     }
     
