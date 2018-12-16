@@ -23,12 +23,11 @@ import java.util.List;
 /**
  * This abstract class can be used to help draw shapes with a boundary and no fill.  The subclass can call addPoint() to add new 
  * mouse points to the shape, and then create the shape and add it to the ZCanvas.  Points are connected by straight lines.
+ * If a null point is added, it becomes a gap in the drawing between the points on other side of it.
  * @author kkieffer
  */
 public abstract class BoundaryDraw implements DrawClient, KeyListener {
 
-    
-    
     
     /**
      * From a list of 2D points, creates a 2D line path between them.
@@ -46,9 +45,20 @@ public abstract class BoundaryDraw implements DrawClient, KeyListener {
         Point2D p = points.get(0);
         path.moveTo(p.getX(), p.getY());
 
+        boolean moveNext = false;
         for (int i=1; i<points.size(); i++) {
             p = points.get(i);
-            path.lineTo(p.getX(), p.getY());
+            if (p == null) {  //if null, switch to "move" (gap in draw)
+                moveNext = true;
+                continue;
+            }
+            
+            if (moveNext)
+                path.moveTo(p.getX(), p.getY());
+            else
+                path.lineTo(p.getX(), p.getY());
+            
+            moveNext = false;
         }
        
         if (closePath)
@@ -102,8 +112,12 @@ public abstract class BoundaryDraw implements DrawClient, KeyListener {
         
         //Translate everything into units of the canvas
         for (int i=0; i<mousePoints.size(); i++) {
-            double x = mousePoints.get(i).getX() / scale;
-            double y = mousePoints.get(i).getY() / scale;
+            Point2D p = mousePoints.get(i);
+            if (p == null)
+                continue;
+            
+            double x = p.getX() / scale;
+            double y = p.getY() / scale;
             mousePoints.set(i, new Point2D.Double(x, y));
         }
         
@@ -163,7 +177,7 @@ public abstract class BoundaryDraw implements DrawClient, KeyListener {
         Iterator<Point2D> it = mousePoints.iterator();
         while (it.hasNext()) {
             Point2D curr = it.next();
-            if (previous != null)
+            if (previous != null && curr != null)
                 g2d.draw(new Line2D.Double(previous.getX(), previous.getY(), curr.getX(), curr.getY()));
             previous = curr;
         }

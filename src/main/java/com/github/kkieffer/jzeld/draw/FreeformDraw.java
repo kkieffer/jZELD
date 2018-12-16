@@ -9,8 +9,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 
 /**
- * A drawing object that creates a freeform drawing while holding the mouse down - straight lines connected the mouse points 
- * together. When the mouse is released the shape is added to the canvas.
+ * A drawing object that creates a freeform drawing while holding the mouse down and dragging - straight lines connected the mouse points 
+ * together. When the mouse is released, the freeform drawing resumes from the location the mouse is pressed and dragged at.
  * If the close parameter is specified, the shape is closed by drawing a line from the last point to the first.
  * 
  * @author kkieffer
@@ -32,14 +32,14 @@ public class FreeformDraw extends BoundaryDraw {
 
     @Override
     public void drawClientMouseReleased(Point2D mouse, MouseEvent e) {
-        complete();
+        this.addPoint(null);
     }
 
     @Override
     public void drawClientMouseDragged(Point2D mouse, MouseEvent e) {
         this.addPoint(mouse);
     }
-
+    
     @Override
     public void drawClientMouseWheelMoved(Point2D scaledMouse, MouseWheelEvent e) {  //no op
     }
