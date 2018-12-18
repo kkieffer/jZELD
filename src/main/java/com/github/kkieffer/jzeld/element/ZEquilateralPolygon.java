@@ -95,7 +95,7 @@ public class ZEquilateralPolygon extends ZPolygon {
         
         Component parent = SwingUtilities.getRoot(canvas);
 
-        String rc = (String)JOptionPane.showInputDialog(parent, "Update Number of Sides", "Modify Equilateral Polygon", JOptionPane.QUESTION_MESSAGE, radiusIcon,
+        String rc = (String)JOptionPane.showInputDialog(parent, "Update Number of Sides", "Edit Equilateral Polygon", JOptionPane.QUESTION_MESSAGE, radiusIcon,
                                                 (Object[])null, (Object)String.valueOf(sides));
         if (rc != null) {
             try {

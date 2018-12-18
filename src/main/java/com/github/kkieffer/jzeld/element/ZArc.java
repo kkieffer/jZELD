@@ -177,7 +177,7 @@ public class ZArc extends ZRectangle {
         private final ZArc arc;
         
         private ArcDialog(ZArc a, ZCanvas canvas) {
-            super("Modify Arc");
+            super("Edit Arc");
             arc = a;
 
             JPanel p = new JPanel();

@@ -134,7 +134,7 @@ public class ZRoundedRectangle extends ZRectangle {
         private final ZRoundedRectangle rect;
         
         private RoundedRectDialog(ZRoundedRectangle r, ZCanvas canvas) {
-            super("Modify Rounded Rectangle");
+            super("Edit Rounded Rectangle");
             rect = r;        
             double unitScale = canvas.getUnit().getScale();
 

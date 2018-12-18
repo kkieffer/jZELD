@@ -258,7 +258,7 @@ public class ZQuadrilateral extends ZPolygon {
         private final ZQuadrilateral quad;
         
         private QuadrilateralDialog(ZQuadrilateral r, ZCanvas canvas) {
-            super("Modify Quadrilateral");
+            super("Edit Quadrilateral");
             quad = r;        
 
            
