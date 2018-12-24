@@ -1935,7 +1935,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param classType the classType to match, elements must be equal, subclasses of, or implement the classType. Use ZElement for all types
      * @return 
      */
-    public ZElement[] getElementsByClass(Class<? extends ZElement> classType) {
+    public ZElement[] getElementsByClass(Class<?> classType) {
         
         ArrayList<ZElement> list = new ArrayList<>();
         for (ZElement e : fields.zElements) {

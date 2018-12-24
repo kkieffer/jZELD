@@ -43,6 +43,7 @@ public class ZImage extends ZRectangle {
      * @param borderColor color of the border, which can be null only if the borderWidth is zero
      * @param dashPattern the dash pattern of the border, null for solid
      * @param fillColor color of the rectangle area, which can be null for transparent. Any transparent image pixels will have this color
+     * @param borderStyle style of the border
      * @param img the image painted on this element, if null, it is not painted
      */
     public ZImage(double x, double y, double width, double height, double rotation, boolean canSelect, boolean canResize, boolean canMove,  float borderWidth, Color borderColor, Float[] dashPattern, Color fillColor, StrokeStyle borderStyle, BufferedImage img) {

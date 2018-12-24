@@ -66,7 +66,7 @@ public class ZEditableBoundedText extends ZEditableText {
     }
 
     
-    private boolean fits(double w, double h) {  //true of the text widget bounds fit the bounds of this element, false otherwise
+    protected boolean fits(double w, double h) {  //true of the text widget bounds fit the bounds of this element, false otherwise
         
         
         Dimension d = textWidget.getPreferredSize();  //preferred size is the size that it should be based on the amount of characters     
@@ -80,7 +80,7 @@ public class ZEditableBoundedText extends ZEditableText {
     }
                     
     
-    private void validateSize(double w, double h) {
+    protected void validateSize(double w, double h) {
              
         int fontSize = getTextAttributes().font.getSize()-1;
     
