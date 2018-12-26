@@ -1,6 +1,7 @@
 
 package com.github.kkieffer.jzeld;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import javax.xml.bind.Unmarshaller;
@@ -44,6 +45,12 @@ public class UnitMeasure implements Serializable {
     protected transient DecimalFormat dFormat;
     
     protected void afterUnmarshal(Unmarshaller u, Object parent) {
+        setDecimalFormatString();
+    }
+    
+    //Custom deserialize
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
         setDecimalFormatString();
     }
      

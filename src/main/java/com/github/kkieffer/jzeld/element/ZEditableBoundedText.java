@@ -61,7 +61,7 @@ public class ZEditableBoundedText extends ZEditableText {
         
         return "<b>ZEditableText: An editable text box.</b><br><br>Double click on the text box to show the cursor and edit text. The font size of the text " +
                 "is automatically sized to fit the text box size. " + TextAttributes.getHtmlHelp() + "<br><br>" + 
-                "The text box background color can be set, along with the border color and thickness. A dashed border is not supported.<br><br>" + super.getHtmlHelp();
+                "The text box background color can be set, along with the border color and thickness. A dashed border is not supported.<br><br>" + getBaseElementHtmlHelp();
         
     }
 
