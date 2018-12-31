@@ -19,20 +19,18 @@ public class LineStyleMenu extends JMenu {
 
    
     
-    private static class StyleMenuItem extends AbstractContextMenu {
+    private static class StyleMenuItem extends AbstractContextMenuItem {
         
         
         public StyleMenuItem(ZCanvas c, StrokeStyle style) {
             
-            super(c);
+            super(style.toString(), c);
             
             createMenuGraphics();
        
             g.setColor(Color.BLACK);
             g.setStroke(new BasicStroke(8.0f, style.getCapType(), style.getJoinType()));
-            int strW = g.getFontMetrics().stringWidth(style.toString()) + 10;
-            g.drawString(style.toString(), 0, 12);
-            g.drawLine(strW, 8, strW + 25, 8);
+            g.drawLine(10, 8, 70, 8);
             g.dispose();
 
             this.setIcon(new ImageIcon(bufferedImage));
@@ -55,7 +53,7 @@ public class LineStyleMenu extends JMenu {
     
    
     
-    private final ArrayList<AbstractContextMenu> menuItemList = new ArrayList<>();
+    private final ArrayList<AbstractContextMenuItem> menuItemList = new ArrayList<>();
     
   
     public LineStyleMenu(String text, ZCanvas c) {
@@ -70,17 +68,17 @@ public class LineStyleMenu extends JMenu {
     }
     
      public void addListener(ContextMenuListener l) {
-        for (AbstractContextMenu m : menuItemList)
+        for (AbstractContextMenuItem m : menuItemList)
             m.addListener(l);
     }
     
     public void removeListener(ContextMenuListener l) {
-        for (AbstractContextMenu m : menuItemList)
+        for (AbstractContextMenuItem m : menuItemList)
             m.removeListener(l);
     }
     
     public void setCanvas(ZCanvas c) {
-        for (AbstractContextMenu m : menuItemList)
+        for (AbstractContextMenuItem m : menuItemList)
             m.setCanvas(c);
     }
     

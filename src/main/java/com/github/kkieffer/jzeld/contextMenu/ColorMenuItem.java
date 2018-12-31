@@ -17,7 +17,7 @@ import javax.swing.ImageIcon;
  * 
  * @author kkieffer
  */
-public class ColorMenuItem extends AbstractContextMenu {
+public class ColorMenuItem extends AbstractContextMenuItem {
      
     public static enum Type {LINE, FILL, CLEAR}
     
@@ -35,8 +35,7 @@ public class ColorMenuItem extends AbstractContextMenu {
     
 
     public ColorMenuItem(String text, ZCanvas c, Type type) {
-        super(c);
-        setText(text);
+        super(text, c);
         if (type != Type.CLEAR)
             setIcon(colorIcon);
         

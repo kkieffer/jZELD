@@ -17,7 +17,7 @@ import javax.swing.JMenuItem;
  * Abstract base class for Context Menu. Notifies listeners when a menu setting is selected
  * @author kkieffer
  */
-public class AbstractContextMenu extends JMenuItem {
+public class AbstractContextMenuItem extends JMenuItem {
     
     protected ZCanvas canvas;
     
@@ -27,7 +27,8 @@ public class AbstractContextMenu extends JMenuItem {
     protected Graphics2D g;
     
     
-    protected AbstractContextMenu(ZCanvas c) {
+    protected AbstractContextMenuItem(String text, ZCanvas c) {
+        super(text);
         canvas = c;
     }
     

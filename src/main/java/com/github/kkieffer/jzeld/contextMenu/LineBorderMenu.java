@@ -38,22 +38,22 @@ public class LineBorderMenu extends JMenu {
         
     };
     
-    private static class WeightMenuItem extends AbstractContextMenu {
+    private static class WeightMenuItem extends AbstractContextMenuItem {
         
         
         public WeightMenuItem(ZCanvas c, GraphicsConfiguration gC, float thickStep) {
             
-            super(c);
+            super("", c);
             createMenuGraphics();
 
             DecimalFormat fmt = new DecimalFormat("0.0");
             
             g.setStroke(new BasicStroke(thickStep));
             String label = fmt.format(thickStep);
-            int strW = g.getFontMetrics().stringWidth(label) + 10;
-            g.drawString(label, 0, 12);
+            setText(label);
+            
             if (thickStep > 0.0)
-                g.drawLine(strW, 8, 100, 8);
+                g.drawLine(10, 8, 90, 8);
             
             g.dispose();
             
@@ -75,12 +75,12 @@ public class LineBorderMenu extends JMenu {
     
    
     
-    private static class DashMenuItem extends AbstractContextMenu {
+    private static class DashMenuItem extends AbstractContextMenuItem {
         
         
         public DashMenuItem(ZCanvas c, GraphicsConfiguration gC, Float[] dash) {
             
-            super(c);
+            super("", c);
 
             createMenuGraphics();
 
@@ -117,7 +117,7 @@ public class LineBorderMenu extends JMenu {
     
     
     
-    private final ArrayList<AbstractContextMenu> menuItemList = new ArrayList<>();
+    private final ArrayList<AbstractContextMenuItem> menuItemList = new ArrayList<>();
     
   
     public LineBorderMenu(String text, ZCanvas c, Type type) {
@@ -150,17 +150,17 @@ public class LineBorderMenu extends JMenu {
     }
     
     public void addListener(ContextMenuListener l) {
-        for (AbstractContextMenu m : menuItemList)
+        for (AbstractContextMenuItem m : menuItemList)
             m.addListener(l);
     }
     
     public void removeListener(ContextMenuListener l) {
-        for (AbstractContextMenu m : menuItemList)
+        for (AbstractContextMenuItem m : menuItemList)
             m.removeListener(l);
     }
     
     public void setCanvas(ZCanvas c) {
-        for (AbstractContextMenu m : menuItemList)
+        for (AbstractContextMenuItem m : menuItemList)
             m.setCanvas(c);
     }
     
