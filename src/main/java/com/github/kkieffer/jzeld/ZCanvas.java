@@ -1628,6 +1628,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         repaint();
     }
     
+    public Color getCanvasBackgroundColor() {
+        return fields.backgroundColor;
+    }
+    
     
     /**
      * Sets the outline width of the selected elements
@@ -2984,8 +2988,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     /**
      * Print the canvas to a supplied Graphics2D context, the margins, canvas rulers, and grid are hidden
      * @param g the context to draw on
+     * @param hideBackground whether or not to paint the background color
      */
-    public void paintToGraphicsContext(Graphics2D g) {
+    public void paintToGraphicsContext(Graphics2D g, boolean hideBackground) {
         
         //Hide margins, ruler, and grid
         boolean marginsOn = areMarginsOn();
@@ -2993,11 +2998,13 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         ZGrid savedGrid = fields.grid; //save grid
         ZCanvasRuler horizontalRuler = fields.horizontalRuler;
         ZCanvasRuler verticalRuler = fields.verticalRuler;
+        Color savedColor = fields.backgroundColor;
         
         setGrid(null);
         setHorizontalRuler(null);
         setVerticalRuler(null);
-        
+        if (hideBackground)
+            setCanvasBackgroundColor(null);
         
         drawOff();
         resetView();
@@ -3021,7 +3028,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         setGrid(savedGrid);
         setHorizontalRuler(horizontalRuler);
         setVerticalRuler(verticalRuler);
-                
+        if (hideBackground)
+            setCanvasBackgroundColor(savedColor);
+            
     }
     
     /**

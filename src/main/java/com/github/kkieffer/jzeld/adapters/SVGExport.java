@@ -52,8 +52,8 @@ public class SVGExport {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
         // Ask the canvas to render into the SVG Graphics2D implementation.
-        c.paintToGraphicsContext(g2d);
-        
+        c.paintToGraphicsContext(g2d, true);
+
 
         boolean useCSS = true; // we want to use CSS style attributes
         g2d.stream(w, useCSS);
