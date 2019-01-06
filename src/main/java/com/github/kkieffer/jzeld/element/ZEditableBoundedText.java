@@ -70,8 +70,6 @@ public class ZEditableBoundedText extends ZEditableText {
         
         
         Dimension d = textWidget.getPreferredSize();  //preferred size is the size that it should be based on the amount of characters     
-        if (d.width == 0)  //break out on zero characters
-            return true;
         
         double textMinWidth = d.getWidth()/72;
         double textMinHeight = d.getHeight()/72;
@@ -81,7 +79,11 @@ public class ZEditableBoundedText extends ZEditableText {
                     
     
     protected void validateSize(double w, double h) {
-             
+    
+        Dimension d = textWidget.getPreferredSize();  //preferred size is the size that it should be based on the amount of characters     
+        if (d.width == 0)  //break out on zero characters - zero always fits, and the font will scale forever
+            return;
+        
         int fontSize = getTextAttributes().font.getSize()-1;
     
         if (fits(w, h)) { //already fits, scale font up to fit
