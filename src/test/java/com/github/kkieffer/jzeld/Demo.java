@@ -8,6 +8,7 @@ import com.github.kkieffer.jzeld.attributes.TextAttributes;
 import com.github.kkieffer.jzeld.adapters.SVGExport;
 import com.github.kkieffer.jzeld.contextMenu.ZDefaultContextMenu;
 import com.github.kkieffer.jzeld.ZCanvas.Orientation;
+import com.github.kkieffer.jzeld.adapters.SVGImport;
 import com.github.kkieffer.jzeld.draw.FreeformDraw;
 import com.github.kkieffer.jzeld.draw.OrthogonalLineDraw;
 import com.github.kkieffer.jzeld.draw.StraightLineDraw;
@@ -290,10 +291,23 @@ public class Demo extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    File f = new File("test.svg");
+                    File f = new File("saved.svg");
                     SVGExport.toSVG(c, f);
                     System.out.println("Wrote canvas to " + f.getAbsolutePath());
                 } catch (IOException ex) {
+                    System.err.println(ex);
+                } 
+            }
+        });      
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.ALT_DOWN_MASK), "ImportSVG");
+        am.put("ImportSVG", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    File f = new File("toImport.svg");
+                    SVGImport.fromFile(c, f, false);
+                    System.out.println("Imported " + f.getAbsolutePath());
+                } catch (Exception ex) {
                     System.err.println(ex);
                 } 
             }
