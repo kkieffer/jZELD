@@ -121,7 +121,7 @@ public class ZImage extends ZRectangle {
      * @param height the image height
      */
     protected void paintImage(Graphics2D g, Image img, final int x, final int y, final int width, final int height) {      
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.drawImage(img, x, y, width, height, null);
     }
