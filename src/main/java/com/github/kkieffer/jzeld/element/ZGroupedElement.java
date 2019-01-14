@@ -1,10 +1,12 @@
 
 package com.github.kkieffer.jzeld.element;
 
+import com.github.kkieffer.jzeld.adapters.ShapeAdapter;
 import com.github.kkieffer.jzeld.attributes.CustomStroke;
 import com.github.kkieffer.jzeld.attributes.ShadowAttributes;
 import com.github.kkieffer.jzeld.attributes.TextAttributes;
 import com.github.kkieffer.jzeld.attributes.PaintAttributes;
+import static com.github.kkieffer.jzeld.element.ZShape.setClip;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -18,6 +20,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * A ZGroupedElement holds a collection of elements that are drawn together and treated as a single element. The elements in the group are arranged
@@ -30,6 +33,10 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
 
     @XmlElement(name="ZElement")        
     private ArrayList<ZElement> elements;
+    
+    @XmlJavaTypeAdapter(ShapeAdapter.class)
+    private Shape clippingShape = null; 
+   
     
     private double groupedWidth;
     private double groupedHeight;
@@ -88,19 +95,21 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
      * Groups the elements into a ZGroupedElement. Sub-elements are repositioned relative to the grouped element.  The grouped element
      * position and size is set to bound all the sub-elements.
      * @param elements
+     * @param clippingShape shape that clips the group, which can be null
      * @return 
      */
-    public static ZGroupedElement createGroup(ArrayList<ZElement> elements) {
+    public static ZGroupedElement createGroup(ArrayList<ZElement> elements, Shape clippingShape) {
         
         Rectangle2D b = getEnclosingBounds(elements);
-        return new ZGroupedElement(b.getX(), b.getY(), b.getWidth(), b.getHeight(), elements);
+        return new ZGroupedElement(b.getX(), b.getY(), b.getWidth(), b.getHeight(), elements, clippingShape);
     }
 
     
-    private ZGroupedElement(double x, double y, double w, double h, ArrayList<ZElement> srcElements) {
+    private ZGroupedElement(double x, double y, double w, double h, ArrayList<ZElement> srcElements, Shape clipping) {
         super(x, y, w, h, 0.0, true, true, true);
         groupedWidth = w;  //maintain the original grouped size in case of resize
         groupedHeight = h;
+        clippingShape = clipping;
         
         elements = copyElements(srcElements);
         
@@ -111,6 +120,12 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
             e.move(-x, -y, Integer.MAX_VALUE, Integer.MAX_VALUE);
         }
         
+        
+        if (clippingShape != null) {
+            AffineTransform a = AffineTransform.getTranslateInstance(-x, -y);
+            clippingShape = a.createTransformedShape(clippingShape);
+        }   
+        
     }
     
     private ZGroupedElement() {}
@@ -120,6 +135,16 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
         this.elements = copyElements(src.elements);
         this.groupedWidth = src.groupedWidth;
         this.groupedHeight = src.groupedHeight;
+        
+        if (src.clippingShape != null) {
+            try {
+                //Make a copy of the shape
+                ShapeAdapter a = new ShapeAdapter();
+                this.clippingShape = a.unmarshal(a.marshal(src.clippingShape));
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
     
     
@@ -399,6 +424,15 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
            
         }
         
+        if (clippingShape != null) {
+            AffineTransform scaleInstance = AffineTransform.getScaleInstance(-1.0, 1.0);  //scaling negative creates a mirror image the other direction
+            clippingShape = scaleInstance.createTransformedShape(clippingShape);
+            
+            AffineTransform translateInstance = AffineTransform.getTranslateInstance(bounds.getWidth(), 0);  //move back to where it was
+            clippingShape = translateInstance.createTransformedShape(clippingShape);
+        }
+        
+        
     }
     
     @Override
@@ -417,6 +451,14 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
 
             e.flipVertical();
            
+        }
+        
+        if (clippingShape != null) {
+            AffineTransform scaleInstance = AffineTransform.getScaleInstance(1.0, -1.0);  //scaling negative creates a mirror image the other direction
+            clippingShape = scaleInstance.createTransformedShape(clippingShape);
+            
+            AffineTransform translateInstance = AffineTransform.getTranslateInstance(0, bounds.getHeight());  //move back to where it was
+            clippingShape = translateInstance.createTransformedShape(clippingShape);
         }
         
     }
@@ -450,6 +492,12 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
             e.reposition(newX/scale, newY/scale, Double.MAX_VALUE, Double.MAX_VALUE);
         }
         
+        //Scale the clip
+        if (clippingShape != null) {
+            AffineTransform scaleInstance = AffineTransform.getScaleInstance(scaleX, scaleY);
+            clippingShape = scaleInstance.createTransformedShape(clippingShape);
+        }
+            
         super.setSize(w, h, minSize, scale);
     }
     
@@ -460,7 +508,14 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
         if (!isVisible())
             return;
         
-         
+        Shape scaledClip = null;
+        if (clippingShape != null) {
+            AffineTransform scaleInstance = AffineTransform.getScaleInstance(unitSize, unitSize);
+            scaledClip = scaleInstance.createTransformedShape(clippingShape);
+        }
+        
+        Shape origClip = setClip(g, scaledClip);
+        
         //Paint each element - each element has been "moved" to its offset within the group already
         for (ZElement e : elements) {    
             AffineTransform orig = g.getTransform();
@@ -475,7 +530,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
                     
         }
 
-
+        g.setClip(origClip);
 
     }
 

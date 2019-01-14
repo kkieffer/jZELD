@@ -49,6 +49,8 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
     
     protected PaintAttributes paintAttr = null;    
     protected CustomStroke customStroke = null;
+    
+    protected PaintAttributes strokeAttr = null;
        
     protected ShadowAttributes shadowAttributes = null;
     
@@ -66,6 +68,7 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         paintAttr = src.paintAttr == null ? null : new PaintAttributes(src.paintAttr);
         shadowAttributes = src.shadowAttributes == null ? null : new ShadowAttributes(src.shadowAttributes);
         customStroke = src.customStroke == null ? null : src.customStroke.copyOf();
+        strokeAttr = src.strokeAttr == null ? null : new PaintAttributes(src.strokeAttr);
         shadowImage = null;
     }
     
@@ -212,6 +215,20 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
     
     public PaintAttributes getPaintAttributes() {
         return paintAttr;
+    }
+    
+    /**
+     * Set the stroke paint attributes for the element.  The stroke attributes (linear, radial, or texture) are applied over the stroke's color.
+     * @param p the paint attributes.  To remove, use null
+     */
+    public void setStrokeAttributes(PaintAttributes p) {
+        strokeAttr = p;
+        changed();
+    }
+    
+    
+    public PaintAttributes getStrokeAttributes() {
+        return strokeAttr;
     }
     
     
@@ -580,10 +597,14 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
        if (customStroke != null) {
            g.setStroke(customStroke);
            g.setColor(customStroke.getColor());
+           
+           if (strokeAttr != null)
+                strokeAttr.applyPaintAttribute(g, width, height, unitSize, flipHoriz, flipVert);
+           
            drawShape(g, unitSize, width, height);
        } 
         
-       if (borderThickness != 0 && borderColor != null) {  //use built-in Basic Stroke
+       if (borderThickness != 0 && (borderColor != null || strokeAttr != null)) {  //use built-in Basic Stroke
            
             if (dashPattern == null || dashPattern.length == 0)
                 g.setStroke(new BasicStroke(borderThickness, borderStyle.getCapType(), borderStyle.getJoinType()));
@@ -597,6 +618,9 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
        
  
             g.setColor(borderColor);
+            if (strokeAttr != null)
+                strokeAttr.applyPaintAttribute(g, width, height, unitSize, flipHoriz, flipVert);
+                
             drawShape(g, unitSize, width, height);
        }
                    

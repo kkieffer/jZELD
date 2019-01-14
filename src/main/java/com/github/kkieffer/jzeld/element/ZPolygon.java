@@ -36,7 +36,6 @@ public abstract class ZPolygon extends ZAbstractShape {
     public boolean supportsFlip() {
         return true;
     }
-    //protected abstract Path2D getPath2D(double width, double height); 
     
     @Override
     protected void fillShape(Graphics2D g, double unitSize, double width, double height) {
