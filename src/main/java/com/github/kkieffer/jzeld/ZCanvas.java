@@ -40,6 +40,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -1463,7 +1464,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         undoStack.suspendSave();  //don't push all the remove and add changes to the undo stack
         
         Collections.reverse(selectedElements); //the selected elements are ordered with top z plane first.  But the Grouped Element draws grouped elements in the order provided, so we need to reverse the list
-        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements);  //create the group of elements
+        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements, null);  //create the group of elements
         
         for (ZElement e: selectedElements) //remove all selected
             removeElement(e);
@@ -1601,7 +1602,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         mergedShape = pos.createTransformedShape(mergedShape);
    
         
-        ZShape shape = new ZShape(bounds.getX(), bounds.getY(), mergedShape, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes(), ref.getCustomStroke(), ref.getOutlineStyle());               
+        ZShape shape = new ZShape(bounds.getX(), bounds.getY(), mergedShape, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes(), ref.getStrokeAttributes(), ref.getCustomStroke(), ref.getOutlineStyle());               
         
         this.replaceElement(ref, shape);
         
@@ -3086,7 +3087,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return null;
         
         Collections.reverse(selectedElements); //the selected elements are ordered with top z plane first.  But the Grouped Element draws grouped elements in the order provided, so we need to reverse the list
-        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements);  //create the group of elements
+        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements, null);  //create the group of elements
         
         group.reposition(0, 0, Double.MAX_VALUE, Double.MAX_VALUE); //no offset (not on canvas, painting to image
         
