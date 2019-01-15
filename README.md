@@ -92,6 +92,7 @@ additional hotkeys.
 5.  Create a orthogonal-line drawing (Ctrl-O)
 6.  Copy the selected element as an image to a png file (Ctrl-E)
 7.  Export to an svg file (Alt-G)
+8.  Import an svg file (Alt-I)
 
 When starting the demo, if a previous instance was saved with Ctrl-S, it can be loaded.  If the user chooses not to load, a default ZCanvas is loaded with a collection
 of demo ZElements.  The default Demo is shown below.
@@ -131,7 +132,6 @@ Here are some ideas for using jZELD in a larger application:
 2. Label maker. Create mailing labels from an address book, with a company image.  Programmatically set the ZEditableText element and send the ZCanvas to the printer.
 3. Scrapbook application.  Layout photos using ZImage, rotate them, overlap them, add text.  Use ZRectangle to create shadows, borders, etc.  Create a multi-page book with an
 	ArrayList of ZCanvas sheets.  
-4. Create a Java version of Powerpoint! 
 
 
 ## License
