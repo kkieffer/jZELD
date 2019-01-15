@@ -163,6 +163,12 @@ class SVGImportUtils {
     }
     
     
+    /**
+     * From the clip shape, apply the svg transform, conver to canvas units, but leave it at the current position
+     * @param clip the clipping shape
+     * @param svgTransform transform to apply
+     * @return the transformed clip
+     */
     static Shape transformClip(Shape clip, AffineTransform svgTransform)  {
     
         if (clip == null)

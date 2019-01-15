@@ -143,22 +143,27 @@ public class ZShape extends ZAbstractShape {
         return copy.shape;
     }
     
-    
+    /**
+     * Returns the clipping shape for this shape. The clipping shape has been offset to this shape's origin
+     * @return 
+     */
     public Shape getClippingShape() {
         return clippingShape;
     }
     
-    
+    /**
+     * Set the clipping shape for this shape. The clip shape must be in canvas units, but in absolute position on the canvas
+     * @param s the clip shape to apply, null to remove clip
+     */
     public void setClippingShape(Shape s) {
-        if (clippingShape != null) {
-            Rectangle2D b = getBounds2D();
-            AffineTransform a = AffineTransform.getTranslateInstance(-b.getX(), -b.getY());
-            clippingShape = a.createTransformedShape(clippingShape);
+        if (s != null) {
+            Rectangle2D b = this.getBounds2D();
+            AffineTransform a = AffineTransform.getTranslateInstance(-b.getX(), -b.getY());  //translate to this shape's origin
+            clippingShape = a.createTransformedShape(s);
         }
-        
-        clippingShape = s;
+        else
+            clippingShape = null;
     }
-    
     
     public void scaleBorderWithShape(boolean enable) {
         scaleBorderWithShape = enable;
@@ -196,7 +201,7 @@ public class ZShape extends ZAbstractShape {
         //Scale the shape by the ratio
         AffineTransform scaleInstance = AffineTransform.getScaleInstance(widthRatio, heightRatio);
         shape = scaleInstance.createTransformedShape(shape);
-        setClippingShape(scaleInstance.createTransformedShape(clippingShape));
+        clippingShape = scaleInstance.createTransformedShape(clippingShape);
         
         if (scaleBorderWithShape && borderThickness != 0) {
             double borderScale = (double)Math.sqrt(widthRatio * heightRatio);
@@ -212,6 +217,7 @@ public class ZShape extends ZAbstractShape {
         Shape origClip = setClip(g, scaledClip);
         if (scaledShape != null)
             g.fill(scaledShape);
+        g.fill(scaledClip);
         g.setClip(origClip);
     }
 
@@ -240,11 +246,11 @@ public class ZShape extends ZAbstractShape {
         Rectangle2D bounds = getBounds2D();
         AffineTransform scaleInstance = AffineTransform.getScaleInstance(-1.0, 1.0);  //scaling negative creates a mirror image the other direction
         shape = scaleInstance.createTransformedShape(shape);
-        setClippingShape(scaleInstance.createTransformedShape(clippingShape));
+        clippingShape = scaleInstance.createTransformedShape(clippingShape);
 
         AffineTransform translateInstance = AffineTransform.getTranslateInstance(bounds.getWidth(), 0);  //move back to where it was
         shape = translateInstance.createTransformedShape(shape);
-        setClippingShape(translateInstance.createTransformedShape(clippingShape));
+        clippingShape = translateInstance.createTransformedShape(clippingShape);
 
         super.flipHorizontal();
     }
@@ -254,11 +260,11 @@ public class ZShape extends ZAbstractShape {
         Rectangle2D bounds = getBounds2D();
         AffineTransform scaleInstance = AffineTransform.getScaleInstance(1.0, -1.0);  //scaling negative creates a mirror image the other direction
         shape = scaleInstance.createTransformedShape(shape);
-        setClippingShape(scaleInstance.createTransformedShape(clippingShape));
+        clippingShape = scaleInstance.createTransformedShape(clippingShape);
           
         AffineTransform translateInstance = AffineTransform.getTranslateInstance(0, bounds.getHeight());  //move back to where it was
         shape = translateInstance.createTransformedShape(shape);
-        setClippingShape(translateInstance.createTransformedShape(clippingShape));
+        clippingShape = translateInstance.createTransformedShape(clippingShape);
     
         super.flipVertical();
     }

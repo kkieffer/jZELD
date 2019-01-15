@@ -95,7 +95,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
      * Groups the elements into a ZGroupedElement. Sub-elements are repositioned relative to the grouped element.  The grouped element
      * position and size is set to bound all the sub-elements.
      * @param elements
-     * @param clippingShape shape that clips the group, which can be null
+     * @param clippingShape shape that clips the group, which can be null. The clipping shape is a shape in absolute position, scaled to canvas units
      * @return 
      */
     public static ZGroupedElement createGroup(ArrayList<ZElement> elements, Shape clippingShape) {
@@ -121,7 +121,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
         }
         
         
-        if (clippingShape != null) {
+        if (clippingShape != null) {  //scale this to the group origin (removing x, y as above)
             AffineTransform a = AffineTransform.getTranslateInstance(-x, -y);
             clippingShape = a.createTransformedShape(clippingShape);
         }   

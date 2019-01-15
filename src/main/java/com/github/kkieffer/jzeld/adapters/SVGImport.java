@@ -282,7 +282,7 @@ public class SVGImport {
                 
                clipShape = node.getClip() == null ? null : node.getClip().getClipPath();  //clipping path for the composite
                 if (clipShape != null) 
-                    clipShape = SVGImportUtils.transformClip(clipShape, currentTransform);  //transform to a clip shape for the canvas
+                    clipShape = SVGImportUtils.transformClip(clipShape, currentTransform);  //transform to a clip shape for the canvas (now in canvas units, and transformed)
             }
             
             ArrayList<ZElement> svgConvertedElements = new ArrayList<>();  //new list of elements for this composite group
@@ -313,7 +313,7 @@ public class SVGImport {
 
         ArrayList<ZElement> zElements = new ArrayList<>();
         
-        if (node instanceof ShapeNode) {            
+        if (node instanceof ShapeNode) {
             zElements.addAll(parseShapeNode((ShapeNode)node)); //first element is shape, any others are markers 
         } 
         else if (node instanceof TextNode) {
@@ -358,6 +358,12 @@ public class SVGImport {
      * @return array of created shapes (can contain marker shapes too)
      */
     private ArrayList<ZElement> parseShapeNode(ShapeNode shapeNode) {
+
+        Paint fillPaint = null;
+        Stroke stroke = null;
+        Paint strokePaint = null;
+        CompositeGraphicsNode markerNode = null;
+        ArrayList<ZElement> elements = new ArrayList<>();  //create an array to hold the shape and markers
         
         Shape svgShape = shapeNode.getShape();
         Shape clipShape = shapeNode.getClip() == null ? null : shapeNode.getClip().getClipPath();
@@ -365,11 +371,7 @@ public class SVGImport {
         ArrayList<ShapePainter> painters = new ArrayList<>();
         
         getShapePainters(shapeNode.getShapePainter(), painters);  //get all shape painters
-        Paint fillPaint = null;
-        Stroke stroke = null;
-        Paint strokePaint = null;
-        CompositeGraphicsNode markerNode = null;
-        
+            
         StringBuilder b = new StringBuilder("Parsing Shape Node: " + getIDString(shapeNode));
         
         for (ShapePainter p : painters)  {
@@ -398,8 +400,8 @@ public class SVGImport {
             
         System.out.println(b.toString());
  
-        if (fillPaint == null && strokePaint == null)  //nothing to paint
-            return null;
+        if (fillPaint == null && strokePaint == null && markerNode == null)  //nothing to paint
+            return elements;
 
         Pair<Shape, Rectangle2D> shapePair = SVGImportUtils.transformShape(svgShape, currentTransform);  //transform to a shape for the canvas
         clipShape = SVGImportUtils.transformClip(clipShape, currentTransform);  //transform to a clip shape for the canvas
@@ -414,7 +416,6 @@ public class SVGImport {
         Shape baseShape = shapePair.getLeft();
         Rectangle2D bounds = shapePair.getRight();
 
-        ArrayList<ZElement> elements = new ArrayList<>();  //create an array to hold the shape and markers
         
         ZShape zshape = createZShape(shapeNode, baseShape, clipShape, bounds, fillPaint, stroke, strokePaint);
         if (zshape == null)
@@ -464,9 +465,7 @@ public class SVGImport {
             
             currentTransform = savedTransform;  //restore
         }
-        
-        
-        
+
         return elements;
     }
 
