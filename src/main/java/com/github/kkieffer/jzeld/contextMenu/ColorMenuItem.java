@@ -53,7 +53,7 @@ public class ColorMenuItem extends AbstractContextMenuItem {
                 
                 
                 if (type != Type.CLEAR) {
-                    Color newColor = ZColorChooser.showDialog(canvas, "Select " + type + " Color", oldColor);
+                    Color newColor = ZColorChooser.showDialog(canvas, "Select " + type + " Color", oldColor, null);
                     if (newColor == null)
                         return;
 

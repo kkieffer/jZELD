@@ -86,14 +86,19 @@ public class ZColorChooser {
      * Show the Color Chooser dialog. Selecting a Color and pressing "OK" will add the selected color to the color history.
      * @param parent parent component
      * @param title dialog title
-     * @param initialColor the initially selected color, if null, initial color will be set to WHITE
+     * @param initialColor the initial selected color, if null, initial color will be set to WHITE
+     * @param panels optional array of additional panels to add to the color chooser, null for none
      * @return the selected color, or null if "CANCEL" is pressed
      */
-    public static Color showDialog(Component parent, String title, Color initialColor) {
+    public static Color showDialog(Component parent, String title, Color initialColor, AbstractColorChooserPanel[] panels) {
       
         //Create the chooser
         final JColorChooser chooser = new JColorChooser(initialColor == null ? Color.WHITE : initialColor);
-        
+        if (panels != null) {
+            for (AbstractColorChooserPanel p : panels)
+                chooser.addChooserPanel(p);
+        }
+               
         //Populate the recent colors using reflection (because the objects are not publicly accessible
         if (!colorHistory.isEmpty()) {
             
@@ -134,6 +139,31 @@ public class ZColorChooser {
         if (c != null)
             addToColorHistory(new Color[]{c});
         
+        dialog.dispose();
         return ok.getColor();
     }
+    
+    /**
+     * Color difference calculation in RGB space, using some effects of perception:
+     * https://en.wikipedia.org/wiki/Color_difference
+     * @param c1 the first color
+     * @param c2 the second color
+     * @return a value indicating the relative difference in color
+     */
+    public static double deltaColor(Color c1, Color c2) {
+        
+        double r = (c1.getRed() + c2.getRed())/2;
+        double deltaR = c1.getRed() - c2.getRed();
+        double deltaG = c1.getGreen() - c2.getGreen();
+        double deltaB = c1.getBlue() - c2.getBlue();
+        
+        double t = r * (Math.pow(deltaR, 2) - Math.pow(deltaB, 2)) / 256;
+        
+        double deltac2 = 2*Math.pow(deltaR, 2) + 4*Math.pow(deltaG, 2) + 3*Math.pow(deltaB, 2) + t;
+        
+        return Math.sqrt(deltac2);
+        
+    }
+    
+    
 }
