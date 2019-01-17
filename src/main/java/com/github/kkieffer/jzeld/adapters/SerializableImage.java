@@ -14,6 +14,7 @@ import java.io.Serializable;
 import javax.imageio.ImageIO;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import sun.awt.image.ToolkitImage;
 
 /**
  *
@@ -63,7 +64,14 @@ public class SerializableImage implements Serializable {
     public static BufferedImage resizeImage(Image original, int newWidth, int newHeight, int newType, int x, int y, int w, int h) {
         
         if (newType == 0) {
-            boolean hasAlpha = ((BufferedImage)original).getColorModel().hasAlpha();
+            boolean hasAlpha;
+            if (original instanceof ToolkitImage) 
+                hasAlpha = ((ToolkitImage)original).getColorModel().hasAlpha();
+            else if (original instanceof BufferedImage)
+                hasAlpha = ((BufferedImage)original).getColorModel().hasAlpha();
+            else
+                throw new RuntimeException("Unsupported image type to resize");
+            
             newType = hasAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
         }
         
