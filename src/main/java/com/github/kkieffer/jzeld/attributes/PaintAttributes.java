@@ -27,7 +27,7 @@ public class PaintAttributes implements Serializable {
 
     public enum RadiusRelative {WIDTH, HEIGHT, LONGEST, SHORTEST};
     
-    private enum PaintType {LINEAR, RADIAL, CONICAL, PATTERN};
+    public enum PaintType {LINEAR, RADIAL, CONICAL, PATTERN};
     
     private PaintType type;
     private CycleMethod cycleMethod;
@@ -71,7 +71,7 @@ public class PaintAttributes implements Serializable {
                 break;              
             case RADIAL:       
                 center = new Point2D.Float((float)src.center.getX(), (float)src.center.getY());
-                focus = new Point2D.Float((float)src.focus.getX(), (float)src.focus.getY());
+                focus = src.focus == null ? null : new Point2D.Float((float)src.focus.getX(), (float)src.focus.getY());
                 radius = src.radius;
                 radiusRelative = src.radiusRelative;
                 break;
@@ -90,6 +90,56 @@ public class PaintAttributes implements Serializable {
         
         paint = null; 
     }
+    
+    public PaintType getType() {
+        return type;
+    }
+    
+    public Point2D getStartPoint() {
+        if (start == null)
+            return null;
+        return new Point2D.Float((float)start.getX(), (float)start.getY());
+    }
+    
+    public Point2D getFinishPoint() {
+        if (finish == null)
+            return null;
+        return new Point2D.Float((float)finish.getX(), (float)finish.getY());
+    }
+    
+    public Point2D getCenterPoint() {
+        if (center == null)
+            return null;
+        return new Point2D.Float((float)center.getX(), (float)center.getY());
+    }
+    
+    public Point2D getFocusPoint() {
+        if (focus == null)
+            return null;
+        return new Point2D.Float((float)focus.getX(), (float)focus.getY());
+    }
+    
+    
+    public float getRadius() {
+        return radius;
+    }
+    
+    public RadiusRelative getRadiusRelative() {
+        return radiusRelative;
+    }
+    
+    public Color[] getColors() {
+        return Arrays.copyOf(colors, colors.length);
+    }
+    
+    public float[] getColorDistributions() {
+        return Arrays.copyOf(dist, dist.length);
+    }
+   
+    public CycleMethod getCycle() {
+        return cycleMethod;
+    }
+    
     
     public void applyPaintAttribute(Graphics2D g2d, double width, double height, double unitSize, boolean flipH, boolean flipV) {
         
@@ -137,7 +187,7 @@ public class PaintAttributes implements Serializable {
                 }
                 
                 Point2D.Float theCenter = new Point2D.Float(flipHoriz ? 1.0f-center.x : center.x, flipVert ? 1.0f-center.y : center.y);
-                Point2D.Float theFocus = new Point2D.Float(flipHoriz ? 1.0f-focus.x : focus.x, flipVert ? 1.0f-focus.y : focus.y);
+                Point2D.Float theFocus = focus == null ? theCenter : new Point2D.Float(flipHoriz ? 1.0f-focus.x : focus.x, flipVert ? 1.0f-focus.y : focus.y);
 
 
                 paint = new RadialGradientPaint(w * theCenter.x, h * theCenter.y, radiusVal, w * theFocus.x, h * theFocus.y, dist, colors, cycleMethod);
@@ -220,7 +270,7 @@ public class PaintAttributes implements Serializable {
     /**
      * Create a radial gradient paint attribute set
      * @param center the starting point, relative to the element bounds (x and y range from 0 to 1.0, 0.5,0.5 is centered in shape)
-     * @param focus the focus point, relative to the element bounds (x and y range from 0 to 1.0).  If focus is null, the focus is the center
+     * @param focus the focus point, relative to the element bounds (x and y range from 0 to 1.0).  Focus can be null
      * @param radius the radius to which the endpoint lies, relative to the bounds specified by the rr parameter
      * @param rr determines how to compute the radius, if WIDTH, the radius is relative to the width (0 to 1.0), likewise for height.  If LONGEST, radius is relative to the longer side.  Likewise for SHORTEST.
      * @param dist the color distribution points, 0 (center) to 1.0 (radius)
@@ -237,8 +287,6 @@ public class PaintAttributes implements Serializable {
         a.center = new Point2D.Float((float)center.getX(), (float)center.getY());
         if (focus != null)
             a.focus = new Point2D.Float((float)focus.getX(), (float)focus.getY());
-        else
-            a.focus = a.center;
             
         a.radius = radius;
         a.radiusRelative = rr;
