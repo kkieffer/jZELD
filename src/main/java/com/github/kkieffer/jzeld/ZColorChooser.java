@@ -140,6 +140,10 @@ public class ZColorChooser {
             addToColorHistory(new Color[]{c});
         
         dialog.dispose();
+        
+        for (AbstractColorChooserPanel p : panels)  //remove panels, so they can be reused
+            chooser.removeChooserPanel(p);
+        
         return ok.getColor();
     }
     

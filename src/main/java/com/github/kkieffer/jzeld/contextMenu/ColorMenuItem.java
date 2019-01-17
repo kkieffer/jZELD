@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
 
 /**
  * Color Menu Item is a Menu item with a color wheel icon, that when selected brings up a color chooser panel.  It can be used for
@@ -33,8 +34,11 @@ public class ColorMenuItem extends AbstractContextMenuItem {
         }
     }
     
-
     public ColorMenuItem(String text, ZCanvas c, Type type) {
+        this(text, c, type, null);
+    }
+    
+    public ColorMenuItem(String text, ZCanvas c, Type type, AbstractColorChooserPanel[] chooserPanels) {
         super(text, c);
         if (type != Type.CLEAR)
             setIcon(colorIcon);
@@ -53,7 +57,7 @@ public class ColorMenuItem extends AbstractContextMenuItem {
                 
                 
                 if (type != Type.CLEAR) {
-                    Color newColor = ZColorChooser.showDialog(canvas, "Select " + type + " Color", oldColor, null);
+                    Color newColor = ZColorChooser.showDialog(canvas, "Select " + type + " Color", oldColor, chooserPanels);
                     if (newColor == null)
                         return;
 
