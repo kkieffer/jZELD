@@ -217,7 +217,6 @@ public class ZShape extends ZAbstractShape {
         Shape origClip = setClip(g, scaledClip);
         if (scaledShape != null)
             g.fill(scaledShape);
-        g.fill(scaledClip);
         g.setClip(origClip);
     }
 
