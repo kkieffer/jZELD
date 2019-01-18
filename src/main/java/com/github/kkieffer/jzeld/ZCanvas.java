@@ -963,7 +963,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return false;
         
         selectNone();
-        
+
         drawClient = c;
         for (ZCanvasEventListener l : canvasEventListeners)
             l.canvasHasDrawClient(true);
@@ -1280,7 +1280,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @param o the opacity, from 0.0 (transparent) to 1.0 (opaque) 
      */
      public void setOpacity(float o) {
-         
+
+         undoStack.saveContext(fields.zElements);
+      
         for (ZElement e : getSelectedElements()) {
            e.setOpacity(o);
         }
