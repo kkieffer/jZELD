@@ -140,6 +140,19 @@ public class PaintAttributes implements Serializable {
         return cycleMethod;
     }
     
+    public float getImageWidth() {
+        return imgWidth;
+    }
+    
+    public float getImageHeight() {
+        return imgHeight;
+    }
+    
+    public BufferedImage getImage() {
+        SerializableImage i = new SerializableImage(patternImage);
+        return (BufferedImage)i.getImage();
+    }
+    
     
     public void applyPaintAttribute(Graphics2D g2d, double width, double height, double unitSize, boolean flipH, boolean flipV) {
         
