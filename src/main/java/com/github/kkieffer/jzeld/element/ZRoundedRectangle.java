@@ -104,6 +104,40 @@ public class ZRoundedRectangle extends ZRectangle {
         return new RoundRectangle2D.Double(0, 0, width, height, scale*radius*2, scale*radius*2);
     }
     
+    /**
+     * Resize the object, new width and height in pixels, preserve the corner angle
+     * @param w width in pixels
+     * @param h height in pixels
+     * @param minSize the minimum size, in pixels
+     * @param scale scale factor
+     */
+    @Override
+    public void setSize(double w, double h, double minSize, double scale) {
+   
+        //Hold onto the old values
+        Rectangle2D r = getBounds2D(scale);
+        double oldWidth = r.getWidth();
+        double oldHeight = r.getHeight();
+
+        //Compute the new size, which may limit the minimum
+        super.setSize(w, h, minSize, scale);
+        
+        //Get the new size and calculate the ratio of new to old
+        r = getBounds2D(scale);
+
+        double widthRatio = r.getWidth() / oldWidth;
+        double heightRatio = r.getHeight() / oldHeight;
+
+        double cornerScale = (double)Math.sqrt(widthRatio * heightRatio);
+
+        radius *= cornerScale;
+        
+        if (dialog != null)
+            dialog.updateValue();
+        
+    }
+    
+    
     @Override
     public boolean supportsEdit() {
         return true;
@@ -127,28 +161,32 @@ public class ZRoundedRectangle extends ZRectangle {
         }
     }
     
-    
+
     
     private static class RoundedRectDialog extends JFrame {
 
         private final ZRoundedRectangle rect;
+        private final double unitScale;
+        private final JSpinner cornerRadiusSpinner;
+        
+        
+        private double getMax() {
+            Rectangle2D b = rect.getBounds2D();
+            double max = b.getWidth() > b.getHeight() ? b.getWidth() : b.getHeight();
+            max *= unitScale/2;  //half the max, and convert to unit
+            return max;
+        }
         
         private RoundedRectDialog(ZRoundedRectangle r, ZCanvas canvas) {
             super("Edit Rounded Rectangle");
             rect = r;        
-            double unitScale = canvas.getUnit().getScale();
-
-            
-            Rectangle2D b = rect.getBounds2D();
-            double max = b.getWidth() > b.getHeight() ? b.getWidth() : b.getHeight();
-            
-            max *= unitScale/2;  //half the max, and convert to unit
+            unitScale = canvas.getUnit().getScale();
 
             JPanel p = new JPanel();
             
             JLabel cornerLabel = new JLabel("Corner Radius (" + canvas.getUnit().getName() + ")");
-            JSpinner cornerRadiusSpinner = new JSpinner();
-            cornerRadiusSpinner.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, max, max/100));
+            cornerRadiusSpinner = new JSpinner();
+            cornerRadiusSpinner.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, getMax(), getMax()/100));
             cornerRadiusSpinner.setValue(rect.getRadius()*unitScale);
  
             cornerRadiusSpinner.addChangeListener(new ChangeListener() {
@@ -161,7 +199,7 @@ public class ZRoundedRectangle extends ZRectangle {
             });
             
             
-            
+                      
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
             java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
@@ -200,6 +238,12 @@ public class ZRoundedRectangle extends ZRectangle {
             DialogUtils.addShortcutAndIcon(p, "dispose");
             
         }
+        
+        private void updateValue() {
+            cornerRadiusSpinner.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, getMax(), getMax()/100));
+            cornerRadiusSpinner.setValue(rect.getRadius()*unitScale);
+        }
+        
     }
    
 

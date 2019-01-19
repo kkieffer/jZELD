@@ -134,6 +134,12 @@ public class Demo extends javax.swing.JFrame {
         r5.setPaintAttributes(conPaint);
         c.addElement(r5);
         
+        
+        //Block Arrow
+        ZBlockArrow b = new ZBlockArrow(8.0, 2.0, 2.0, 1.0, 0.0, true, true, true, 1, Color.BLACK, null, Color.MAGENTA, StrokeStyle.SQUARE);
+        c.addElement(b);
+        
+        
         //Create some editable text
         Font f = new Font("SERIF", Font.BOLD, 22);
         TextAttributes t2 = new TextAttributes(HorizontalJustify.CENTER, f, Color.RED);
