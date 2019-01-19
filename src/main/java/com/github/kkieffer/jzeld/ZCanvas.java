@@ -386,6 +386,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "Tab");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "Plus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "Minus");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Escape");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.META_DOWN_MASK), "MetaPlus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.META_DOWN_MASK), "MetaMinus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, KeyEvent.SHIFT_DOWN_MASK), "ShiftPressed");
@@ -417,6 +418,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             @Override
             public void actionPerformed(ActionEvent e) {
                 selectNextElement();
+            }
+        });
+        am.put("Escape", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (passThruElement != null || drawClient != null)
+                    return;
+                selectNone();
             }
         });
         am.put("Plus", new AbstractAction(){
@@ -2208,7 +2217,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void selectNextElement() {
         
-        if (passThruElement != null)
+        if (passThruElement != null ||  drawClient != null)
             return;
                     
         ZElement first = lastSelectedElement;
@@ -2486,7 +2495,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                              
                 boolean isOnDragBox = false;
                 
-                if (lowerRightTransformed.distance(mouseLoc) < DRAG_BOX_SIZE)  //see if its within the drag box
+                if (lowerRightTransformed.distance(mouseLoc) < DRAG_BOX_SIZE/fields.zoom)  //see if its within the drag box
                     isOnDragBox = true;
                 
                 /**

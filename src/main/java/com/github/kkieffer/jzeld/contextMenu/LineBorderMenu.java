@@ -34,6 +34,7 @@ public class LineBorderMenu extends JMenu {
                                         new Float[]{.2f, .2f, .05f, .2f},
                                         new Float[]{.05f, .2f},
                                         new Float[]{.2f, .1f},
+                                        new Float[]{.2f, .3f},
                                         new Float[]{.3f, .1f}
         
     };
