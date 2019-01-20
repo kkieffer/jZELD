@@ -564,7 +564,7 @@ public class SVGImport {
         Color fillColor = null;        
         float borderWidth = 0.0f;
         Color borderColor = null;
-        Float[] dashPattern = null;
+        Float[] dashArray = null;
         StrokeStyle borderStyle = StrokeStyle.SQUARE;
         PaintAttributes fillPaintAttributes = null;
         PaintAttributes strokePaintAttributes = null;
@@ -579,13 +579,9 @@ public class SVGImport {
             borderWidth = bs.getLineWidth();
 
             float[] da = bs.getDashArray();
-            if (da != null) {
-                dashPattern = ArrayUtils.toObject(da);
-                for (int i=0; i<dashPattern.length; i++)
-                    dashPattern[i] /= 72.0f;   //convert to units
-            }
-
-
+            if (da != null)
+                dashArray = ArrayUtils.toObject(da);
+            
             if (bs.getEndCap() == BasicStroke.CAP_ROUND)
                 borderStyle = StrokeStyle.ROUNDED;
 
@@ -620,7 +616,7 @@ public class SVGImport {
         
 
         ZShape zshape = new ZShape(bounds.getX(), bounds.getY(), baseShape, 0.0, true, true, true, borderWidth, borderColor, 
-                                    dashPattern, fillColor, fillPaintAttributes, strokePaintAttributes, null, borderStyle);
+                                    dashArray, fillColor, fillPaintAttributes, strokePaintAttributes, null, borderStyle);
         
         if (currentAlphaComposite != null)
             zshape.setOpacity(currentAlphaComposite.getAlpha());
