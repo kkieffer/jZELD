@@ -126,6 +126,8 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
             clippingShape = a.createTransformedShape(clippingShape);
         }   
         
+        setName("ZGroup (" + elements.size() + " elements)");
+        
     }
     
     private ZGroupedElement() {}
