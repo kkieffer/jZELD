@@ -60,7 +60,7 @@ public class LineBorderMenu extends JMenu {
                 g.drawLine(10, 8, 90, 8);                    
             }
             else 
-                setText("Set..");
+                setText("Set...");
             
             g.dispose();
 
