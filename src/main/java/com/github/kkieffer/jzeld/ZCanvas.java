@@ -2285,8 +2285,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 e.deselectedForEdit();
                 e.deselect();
             }
-            passThruElement = null;
         }
+        passThruElement = null;
         selectedResizeElement = null;
         lastSelectedElement = null;
         for (ZCanvasEventListener l : canvasEventListeners)
