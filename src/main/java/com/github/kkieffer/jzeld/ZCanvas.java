@@ -40,7 +40,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -225,7 +224,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         @XmlElement(name="MarginsOn")        
         private boolean marginsOn;
-            
+        
+        @XmlElement(name="RulersHidden")        
+        private boolean rulersHidden;
+        
         @XmlElement(name="HorizontalRuler")        
         private ZCanvasRuler horizontalRuler;
         
@@ -768,6 +770,23 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void marginsOn(boolean on) {
         fields.marginsOn = on;
+        repaint();
+    }
+    
+    
+    /**
+     * Returns true if the rulers are hidden.
+     */
+    public boolean areRulersHidden() {
+        return fields.rulersHidden;
+    }
+    
+    /**
+     * Show or hide the rulser
+     * @param hide true to hide
+     */
+    public void hideRulers(boolean hide) {
+        fields.rulersHidden = hide;
         repaint();
     }
     
@@ -2301,12 +2320,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         //Paint any rulers before scaling and translations
         if (fields.horizontalRuler != null) {
             g2d.translate(fields.origin.x, 0); 
-            fields.horizontalRuler.paint(g2d, (int)(SCALE*fields.zoom), getWidth(), getHeight());    
+            if (!fields.rulersHidden)
+                fields.horizontalRuler.paint(g2d, (int)(SCALE*fields.zoom), getWidth(), getHeight());    
             g2d.translate(-fields.origin.x, 0);         
         }
         if (fields.verticalRuler != null) {
             g2d.translate(0, fields.origin.y); 
-            fields.verticalRuler.paint(g2d, (int)(SCALE*fields.zoom), getWidth(), getHeight());    
+            if (!fields.rulersHidden)
+                fields.verticalRuler.paint(g2d, (int)(SCALE*fields.zoom), getWidth(), getHeight());    
             g2d.translate(0, -fields.origin.y);         
         }
 
@@ -3008,13 +3029,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         boolean marginsOn = areMarginsOn();
         marginsOn(false);
         ZGrid savedGrid = fields.grid; //save grid
-        ZCanvasRuler horizontalRuler = fields.horizontalRuler;
-        ZCanvasRuler verticalRuler = fields.verticalRuler;
+        hideRulers(true);
         Color savedColor = fields.backgroundColor;
         
-        setGrid(null);
-        setHorizontalRuler(null);
-        setVerticalRuler(null);
+        setGrid(null);      
         if (hideBackground)
             setCanvasBackgroundColor(null);
         
@@ -3038,8 +3056,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         //Restore margins, ruler and grid
         marginsOn(marginsOn);
         setGrid(savedGrid);
-        setHorizontalRuler(horizontalRuler);
-        setVerticalRuler(verticalRuler);
+        hideRulers(false);
         if (hideBackground)
             setCanvasBackgroundColor(savedColor);
             
