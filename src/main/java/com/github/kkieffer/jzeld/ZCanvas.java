@@ -40,6 +40,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -1625,27 +1626,20 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return -1;
            
         
-        Rectangle2D bounds = mergedShape.getBounds2D();  //find the new position of the joined object
-
-        //Move back to zero position reference
-        AffineTransform pos = AffineTransform.getTranslateInstance(-bounds.getX(), -bounds.getY());
-        mergedShape = pos.createTransformedShape(mergedShape);
-   
-        
-        ZShape shape = new ZShape(bounds.getX(), bounds.getY(), mergedShape, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes(), ref.getStrokeAttributes(), ref.getCustomStroke(), ref.getOutlineStyle());               
+        ZShape shape = ZShape.createFromReference(ref, mergedShape);  //create a ZShape from the reference attributes and the merged shape
         
         this.replaceElement(ref, shape);
         
         lastMethod = null;
         selectNone();
         selectElement(shape, false);
-        
+   
         undoStack.resumeSave(); 
-  
+           
         repaint();
         return combineList.size() + 1;
     }
-   
+    
     
     /**
      * Changes the background color of the canvas
