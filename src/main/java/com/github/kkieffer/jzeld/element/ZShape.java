@@ -68,6 +68,27 @@ public class ZShape extends ZAbstractShape {
     transient protected Shape scaledShape;  //holds a resized version of the shape for painting
     transient protected Shape scaledClip;  //holds a resized version of the clipping shape for painting
     
+    
+    /**
+     * Creates a new ZShape from the provided Shape, with the same attributes as the reference 
+     * @param ref the reference element, from which attributes are taken
+     * @param s the shape to use
+     * @return a new ZShape 
+     */
+    public static ZShape createFromReference(ZAbstractShape ref, Shape s) {
+              
+        Rectangle2D bounds = s.getBounds2D();  //find the position of the shape
+  
+        //Move back to zero position reference
+        AffineTransform pos = AffineTransform.getTranslateInstance(-bounds.getX(), -bounds.getY());
+        s = pos.createTransformedShape(s);
+        
+    
+        return new ZShape(bounds.getX(), bounds.getY(), s, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes(), ref.getStrokeAttributes(), ref.getCustomStroke(), ref.getOutlineStyle());                
+    }
+    
+    
+    
     protected ZShape() {}
     
     /**
@@ -120,7 +141,7 @@ public class ZShape extends ZAbstractShape {
         return new ZShape(this, forNew);
     }
     
-    public void setShape(Shape s) {
+    protected void setShape(Shape s) {
         this.shape = s;
         super.setSize(s.getBounds2D().getWidth(), s.getBounds2D().getHeight(), MIN_SHAPE_DIMENSION, 1.0);
     }
