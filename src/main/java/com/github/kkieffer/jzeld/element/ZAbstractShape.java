@@ -432,7 +432,7 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
      * Combine this shape with the provided list of ZAbstractShapes. The 
      * @param operation the merge operation
      * @param shapes the elements whose shapes are combined
-     * @return the combined shape
+     * @return the combined shape, or null if combine resulted in shape with no area
      */
     public final Shape combineWith(CombineOperation operation, ArrayList<ZAbstractShape> shapes) {
         
@@ -465,6 +465,43 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         return a;
     }
     
+
+    /**
+     * Combine this element with the provided Area and return a new ZShape containing merged areas.  This element
+     * is not modified.
+     * The attributes of this element are used in the new ZShape.
+     * @param operation the operation to apply
+     * @param area the area to combine with the shape, in unit area
+     * @return the newly merged ZShape, or null, if combine operation results in a shape with no area
+     */
+    public final ZShape combineWith(CombineOperation operation, Area area) {
+        
+        Shape refShape = getShape();  //reference shape
+        Area a = new Area(refShape);
+     
+        switch (operation) {
+            case Join:
+                a.add(area);
+                break;
+            case Subtract:
+                a.subtract(area);
+                break;
+            case Intersect:
+                a.intersect(area);
+                break;
+            case Exclusive_Join:
+                a.exclusiveOr(area);
+                break;
+        }
+            
+        if (a.isEmpty())
+            return null;
+                       
+        return ZShape.createFromReference(this, a);  //create a ZShape from the reference attributes and the merged shape
+
+    }
+    
+
     @Override
     protected void setSize(double w, double h, double minSize, double scale) {
         super.setSize(w, h, minSize, scale);
