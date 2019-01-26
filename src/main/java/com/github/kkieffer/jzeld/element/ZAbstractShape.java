@@ -93,6 +93,16 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
     }
     
     /**
+     * For most subclasses, selecting on the canvas from within the shape outline is the typical case - the ZCanvas won't select an element when the mouse
+     * is within the bounds but not within the shape. This behavior may be overridden by subclasses.
+     * @return 
+     */
+    public boolean selectAsShape() {
+        return true;
+    }
+    
+    
+    /**
      * Change the attributes
      * @param outlineWidth unit width of the border, use zero for no border
      * @param outlineColor color of the border, which can be null for a transparent border
@@ -325,7 +335,7 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         
         return area;
     }
-    
+
     public interface ComputeProgress {
         void progress(float percent);
     }

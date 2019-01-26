@@ -78,7 +78,7 @@ public abstract class BoundaryDraw implements DrawClient, KeyListener {
     
         
     protected ArrayList<Point2D> mousePoints = new ArrayList<>();
-    private final ZCanvas canvas;
+    protected final ZCanvas canvas;
     protected final boolean close;
     protected float strokeWidth;
     protected Color lineColor;

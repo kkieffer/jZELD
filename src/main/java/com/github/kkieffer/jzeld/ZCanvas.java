@@ -1008,7 +1008,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         for (ZCanvasEventListener l : canvasEventListeners)
             l.canvasHasDrawClient(false);
         
-        setCurrentCursor(Cursor.getDefaultCursor());
+        setCurrentCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 
         repaint();
     }
@@ -2516,7 +2516,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 /**
                  * Special case for shapes - if the mouse wasn't on the shape and wasn't on the drag box, consider it not selected
                  */
-                if (o instanceof ZAbstractShape) {
+                if (o instanceof ZAbstractShape && ((ZAbstractShape)o).selectAsShape()) {
                     double margin = Math.ceil(o.getOutlineWidth()) + SHAPE_SELECT_MARGIN;  //add the outline width, plus some margin
 
                     boolean containsMousePoint = ((ZAbstractShape)o).contains(mouseIn, margin, SCALE);  //see if the actual shape contains it                    
