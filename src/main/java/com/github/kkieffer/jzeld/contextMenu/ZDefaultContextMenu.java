@@ -315,7 +315,8 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         }
         lineWeightMenu.setEnabled(lastSelected.hasOutline());
         lineColorMenuItem.setEnabled(lastSelected.hasOutline());
-        lineDashMenu.setEnabled(lastSelected.hasDash());
+        lineStyleMenu.setEnabled(lastSelected.hasOutline());
+        lineDashMenu.setEnabled(lastSelected.hasOutline() && lastSelected.hasDash());
         fillColorMenuItem.setEnabled(lastSelected.hasFill());
          
         alignMenu.setEnabled(selectedElements.size() > 1);
