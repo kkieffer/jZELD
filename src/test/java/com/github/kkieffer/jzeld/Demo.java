@@ -106,10 +106,10 @@ public class Demo extends javax.swing.JFrame {
         p.setShadowAttributes(new ShadowAttributes());
         c.addElement(p);
           
-        ZQuadrilateral pg = new ZQuadrilateral(QuadType.RHOMBUS, 6.0, 2.0, 1.0, 1.0, 0.0, true, true, true, 4, Color.BLACK, null, Color.BLUE, StrokeStyle.SQUARE, 20);
+        ZQuadrilateral pg = new ZQuadrilateral(QuadType.RHOMBUS, 6.0, 2.0, 1.0, 1.0, 0.0, true, true, true, 0, Color.BLACK, null, Color.BLUE, StrokeStyle.SQUARE, 20);
         pg.setOpacity(0.5f);
+        pg.setPrintable(false);  //don't print
         c.addElement(pg);
-        pg.setCustomStroke(new CircleStrokeExample());
         
          //Create an arc
         ZArc a = new ZArc(1.0, 4.0, 1.0, 1.0, 0.0, true, true, true, 7, Color.ORANGE, null, Color.RED, StrokeStyle.SQUARE, 30.0, 45.0, ArcType.PIE);
@@ -136,9 +136,10 @@ public class Demo extends javax.swing.JFrame {
         
         
         //Block Arrow
-        ZBlockArrow b = new ZBlockArrow(8.0, 2.0, 2.0, 1.0, 0.0, true, true, true, 1, Color.BLACK, null, Color.MAGENTA, StrokeStyle.SQUARE);
+        ZBlockArrow b = new ZBlockArrow(8.0, 2.0, 2.0, 1.0, 0.0, true, true, true, 10, Color.WHITE, null, Color.YELLOW, StrokeStyle.SQUARE);
         c.addElement(b);
-        
+        b.setCustomStroke(new CircleStrokeExample());
+    
         
         //Create some editable text
         Font f = new Font("SERIF", Font.BOLD, 22);

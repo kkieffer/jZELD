@@ -66,6 +66,7 @@ public abstract class ZElement implements Serializable {
     private boolean resizable;
     private boolean canMove;
     private boolean visible;
+    private boolean printable = true;
     
     protected boolean flipHoriz = false;
     protected boolean flipVert = false;
@@ -101,6 +102,7 @@ public abstract class ZElement implements Serializable {
         this.className = this.getClass().getName();
         this.name = this.getClass().getSimpleName();
         this.visible = true;
+        this.printable = true;
         this.hasChanges = false;
         this.uuid = UUID.randomUUID();
         
@@ -127,6 +129,7 @@ public abstract class ZElement implements Serializable {
         this.resizable = src.resizable;
         this.canMove = src.canMove;
         this.visible = src.visible;
+        this.printable = src.printable;
         this.name = src.name; 
         this.opacity = src.opacity;
         this.flipHoriz = src.flipHoriz;
@@ -159,7 +162,8 @@ public abstract class ZElement implements Serializable {
                "Shear the element vertically by selecting it and using the mouse wheel while pressing keys Alt-Shift-S.<br><br>" +
                (supportsFlip() ? "Flip the element horizontally or vertically by right-clicking and selecting from the context menu.<br><br>" : "") +
                "Adjust element attributes by by right-clicking and selecting from the context menu.<br><br>" +
-               "The Z-plane order can be adjusted by right-clicking and selecting from the context menu.<br><br>";
+               "The Z-plane order can be adjusted by right-clicking and selecting from the context menu.<br><br>" +
+                (printable ? "" : "Note: This element will be hidden when printing");
         
     }
     
@@ -366,6 +370,18 @@ public abstract class ZElement implements Serializable {
     
     public void setVisible(boolean vis) {
         visible = vis;
+    }
+    
+    /**
+     * True if the element will included when printing
+     * @return 
+     */
+    public boolean isPrintable() {
+        return printable;
+    }
+    
+    public void setPrintable(boolean p) {
+        printable = p;
     }
     
     /**

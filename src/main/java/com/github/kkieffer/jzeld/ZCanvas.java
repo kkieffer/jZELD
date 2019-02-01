@@ -659,7 +659,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void arrangePopup(Container c) {
         Component parent = SwingUtilities.getRoot(this);
-        c.setLocation(parent.getX() + parent.getWidth(), parent.getY() + parent.getHeight()/2 - c.getHeight()/2);   
+        c.setLocation(parent.getX() + parent.getWidth() + 2, parent.getY() + parent.getHeight()/2 - c.getHeight()/2);   
     }
     
     /**
@@ -2131,7 +2131,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             }
                                  
             if (o.isSelected() && highlightSelectedOnly && r.getWidth() > 0 && r.getHeight() > 0) {  //highlight selected element, just outside its boundaries
-                g2d.setColor(Color.BLACK);
+                g2d.setColor(o.isPrintable() ? Color.BLACK : Color.GRAY);
                 g2d.setStroke(new BasicStroke((float)(1.0f/fields.zoom), CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
                 double margin = Math.ceil(o.getOutlineWidth()/2.0) + (1.0/fields.zoom);  //add the outline width, plus 2 pixels out
                 g2d.draw(new Rectangle2D.Double(-margin, -margin, r.getWidth()+margin*2, r.getHeight()+margin*2)); 
@@ -2352,7 +2352,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             ZElement o = it.next();
             if (o.isSelected())
                 selectedElements.add(o);
-            paintElement(g2d, o, false); 
+            
+            if (!printOn || o.isPrintable())
+                paintElement(g2d, o, false); 
         }
      
         for (ZElement s : selectedElements)
