@@ -284,7 +284,7 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
      * Retrieves the abstract shape and then transforms it according to the rotation and position where it lies on the canvas
      * @return 
      */
-    protected Shape getShape() {
+    public Shape getShape() {
         
         Shape s = getAbstractShape();  //gets the abstract shape (placed at 0,0)
         Rectangle2D bounds = getBounds2D();
