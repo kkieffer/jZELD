@@ -84,7 +84,9 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
     public String getHtmlHelp() {
         String className = this.getClass().getSimpleName();
         return "<b>" + className + ": " + getShapeSummary() + "</b><br><br>" + getShapeDescription() + "<br><br>" + 
-                "Right-click on this element to set its attributes: line color and width, line dash pattern, and fill color.<br><br>" + super.getBaseElementHtmlHelp();
+                "Right-click on this element to set its attributes: " + (hasOutline() ? "line color and width, " : "") + 
+                                                                        ((hasOutline() && hasDash()) ? "dash pattern, " : "") +
+                                                                        (hasFill() ? "fill color." : ".") + "<br><br>" + super.getBaseElementHtmlHelp();
     }
     
     @Override
