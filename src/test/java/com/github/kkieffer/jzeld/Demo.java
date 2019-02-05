@@ -141,7 +141,10 @@ public class Demo extends javax.swing.JFrame {
         b.setOpacity(0.8f);
         b.setCustomStroke(new CircleStrokeExample());
     
-        
+        //Wave
+        ZWave w = new ZWave(4.0, 2.0, 6, 0.0, true, true, true, 1.0f, Color.RED, null, null, StrokeStyle.SQUARE, null);
+        c.addElement(w);
+    
         //Create some editable text
         Font f = new Font("SERIF", Font.BOLD, 22);
         TextAttributes t2 = new TextAttributes(HorizontalJustify.CENTER, f, Color.RED);
