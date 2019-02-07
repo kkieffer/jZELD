@@ -12,6 +12,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -49,7 +50,14 @@ public class ZQuadrilateral extends ZPolygon {
  
     private transient QuadrilateralDialog dialog;
 
-    
+    //Custom deserialize - needed to create new transient objects
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        x = new double[4];
+        y = new double[4];
+    }
+        
+        
     protected ZQuadrilateral(){}
     
      /**

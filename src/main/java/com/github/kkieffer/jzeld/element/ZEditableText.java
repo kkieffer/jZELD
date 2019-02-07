@@ -22,6 +22,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
@@ -168,9 +169,18 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         setup();
     }
     
+    //Custom serialize
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        out.writeObject(textWidget.getText());
+    }
+    
     //Custom deserialize
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
+        String txt = (String)in.readObject();
+        textWidget = new JTextPane();
+        textWidget.setText(txt);
         afterUnmarshal(null, null);
     }
     
