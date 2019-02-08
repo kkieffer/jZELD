@@ -160,8 +160,13 @@ public class ZShape extends ZAbstractShape {
     
     @Override
     protected Shape getAbstractShape() {
-        ZShape copy = copyOf(false);
-        return copy.shape;
+        //Make a copy of the shape
+        ShapeAdapter a = new ShapeAdapter();
+        try {
+            return a.unmarshal(a.marshal(shape));
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
     
     /**
