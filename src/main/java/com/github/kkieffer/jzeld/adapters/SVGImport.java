@@ -407,7 +407,8 @@ public class SVGImport {
         clipShape = SVGImportUtils.transformClip(clipShape, currentTransform);  //transform to a clip shape for the canvas
     
         try {
-            stroke = SVGImportUtils.transformStroke(stroke, currentTransform);
+            if (stroke != null)
+                stroke = SVGImportUtils.transformStroke(stroke, currentTransform);
         } catch (SVGImportUtils.UnsupportedSVGProperty ex) {
             parseErrors.add(getIDString(shapeNode) + ": Unknown stroke type");
             stroke = null;

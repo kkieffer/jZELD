@@ -188,9 +188,8 @@ class SVGImportUtils {
             
             BasicStroke bs = (BasicStroke)stroke;
             
-            double strokeWidthScale = (double)Math.sqrt(svgTransform.getScaleX() * svgTransform.getScaleY());
-
-            
+            double strokeWidthScale = (double)Math.sqrt(Math.abs(svgTransform.getScaleX() * svgTransform.getScaleY()));
+          
             float width = (float)(strokeWidthScale * (double)bs.getLineWidth());
                      
             float[] da = bs.getDashArray();
