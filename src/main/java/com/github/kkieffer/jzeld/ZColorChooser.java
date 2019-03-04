@@ -141,8 +141,10 @@ public class ZColorChooser {
         
         dialog.dispose();
         
-        for (AbstractColorChooserPanel p : panels)  //remove panels, so they can be reused
-            chooser.removeChooserPanel(p);
+        if (panels != null) {
+            for (AbstractColorChooserPanel p : panels)  //remove panels, so they can be reused
+                chooser.removeChooserPanel(p);
+        }
         
         return ok.getColor();
     }
