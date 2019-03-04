@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld;
 
 import com.github.kkieffer.jzeld.attributes.CustomStroke;
+import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Shape;
@@ -19,8 +20,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 public class CircleStrokeExample extends CustomStroke implements Stroke {
 
-    public int width = 10;
+    private final static int width = 10;
     
+    private transient Color color;
+    
+    
+    public CircleStrokeExample() {}
+            
     @Override
     public CustomStroke copyOf() {
         return new CircleStrokeExample();
@@ -33,7 +39,13 @@ public class CircleStrokeExample extends CustomStroke implements Stroke {
 
     @Override
     public Color getColor() {
-        return Color.MAGENTA;
+        return color;
+    }
+
+    @Override
+    public void applyAttributes(double unitSize, Color borderColor, float borderThickness, ZElement.StrokeStyle borderStyle, Float[] dashPattern) {
+        color = borderColor;  
+        //ignore other attributes
     }
     
 }

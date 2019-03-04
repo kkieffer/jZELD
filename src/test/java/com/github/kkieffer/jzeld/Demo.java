@@ -136,7 +136,7 @@ public class Demo extends javax.swing.JFrame {
         
         
         //Block Arrow
-        ZBlockArrow b = new ZBlockArrow(8.0, 2.0, 2.0, 1.0, 0.0, true, true, true, 10, Color.WHITE, null, Color.YELLOW, StrokeStyle.SQUARE);
+        ZBlockArrow b = new ZBlockArrow(8.0, 2.0, 2.0, 1.0, 0.0, true, true, true, 10, Color.BLACK, null, Color.YELLOW, StrokeStyle.SQUARE);
         c.addElement(b);
         b.setOpacity(0.8f);
         b.setCustomStroke(new CircleStrokeExample());
