@@ -7,7 +7,6 @@ import com.github.kkieffer.jzeld.adapters.JAXBAdapter.DimensionAdapter;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.FontAdapter;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.PointAdapter;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.Rectangle2DAdapter;
-import com.github.kkieffer.jzeld.attributes.CustomStroke;
 import com.github.kkieffer.jzeld.draw.DrawClient;
 import com.github.kkieffer.jzeld.element.ZElement;
 import com.github.kkieffer.jzeld.element.ZAbstractShape;
@@ -1658,26 +1657,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         return fields.backgroundColor;
     }
     
-    
-    /**
-     * Sets a custom stroke on the selected elements
-     * @param stroke the custom stroke to apply
-     */
-    public void setCustomStroke(CustomStroke stroke) {
-        
-        ArrayList<ZElement> selectedElements = getSelectedElements();
-
-        if (selectedElements.isEmpty() || passThruElement != null) 
-            return;
-        
-        undoStack.saveContext(fields.zElements);
-    
-        for (ZElement selectedElement : selectedElements)
-            selectedElement.setCustomStroke(stroke);
-        
-        repaint();
-        
-    }
     
     /**
      * Sets the outline width of the selected elements
