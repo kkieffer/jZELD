@@ -4,12 +4,14 @@ package com.github.kkieffer.jzeld.element;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.Rectangle2DAdapter;
 import com.github.kkieffer.jzeld.UnitMeasure;
 import com.github.kkieffer.jzeld.ZCanvas;
+import com.github.kkieffer.jzeld.attributes.CustomStroke;
 import static java.awt.BasicStroke.CAP_BUTT;
 import static java.awt.BasicStroke.CAP_ROUND;
 import static java.awt.BasicStroke.JOIN_MITER;
 import static java.awt.BasicStroke.JOIN_ROUND;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -226,6 +228,20 @@ public abstract class ZElement implements Serializable {
      * @param outlineStyle the style for the outline
      */
     public abstract void setAttributes(float outlineWidth, Color outlineColor, Float[] dashPattern, Color fillColor, StrokeStyle outlineStyle);
+    
+    /**
+     * For elements that support an outline and custom stroke, set the custom stroke for the outline. 
+     * @param stroke the custom stroke to apply, null for none
+     */
+    public abstract void setCustomStroke(CustomStroke stroke);
+    
+    
+    /**
+     * Retrieves the current stroke based on the scale of the canvas
+     * @param scale unit scale
+     * @return 
+     */
+    public abstract Stroke getStroke(double scale);
     
     /**
      * For elements that support an outline, sets the current width in pixels of the outline.  Width of 0 is no outline 

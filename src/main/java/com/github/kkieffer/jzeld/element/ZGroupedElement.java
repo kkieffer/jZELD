@@ -1,6 +1,7 @@
 
 package com.github.kkieffer.jzeld.element;
 
+import com.github.kkieffer.jzeld.ZCanvas;
 import com.github.kkieffer.jzeld.adapters.ShapeAdapter;
 import com.github.kkieffer.jzeld.attributes.CustomStroke;
 import com.github.kkieffer.jzeld.attributes.ShadowAttributes;
@@ -12,6 +13,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -373,6 +375,11 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
     }
     
     public CustomStroke getCustomStroke() {
+        return null;
+    }
+    
+    @Override
+    public Stroke getStroke(double scale) {
         return null;
     }
     

@@ -72,7 +72,7 @@ public class ZShape extends ZAbstractShape {
     /**
      * Creates a new ZShape from the provided Shape, with the same attributes as the reference 
      * @param ref the reference element, from which attributes are taken
-     * @param s the shape to use
+     * @param s the shape to use (scaled to unit coordinates)
      * @return a new ZShape 
      */
     public static ZShape createFromReference(ZAbstractShape ref, Shape s) {

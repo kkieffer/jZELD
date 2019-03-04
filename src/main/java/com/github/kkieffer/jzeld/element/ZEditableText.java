@@ -5,7 +5,9 @@ package com.github.kkieffer.jzeld.element;
 import com.github.kkieffer.jzeld.attributes.TextAttributes;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.ColorAdapter;
 import com.github.kkieffer.jzeld.ZCanvas;
+import com.github.kkieffer.jzeld.attributes.CustomStroke;
 import com.github.kkieffer.jzeld.attributes.TextAttributes.HorizontalJustify;
+import static com.github.kkieffer.jzeld.element.ZAbstractShape.createBasicStroke;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -13,6 +15,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -259,6 +262,15 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
         setOutlineColor(outlineColor);  
         setOutlineStyle(outlineStyle);
         changed();
+    }
+    
+    @Override
+    public void setCustomStroke(CustomStroke stroke) {}  //not supported
+
+    
+    @Override
+    public Stroke getStroke(double scale) {
+       return createBasicStroke(scale, borderThickness, borderStyle, null);
     }
     
     @Override

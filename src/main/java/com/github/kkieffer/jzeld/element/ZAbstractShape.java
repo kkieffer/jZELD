@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.FlatteningPathIterator;
@@ -35,6 +36,30 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "ZAbstractShape")
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ZAbstractShape extends ZElement implements ShadowAttributes.ShadowInterface {
+    
+    /**
+     * Utility method for creating a basic stroke
+     * @param unitSize the parameter passed to paint()
+     * @param borderThickness Basic stroke thickness
+     * @param borderStyle end and join style
+     * @param dashPattern dash pattern, null for solid line
+     * @return the created BasicStroke
+     */
+    public static BasicStroke createBasicStroke(double unitSize, float borderThickness, StrokeStyle borderStyle, Float[] dashPattern) {
+
+        if (dashPattern == null || dashPattern.length == 0)
+            return new BasicStroke(borderThickness, borderStyle.getCapType(), borderStyle.getJoinType());
+        
+        else {
+            float[] d = new float[dashPattern.length];
+            for (int i=0; i<dashPattern.length; i++)
+                d[i] = dashPattern[i] * (float)unitSize + borderThickness * .75f;
+
+            return new BasicStroke(borderThickness, borderStyle.getCapType(), borderStyle.getJoinType(), 10.0f, d, 0.0f);           
+        }
+    }
+    
+    
     
     
     @XmlJavaTypeAdapter(ColorAdapter.class)
@@ -206,6 +231,7 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         return true;
     }
     
+    @Override
     public void setCustomStroke(CustomStroke s) {
         customStroke = s;
         changed();
@@ -213,6 +239,17 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
     
     public CustomStroke getCustomStroke() {
         return customStroke;
+    }
+    
+    @Override
+    public Stroke getStroke(double scale) {
+        if (customStroke != null)
+            return customStroke;
+        else if (borderThickness != 0 && (borderColor != null || strokeAttr != null)) {  //use built-in Basic Stroke
+           return createBasicStroke(scale, borderThickness, borderStyle, dashPattern);
+        }
+        else
+           return null;
     }
     
     /**
@@ -310,7 +347,11 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         return s;
     }
     
-    
+    public Shape getShape(double scale) {
+        Shape s = getShape();
+        return AffineTransform.getScaleInstance(scale, scale).createTransformedShape(s);
+    }
+       
     private double integrate(Area a, double resolution) {
 
         double area = 0.0;
@@ -644,6 +685,7 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         }
 
        if (customStroke != null) {
+           customStroke.applyAttributes(unitSize, borderColor, borderThickness, borderStyle, dashPattern);
            g.setStroke(customStroke);
            g.setColor(customStroke.getColor());
            
@@ -653,19 +695,10 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
            drawShape(g, unitSize, width, height);
        } 
         
-       if (borderThickness != 0 && (borderColor != null || strokeAttr != null)) {  //use built-in Basic Stroke
+       else if (borderThickness != 0 && (borderColor != null || strokeAttr != null)) {  //use built-in Basic Stroke
            
-            if (dashPattern == null || dashPattern.length == 0)
-                g.setStroke(new BasicStroke(borderThickness, borderStyle.getCapType(), borderStyle.getJoinType()));
-            else {
-                float[] d = new float[dashPattern.length];
-                for (int i=0; i<dashPattern.length; i++)
-                    d[i] = dashPattern[i] * (float)unitSize + borderThickness * .75f;
-                    
-                g.setStroke(new BasicStroke(borderThickness, borderStyle.getCapType(), borderStyle.getJoinType(), 10.0f, d, 0.0f));           
-            }
-       
- 
+            g.setStroke(createBasicStroke(unitSize, borderThickness, borderStyle, dashPattern));
+
             g.setColor(borderColor);
             if (strokeAttr != null)
                 strokeAttr.applyPaintAttribute(g, width, height, unitSize, flipHoriz, flipVert);
