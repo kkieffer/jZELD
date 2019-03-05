@@ -32,6 +32,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -2136,6 +2137,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      }
     
     
+     private double getSelectMargin(ZElement o) {
+        Stroke s = o.getStroke(SCALE);
+        if (s instanceof CustomStroke)
+            return ((CustomStroke)s).getOutlineMargin();
+        else
+            return o.getOutlineWidth()/2.0;     
+     }
+     
     //Paint the element, if the element has no width or height, provide the canvas width and height
     private void paintElement(Graphics2D g2d, ZElement o, boolean highlightSelectedOnly) {
         if (o != null) {
@@ -2154,7 +2163,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (o.isSelected() && highlightSelectedOnly && r.getWidth() > 0 && r.getHeight() > 0) {  //highlight selected element, just outside its boundaries
                 g2d.setColor(o.isPrintable() ? Color.BLACK : Color.GRAY);
                 g2d.setStroke(new BasicStroke((float)(1.0f/fields.zoom), CAP_SQUARE, JOIN_MITER, 10.0f, selectedAlternateBorder ? dashedBorder : altDashedBorder, 0.0f));
-                double margin = Math.ceil(o.getOutlineWidth()/2.0) + (1.0/fields.zoom);  //add the outline width, plus 2 pixels out
+                double margin = Math.ceil(getSelectMargin(o)) + (1.0/fields.zoom);  //add the outline width, plus 2 pixels out
                 g2d.draw(new Rectangle2D.Double(-margin, -margin, r.getWidth()+margin*2, r.getHeight()+margin*2)); 
  
                 g2d.setColor(Color.WHITE);

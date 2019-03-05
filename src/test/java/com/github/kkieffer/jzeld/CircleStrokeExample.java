@@ -23,7 +23,7 @@ public class CircleStrokeExample extends CustomStroke implements Stroke {
     private final static int width = 10;
     
     private transient Color color;
-    
+    private transient float lineThickness;
     
     public CircleStrokeExample() {}
             
@@ -34,7 +34,7 @@ public class CircleStrokeExample extends CustomStroke implements Stroke {
 
     @Override
     public Shape createStrokedShape(Shape p) {
-        return new BasicStroke(0.5f).createStrokedShape(new BasicStroke(width).createStrokedShape(p));
+        return new BasicStroke(lineThickness).createStrokedShape(new BasicStroke(width).createStrokedShape(p));
     }
 
     @Override
@@ -45,7 +45,13 @@ public class CircleStrokeExample extends CustomStroke implements Stroke {
     @Override
     public void applyAttributes(double unitSize, Color borderColor, float borderThickness, ZElement.StrokeStyle borderStyle, Float[] dashPattern) {
         color = borderColor;  
+        lineThickness = borderThickness;
         //ignore other attributes
+    }
+
+    @Override
+    public double getOutlineMargin() {
+        return width/2.0 + lineThickness;
     }
     
 }

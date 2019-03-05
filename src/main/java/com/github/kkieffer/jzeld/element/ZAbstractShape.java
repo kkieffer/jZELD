@@ -582,7 +582,12 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         //otherwise, just add half the line width for the margins
         
         Rectangle2D bounds = getBounds2D(scale);
-        double ow = (getOutlineWidth()/2.0)/72.0 * scale;  //half the line width
+        
+        double ow;
+        if (customStroke == null)
+            ow = (getOutlineWidth()/2.0)/72.0 * scale;  //half the line width
+        else
+            ow = customStroke.getOutlineMargin()/72.0 * scale;
         
         if (shadowImage != null) {           
             double margin = getShadowMargin(scale);

@@ -123,16 +123,13 @@ public class ZShape extends ZAbstractShape {
         super(src, forNew);
         
         this.scaleBorderWithShape = src.scaleBorderWithShape;
-        try {
-            //Make a copy of the shape
-            ShapeAdapter a = new ShapeAdapter();
-            this.shape = a.unmarshal(a.marshal(src.shape));
-            if (src.clippingShape != null)
-                this.clippingShape = a.unmarshal(a.marshal(src.clippingShape));
-  
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+         
+        //Make a copy of the shape
+        this.shape = ShapeAdapter.copyOf(src.shape);
+
+        if (src.clippingShape != null)
+            this.clippingShape = ShapeAdapter.copyOf(src.clippingShape);
+ 
     }
     
 
@@ -160,13 +157,7 @@ public class ZShape extends ZAbstractShape {
     
     @Override
     protected Shape getAbstractShape() {
-        //Make a copy of the shape
-        ShapeAdapter a = new ShapeAdapter();
-        try {
-            return a.unmarshal(a.marshal(shape));
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        return ShapeAdapter.copyOf(shape);
     }
     
     /**

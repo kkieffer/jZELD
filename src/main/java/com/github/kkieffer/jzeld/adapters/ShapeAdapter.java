@@ -50,7 +50,20 @@ public class ShapeAdapter extends XmlAdapter<String, Shape> {
         
     }
       
+    /**
+     * Convenience method to deep copy a shape using marshall/unmarshall 
+     * @param s the shape to copy
+     * @return a deep copy of the shape
+     */
+    public static Shape copyOf(Shape s) {
     
+        ShapeAdapter a = new ShapeAdapter();
+        try {
+            return a.unmarshal(a.marshal(s));
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    } 
    
 
     @Override

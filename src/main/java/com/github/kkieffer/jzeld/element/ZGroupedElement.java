@@ -141,13 +141,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
         this.groupedHeight = src.groupedHeight;
         
         if (src.clippingShape != null) {
-            try {
-                //Make a copy of the shape
-                ShapeAdapter a = new ShapeAdapter();
-                this.clippingShape = a.unmarshal(a.marshal(src.clippingShape));
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
+            this.clippingShape = ShapeAdapter.copyOf(src.clippingShape);
         }
     }
     
