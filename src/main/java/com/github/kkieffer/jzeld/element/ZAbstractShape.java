@@ -233,7 +233,7 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
     
     @Override
     public void setCustomStroke(CustomStroke s) {
-        customStroke = s;
+        customStroke = s.copyOf();
         changed();
     }
     
