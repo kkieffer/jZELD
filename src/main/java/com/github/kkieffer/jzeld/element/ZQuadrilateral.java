@@ -260,6 +260,11 @@ public class ZQuadrilateral extends ZPolygon {
     }
     
     
+    @Override
+    public void removedFrom(ZCanvas canvas) {
+        deselectedForEdit();
+    }
+    
     
     private static class QuadrilateralDialog extends JFrame {
 

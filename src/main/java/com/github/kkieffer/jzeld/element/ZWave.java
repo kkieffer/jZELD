@@ -178,6 +178,11 @@ public class ZWave extends ZShape {
         }
     }
     
+    @Override
+    public void removedFrom(ZCanvas canvas) {
+        deselectedForEdit();
+    }
+    
 
     
     private static class WaveDialog extends JFrame {

@@ -161,6 +161,10 @@ public class ZRoundedRectangle extends ZRectangle {
         }
     }
     
+    @Override
+    public void removedFrom(ZCanvas canvas) {
+        deselectedForEdit();
+    }
 
     
     private static class RoundedRectDialog extends JFrame {
