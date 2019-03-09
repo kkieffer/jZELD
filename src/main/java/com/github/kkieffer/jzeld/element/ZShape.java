@@ -9,7 +9,10 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -85,6 +88,80 @@ public class ZShape extends ZAbstractShape {
         
     
         return new ZShape(bounds.getX(), bounds.getY(), s, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes(), ref.getStrokeAttributes(), ref.getCustomStroke(), ref.getOutlineStyle());                
+    }
+    
+    
+    /**
+     * Creates new ZShapes from the provided Shape, with the same attributes as the reference.  Each contiguous piece of the shape is
+     * converted to a new ZShape
+     * @param ref the reference element, from which attributes are taken
+     * @param s the shape to use (scaled to unit coordinates)
+     * @return a new ZShape 
+     */
+    public static ZShape[] createFromReferencePieces(ZAbstractShape ref, Shape s) {
+              
+        
+        ArrayList<ZShape> shapeList = new ArrayList<>();
+        Rectangle2D bounds = s.getBounds2D();  //find the position of the shape
+  
+        //Move back to zero position reference
+        AffineTransform pos = AffineTransform.getTranslateInstance(-bounds.getX(), -bounds.getY());
+        s = pos.createTransformedShape(s);
+        
+        PathIterator it = s.getPathIterator(null);
+        
+        double[] coords = new double[6];
+        Path2D currentPiece = new Path2D.Double();
+        int currentPieceSegments = 0;
+        currentPiece.setWindingRule(it.getWindingRule());
+        
+        while (!it.isDone()) {
+            
+            int pathType = it.currentSegment(coords);
+            if (pathType == PathIterator.SEG_MOVETO) {  //Reached a break, so create new shape
+                
+                if (currentPieceSegments > 0) {
+                
+                    Shape newPiece = ShapeAdapter.copyOf(currentPiece);
+                    shapeList.add(createFromReference(ref, newPiece));                
+                    currentPiece.reset();  //clear, ready for new piece
+                }
+         
+            }        
+                   
+            //Copy the segment to the new piece
+            switch (pathType) {
+                case PathIterator.SEG_MOVETO:
+                    currentPiece.moveTo(coords[0], coords[1]);
+                    break;
+                case PathIterator.SEG_LINETO:
+                    currentPiece.lineTo(coords[0], coords[1]);
+                    break;
+                case PathIterator.SEG_QUADTO:
+                    currentPiece.quadTo(coords[0], coords[1], coords[2], coords[3]);
+                    break;
+                case PathIterator.SEG_CUBICTO:
+                    currentPiece.curveTo(coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);
+                    break;
+                case PathIterator.SEG_CLOSE:
+                    currentPiece.closePath();
+                    break;
+                default:
+                    throw new RuntimeException("Unhandled path type");
+            }
+            currentPieceSegments++;
+            it.next();
+        }
+        
+        //Last piece 
+        if (currentPieceSegments > 0)           
+            shapeList.add(createFromReference(ref, currentPiece));                
+        
+        
+        
+        ZShape[] shapes = new ZShape[shapeList.size()];
+        shapeList.toArray(shapes);
+        return shapes;
     }
     
     
