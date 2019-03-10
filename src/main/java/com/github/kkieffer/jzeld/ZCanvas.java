@@ -42,7 +42,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -286,7 +285,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     private Timer animationTimer;
     private HighlightAnimation animation = HighlightAnimation.Fast;
-
+    
+    private double scrollWheelMultiplier = 1.0;
     private boolean selectedAlternateBorder;
     private Method lastMethod = null;
     private String lastMethodName = null;
@@ -711,6 +711,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         animationTimer.start();
         
         repaint();
+    }
+    
+    public void setScrollWheelMultiplier(double mult) {
+        scrollWheelMultiplier = mult;
+    }
+    
+    public double getScrollWheelMultiplier() {
+        return scrollWheelMultiplier;
     }
     
     /**
@@ -2927,17 +2935,17 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
             for (ZElement selectedElement : selectedElements) {
                 if (!shiftPressed && !shearXPressed && !shearYPressed) {
-                    double increase = e.getPreciseWheelRotation() * SIZE_INCREASE_MULTIPLIER;
+                    double increase = e.getPreciseWheelRotation() * SIZE_INCREASE_MULTIPLIER * scrollWheelMultiplier;
                     selectedElement.increaseSizeMaintainAspect(increase, DRAG_BOX_SIZE, SCALE);
                 }
                 else if (shiftPressed && !shearXPressed && !shearYPressed) {       
-                    selectedElement.rotate(e.getPreciseWheelRotation() * ROTATION_MULTIPLIER);
+                    selectedElement.rotate(e.getPreciseWheelRotation() * ROTATION_MULTIPLIER * scrollWheelMultiplier);
                 }
                 else if (shearXPressed) {
-                    selectedElement.shearX(e.getPreciseWheelRotation() * SHEAR_MULTIPLIER);
+                    selectedElement.shearX(e.getPreciseWheelRotation() * SHEAR_MULTIPLIER * scrollWheelMultiplier);
                 }
                 else if (shearYPressed) {
-                    selectedElement.shearY(e.getPreciseWheelRotation() * SHEAR_MULTIPLIER);
+                    selectedElement.shearY(e.getPreciseWheelRotation() * SHEAR_MULTIPLIER * scrollWheelMultiplier);
                 }
             }
             
