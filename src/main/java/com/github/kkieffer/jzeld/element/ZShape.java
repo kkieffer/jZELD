@@ -87,7 +87,13 @@ public class ZShape extends ZAbstractShape {
         s = pos.createTransformedShape(s);
         
     
-        return new ZShape(bounds.getX(), bounds.getY(), s, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes(), ref.getStrokeAttributes(), ref.getCustomStroke(), ref.getOutlineStyle());                
+        ZShape newShape = new ZShape(bounds.getX(), bounds.getY(), s, 0.0, true, true, true, ref.getOutlineWidth(), ref.getOutlineColor(), ref.getDashPattern(), ref.getFillColor(), ref.getPaintAttributes(), ref.getStrokeAttributes(), ref.getCustomStroke(), ref.getOutlineStyle());                
+        newShape.setName(ref.getName());  //keep the name
+        newShape.setOpacity(ref.getOpacity()); //keep the opacity
+        newShape.setShadowAttributes(ref.getShadowAttributes());
+        
+        return newShape;
+        
     }
     
     
