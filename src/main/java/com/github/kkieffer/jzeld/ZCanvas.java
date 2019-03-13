@@ -389,6 +389,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
        
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "Tab");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK), "ShiftTab");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "Plus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "Minus");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Escape");
@@ -423,6 +424,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             @Override
             public void actionPerformed(ActionEvent e) {
                 selectNextElement();
+            }
+        });
+         am.put("ShiftTab", new AbstractAction(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectPrevElement();
             }
         });
         am.put("Escape", new AbstractAction(){
@@ -2262,6 +2269,29 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     }
     
     /**
+     * Find the previous element before toFind, if toFind is at beginning, loop back to end. 
+     * @param toFind find next element before this.  If this is null, return the first.  If not found, return the first
+     * @return 
+     */
+    private ZElement getPrev(ZElement toFind) {  
+        
+        if (toFind == null)
+            return fields.zElements.getLast();
+        
+        Iterator<ZElement> it = fields.zElements.descendingIterator();
+        while (it.hasNext()) {
+            ZElement e = it.next();
+            if (e.equals(toFind)) {
+                if (it.hasNext())
+                    return it.next();
+                else
+                    return fields.zElements.getLast();
+            } 
+        }
+        return fields.zElements.getLast();
+    }
+    
+    /**
      * Selects the next selectable ZElement after the last selected element. If nothing is currently selected, selects the first 
      * selectable ZElement.  If nothing is selectable, does nothing
      * If there is an element already selected for pass through events, does nothing.
@@ -2284,9 +2314,33 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             }
             
         } while (next != first);
-        
-
     }
+    
+     /**
+     * Selects the previous selectable ZElement before the last selected element. If nothing is currently selected, selects the first 
+     * selectable ZElement.  If nothing is selectable, does nothing
+     * If there is an element already selected for pass through events, does nothing.
+     */
+    public void selectPrevElement() {
+        
+        if (passThruElement != null ||  drawClient != null)
+            return;
+                    
+        ZElement first = lastSelectedElement;
+        ZElement prev = first;
+        
+        do {
+            prev = getPrev(prev);
+            if (prev.isSelectable()) {
+                selectNone();
+                selectElement(prev, false);
+                repaint();
+                return;
+            }
+            
+        } while (prev != first);
+    }
+    
     
     /**
      * Select all elements.
