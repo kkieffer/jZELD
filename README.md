@@ -112,6 +112,8 @@ Java JRE 1.8 is required.  Other dependencies are provided in the pom.xml file:
 
 * The [filters library from jhlabs](http://www.jhlabs.com/ip/filters/download.html) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
 * The [batik library from Apache](https://xmlgraphics.apache.org/batik/) which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
+* Apache Commons [Lang 3](https://commons.apache.org/proper/commons-lang/) library which is licensed by the [Apache license](https://www.apache.org/licenses/LICENSE-2.0.html)
+* The [Twelvemonkeys ImageIO](https://github.com/haraldk/TwelveMonkeys) library which is licensed by the [BSD license](https://github.com/haraldk/TwelveMonkeys/blob/master/LICENSE.txt)
 
 ## Additional Third Party Code
 
