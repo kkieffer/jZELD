@@ -140,7 +140,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     public enum Orientation {LANDSCAPE, PORTRAIT, REVERSE_LANDSCAPE}  //The ordinals conform to the PageFormat integer defines
    
-    public enum Alignment {Auto, Left_Edge, Top_Edge, Right_Edge, Bottom_Edge, Centered_Vertically, Centered_Horizontally, Centered_Both;
+    public enum Alignment {Auto, Left_Edge, Top_Edge, Right_Edge, Bottom_Edge, Centered_Vertical_Baseline, Centered_Horizontal_Baseline, Centered_Both;
         
         @Override
         public String toString() {
@@ -160,9 +160,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                     return "Aligns element right edges at the same horizontal (X) position";
                 case Bottom_Edge:
                     return "Aligns element bottom edges at the same vertical (Y) position";
-                case Centered_Vertically:
+                case Centered_Vertical_Baseline:
                     return "Centers the elements along a vertical (Y) axis";
-                case Centered_Horizontally:
+                case Centered_Horizontal_Baseline:
                     return "Centers the elements along a horizontal (X) axis";
                 case Centered_Both:
                     return "Centers the elements to the same point";
@@ -510,25 +510,25 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         am.put("MoveLeft", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                moveSelected(-1/SCALE, 0);
+                moveSelected(-1/(SCALE * getPixScale()), 0);
             }
         });
         am.put("MoveRight", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                moveSelected(1/SCALE, 0);
+                moveSelected(1/(SCALE * getPixScale()), 0);
             }
         });
         am.put("MoveUp", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                moveSelected(0, -1/SCALE);
+                moveSelected(0, -1/(SCALE * getPixScale()));
             }
         });
         am.put("MoveDown", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                moveSelected(0, 1/SCALE);
+                moveSelected(0, 1/(SCALE * getPixScale()));
             }
         });
         
@@ -1382,8 +1382,8 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public void align(Alignment atype) {
         
         if (atype == Alignment.Centered_Both) {
-            align(Alignment.Centered_Horizontally);
-            align(Alignment.Centered_Vertically);
+            align(Alignment.Centered_Horizontal_Baseline);
+            align(Alignment.Centered_Vertical_Baseline);
             return;
         }
         
@@ -1403,7 +1403,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
             switch (atype) {
                 case Left_Edge:
-                case Centered_Vertically:
+                case Centered_Vertical_Baseline:
                     if (p.getX() < k.getX())
                         key = e;
                     break;
@@ -1412,7 +1412,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                         key = e;
                     break;
                 case Top_Edge:
-                case Centered_Horizontally:
+                case Centered_Horizontal_Baseline:
                     if (p.getY() < k.getY())
                         key = e;
                     break;
@@ -1443,10 +1443,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             }
             
             if (minVert < minHoriz) {
-                atype = Alignment.Centered_Vertically;  //already using this key
+                atype = Alignment.Centered_Vertical_Baseline;  //already using this key
             }
             else {
-                atype = Alignment.Centered_Horizontally;
+                atype = Alignment.Centered_Horizontal_Baseline;
                 key = key2;
             }
         }
@@ -1470,11 +1470,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 case Bottom_Edge:
                     e.reposition(p.getX()/SCALE, (k.getY() + k.getHeight() - p.getHeight())/SCALE, Double.MAX_VALUE, Double.MAX_VALUE);
                     break;
-                case Centered_Vertically:
+                case Centered_Vertical_Baseline:
                     double ctrX = k.getX() + k.getWidth()/2;
                     e.reposition((ctrX - p.getWidth()/2)/SCALE, p.getY()/SCALE, Double.MAX_VALUE, Double.MAX_VALUE);
                     break;
-                case Centered_Horizontally:
+                case Centered_Horizontal_Baseline:
                     double ctrY = k.getY() + k.getHeight()/2;
                     e.reposition(p.getX()/SCALE, (ctrY - p.getHeight()/2)/SCALE, Double.MAX_VALUE, Double.MAX_VALUE);
                     break;

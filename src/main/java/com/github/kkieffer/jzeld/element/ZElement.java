@@ -549,7 +549,7 @@ public abstract class ZElement implements Serializable {
    }
     
     /**
-     * Change size to the specified width and height in units.
+     * Change size to the specified width and height in units. Maintain the transformed upper left corner position.
      * @param w width in units
      * @param h height in units
      * @param minSize the minimum size, in pixels
@@ -559,7 +559,16 @@ public abstract class ZElement implements Serializable {
         if (!resizable)
             return;
         
+        //Get original location, transformed by the original transform
+        Point2D pos = getPosition(1.0);
+        Point2D oldUpperLeft = getElementTransform(1.0, false).transform(pos, null);
+        
         setSize(w, h, minSize, scale);
+        
+        Point2D newUpperLeft = getElementTransform(1.0, false).transform(pos, null);
+ 
+        move(oldUpperLeft.getX() - newUpperLeft.getX(), oldUpperLeft.getY() - newUpperLeft.getY(), Double.MAX_VALUE,Double.MAX_VALUE);
+                
     }
     
     
@@ -605,8 +614,8 @@ public abstract class ZElement implements Serializable {
         double newWidth = bounds.width + w;
         double newHeight = bounds.height + h;
         
-        setSize(newWidth * scale, newHeight * scale, minSize, scale);
-     
+        changeSize(newWidth * scale, newHeight * scale, minSize, scale);
+        
     }
     
     /**
