@@ -774,6 +774,16 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         repaint();     
     }
     
+    
+    public Rectangle2D getPageMargins() {
+        if (fields.margins == null)
+            return null;
+        
+        Rectangle2D m = new Rectangle2D.Double();
+        m.setRect(fields.margins);
+        return m;
+    }
+    
     /**
      * Returns true if the margins are set to on. Regardless of the setting, they are not shown until they have been defined with setPageMargins()
      * @return 
