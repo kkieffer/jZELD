@@ -2414,16 +2414,14 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
           
           
         //Paint any rulers before scaling and translations
-        if (fields.horizontalRuler != null) {
+        if (!printOn && !fields.rulersHidden && fields.horizontalRuler != null) {
             g2d.translate(fields.origin.x, 0); 
-            if (!fields.rulersHidden)
-                fields.horizontalRuler.paint(g2d, (int)(SCALE*fields.zoom), getWidth(), getHeight());    
+            fields.horizontalRuler.paint(g2d, (int)(SCALE*fields.zoom), getWidth(), getHeight());    
             g2d.translate(-fields.origin.x, 0);         
         }
-        if (fields.verticalRuler != null) {
+        if (!printOn && !fields.rulersHidden && fields.verticalRuler != null) {
             g2d.translate(0, fields.origin.y); 
-            if (!fields.rulersHidden)
-                fields.verticalRuler.paint(g2d, (int)(SCALE*fields.zoom), getWidth(), getHeight());    
+            fields.verticalRuler.paint(g2d, (int)(SCALE*fields.zoom), getWidth(), getHeight());    
             g2d.translate(0, -fields.origin.y);         
         }
 
