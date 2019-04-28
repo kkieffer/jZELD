@@ -1,7 +1,6 @@
 
 package com.github.kkieffer.jzeld.element;
 
-import com.github.kkieffer.jzeld.ZCanvas;
 import com.github.kkieffer.jzeld.adapters.ShapeAdapter;
 import com.github.kkieffer.jzeld.attributes.CustomStroke;
 import com.github.kkieffer.jzeld.attributes.ShadowAttributes;
@@ -423,6 +422,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
             relPositionX = (1.0 - relPositionX)*bounds.getWidth() - e.getBounds2D().getWidth(); //reflect about midpoint
             e.reposition(relPositionX, position.getY(), Double.MAX_VALUE, Double.MAX_VALUE); //y is unchanged
 
+            e.setRotation(-e.getRotation());
             e.flipHorizontal();
            
         }
@@ -452,8 +452,9 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
             relPositionY = (1.0 - relPositionY)*bounds.getHeight() - e.getBounds2D().getHeight(); //reflect about midpoint
             e.reposition(position.getX(), relPositionY, Double.MAX_VALUE, Double.MAX_VALUE); //x is unchanged
 
+            e.setRotation(-e.getRotation());
             e.flipVertical();
-           
+
         }
         
         if (clippingShape != null) {
