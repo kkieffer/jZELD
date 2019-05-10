@@ -144,6 +144,11 @@ public class Demo extends javax.swing.JFrame {
         //Wave
         ZWave w = new ZWave(4.0, 2.0, 6, 0.0, true, true, true, 1.0f, Color.RED, null, null, StrokeStyle.SQUARE, null);
         c.addElement(w);
+        
+        //Cresecent
+        ZCrescent cre = new ZCrescent(9.0, 3.0, 2.0, 2.0, 0.0, true, true, true, 1, Color.BLACK, null, Color.RED, StrokeStyle.SQUARE, 1.0);
+        c.addElement(cre);
+        
     
         //Create some editable text
         Font f = new Font("SERIF", Font.BOLD, 22);
