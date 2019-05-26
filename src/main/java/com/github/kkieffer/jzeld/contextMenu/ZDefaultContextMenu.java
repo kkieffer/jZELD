@@ -88,7 +88,7 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         shearMenu.add(setVerticalShearMenuItem);
         shearMenu.add(clearShearMenuItem);
         
-        orderMenu = new JMenu("Order");
+        orderMenu = new JMenu("Z-Order");
         sendToBackMenuItem = new JMenuItem("Send to Back");
         sendBackwardsMenuItem = new JMenuItem("Send Backward");
         bringToFrontMenuItem = new JMenuItem("Bring to Front");
