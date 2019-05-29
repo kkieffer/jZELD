@@ -6,6 +6,7 @@ import com.github.kkieffer.jzeld.attributes.TextAttributes;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.ColorAdapter;
 import com.github.kkieffer.jzeld.ZCanvas;
 import com.github.kkieffer.jzeld.attributes.CustomStroke;
+import com.github.kkieffer.jzeld.attributes.PaintAttributes;
 import com.github.kkieffer.jzeld.attributes.TextAttributes.HorizontalJustify;
 import static com.github.kkieffer.jzeld.element.ZAbstractShape.createBasicStroke;
 import java.awt.AlphaComposite;
@@ -252,6 +253,14 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     @Override
     public boolean isMutable() {
         return true;
+    }
+    
+    @Override
+    public void setPaintAttributes(PaintAttributes paint) {}  //not supported
+   
+    @Override
+    public PaintAttributes getPaintAttributes() {
+        return null;
     }
     
     @Override

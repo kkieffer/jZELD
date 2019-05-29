@@ -5,6 +5,7 @@ import com.github.kkieffer.jzeld.adapters.JAXBAdapter.Rectangle2DAdapter;
 import com.github.kkieffer.jzeld.UnitMeasure;
 import com.github.kkieffer.jzeld.ZCanvas;
 import com.github.kkieffer.jzeld.attributes.CustomStroke;
+import com.github.kkieffer.jzeld.attributes.PaintAttributes;
 import static java.awt.BasicStroke.CAP_BUTT;
 import static java.awt.BasicStroke.CAP_ROUND;
 import static java.awt.BasicStroke.JOIN_MITER;
@@ -218,6 +219,19 @@ public abstract class ZElement implements Serializable {
         return opacity;
     }
     
+    
+    /**
+     * For elements that support a custom paint attribute, set the custom paint attribute. 
+     * @param paint the custom stroke to apply, null for none
+     */
+    public abstract void setPaintAttributes(PaintAttributes paint);
+    
+    
+    /**
+     * For elements that support a custom paint attribute, get the attribute
+     * @return the paint attribute, null for none
+     */
+    public abstract PaintAttributes getPaintAttributes();
     
     /**
      * Sets the attributes of an element.  An Element does not need to support all or any of these fields.

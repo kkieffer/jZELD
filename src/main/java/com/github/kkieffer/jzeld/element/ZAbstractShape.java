@@ -256,12 +256,14 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
      * Set the paint attributes for the element.  The paint attributes (linear, radial, or texture) are applied over the shape's fill color.
      * @param p the paint attributes.  To remove, use null
      */
+    @Override
     public void setPaintAttributes(PaintAttributes p) {
         paintAttr = p;
         changed();
     }
     
     
+    @Override
     public PaintAttributes getPaintAttributes() {
         return paintAttr;
     }
