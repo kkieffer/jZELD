@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.adapters.ShapeAdapter;
+import com.github.kkieffer.jzeld.attributes.Clippable;
 import com.github.kkieffer.jzeld.attributes.CustomStroke;
 import com.github.kkieffer.jzeld.attributes.PaintAttributes;
 import java.awt.Color;
@@ -31,7 +32,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlRootElement(name = "ZShape")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ZShape extends ZAbstractShape {
+public class ZShape extends ZAbstractShape implements Clippable {
 
 
     /**
@@ -247,6 +248,7 @@ public class ZShape extends ZAbstractShape {
      * Returns the clipping shape for this shape. The clipping shape has been offset to this shape's origin
      * @return 
      */
+    @Override
     public Shape getClippingShape() {
         return clippingShape;
     }
@@ -255,6 +257,7 @@ public class ZShape extends ZAbstractShape {
      * Set the clipping shape for this shape. The clip shape must be in canvas units, but in absolute position on the canvas
      * @param s the clip shape to apply, null to remove clip
      */
+    @Override
     public void setClippingShape(Shape s) {
         if (s != null) {
             Rectangle2D b = this.getBounds2D();
@@ -263,6 +266,12 @@ public class ZShape extends ZAbstractShape {
         }
         else
             clippingShape = null;
+    }
+    
+    
+    @Override
+    public boolean hasClip() {
+        return clippingShape != null;
     }
     
     public void scaleBorderWithShape(boolean enable) {

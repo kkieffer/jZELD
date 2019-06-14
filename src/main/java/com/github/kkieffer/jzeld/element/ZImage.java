@@ -2,11 +2,13 @@
 package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.adapters.SerializableImage;
+import static com.github.kkieffer.jzeld.element.ZShape.setClip;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -133,8 +135,10 @@ public class ZImage extends ZRectangle {
         if (!isVisible())
             return;
 
-        super.paint(g, unitSize, width, height);       
-        
+        super.paint(g, unitSize, width, height);   
+           
+        Shape origClip = setClip(g, scaledClip);
+               
         if (image != null) {
             int x = flipHoriz ? (int)width : 0;
             int w = flipHoriz ? (int)-width : (int)width;
@@ -145,6 +149,9 @@ public class ZImage extends ZRectangle {
             paintImage(g, image.getImage(), x, y, w, h);
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         }
+        
+        g.setClip(origClip);
+
     }
     
     

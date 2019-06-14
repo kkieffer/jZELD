@@ -3,9 +3,12 @@ package com.github.kkieffer.jzeld.contextMenu;
 
 import com.github.kkieffer.jzeld.ZCanvas;
 import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
+import com.github.kkieffer.jzeld.attributes.Clippable;
+import com.github.kkieffer.jzeld.element.ZAbstractShape;
 import com.github.kkieffer.jzeld.element.ZElement;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Shape;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
@@ -56,7 +59,8 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
     protected final ColorMenuItem removeFillMenuItem;
     private final JMenuItem setHorizontalShearMenuItem;
     private final JMenuItem setVerticalShearMenuItem;
-    
+    private final JMenuItem clipMenuItem;   
+    private boolean clip = true;
     
     public ZDefaultContextMenu(ZCanvas canvas) {
         
@@ -122,6 +126,8 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         
         combineMenu = new CombineMenu("Combine", canvas);
            
+        clipMenuItem = new JMenuItem("Clip");
+        
         attributesMenu = new JMenu("Attributes");
         lineWeightMenu = new LineBorderMenu("Line Weight", canvas, LineBorderMenu.Type.WEIGHT);
         lineDashMenu = new LineBorderMenu("Dash Pattern", canvas, LineBorderMenu.Type.DASH);
@@ -148,6 +154,7 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         contextPopupMenu.add(attributesMenu);
         contextPopupMenu.add(new JSeparator());
         contextPopupMenu.add(combineMenu);
+        contextPopupMenu.add(clipMenuItem);
         contextPopupMenu.add(alignMenu);
         
         copyMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -283,6 +290,53 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
 
             }
         });
+        
+        this.clipMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                
+                ZElement[] selectedElementsArray = canvas.getSelectedElementsArray();
+                
+                if (!clip) {
+                    
+                    canvas.saveCanvasContext();
+                    
+                    for (ZElement e : selectedElementsArray) {
+                        
+                        if (e instanceof Clippable) {
+                            Clippable c = (Clippable)e;
+                            c.setClippingShape(null);
+                        }
+                    }
+                    return;
+                }
+                
+                
+                if (selectedElementsArray.length != 2)
+                    return;
+                
+                if (selectedElementsArray[0] instanceof ZAbstractShape) {
+                                        
+                    canvas.saveCanvasContext();
+                                        
+                    Shape clipShape = ((ZAbstractShape)selectedElementsArray[0]).getShape();
+                    
+                    if (selectedElementsArray[1] instanceof Clippable) {
+                        Clippable toBeClipped = (Clippable)selectedElementsArray[1];
+                        toBeClipped.setClippingShape(clipShape);
+                        canvas.removeElement(selectedElementsArray[0]);  //remove the piece that clipped 
+                    }
+                    else
+                        JOptionPane.showMessageDialog(canvas, "No clipping.\nSelected element cannot be clipped.", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);                         
+
+                }
+                else 
+                   JOptionPane.showMessageDialog(canvas, "No clipping.\nSelected element cannot be used for clipping.", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);                         
+
+            
+            }
+        });
                 
     }
 
@@ -322,7 +376,21 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         alignMenu.setEnabled(selectedElements.size() > 1);
         combineMenu.setEnabled(selectedElements.size() > 1);
         
-
+        if (lastSelected.hasClip()) {
+            clipMenuItem.setEnabled(true);
+            clipMenuItem.setText("Remove Clip");
+            clip = false;
+        }
+        else if (selectedElements.size() == 2 && selectedElements.get(1) instanceof Clippable) {
+            clipMenuItem.setEnabled(true);
+            clipMenuItem.setText("Clip");
+            clip = true;
+        }
+        else {
+            clipMenuItem.setEnabled(false);
+            clipMenuItem.setText("Clip");
+            clip = true;
+        }
 
     }
     

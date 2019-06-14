@@ -298,7 +298,7 @@ public class SVGImport {
             
             String name = node.getClass().getSimpleName().replace("Node", "").replace("Graphics", "");
             
-            groupedSVG.setName("SVG" + name + getIDString(node) + "(" + svgConvertedElements.size() + (clipShape != null ? " elem, clipped)" : " elem)"));
+            groupedSVG.setName("SVG" + name + getIDString(node) + "(" + svgConvertedElements.size() + " elements)");
             
             if (clipShape != null)
                 System.out.println("Clip: " + clipShape.getBounds2D());

@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "ZElement")
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class ZElement implements Serializable {
- 
+
     public enum StrokeStyle {ROUNDED(CAP_ROUND, JOIN_ROUND), 
                              SQUARE(CAP_BUTT, JOIN_MITER);
     
@@ -347,6 +347,12 @@ public abstract class ZElement implements Serializable {
 
     
     /**
+     * True if the element has a clipping shape applied, false if it doesn't or doesn't support clipping
+     * @return 
+     */
+    public abstract boolean hasClip();
+    
+    /**
      * True if the element can be selected by the cursor
      * @return 
      */
@@ -440,7 +446,7 @@ public abstract class ZElement implements Serializable {
      * @return 
      */
     public String getName() {
-        return name;
+        return name + (hasClip() ? " (Clipped)" : "");
     }
     
     /**

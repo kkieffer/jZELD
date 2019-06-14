@@ -3,6 +3,7 @@ package com.github.kkieffer.jzeld.contextMenu;
 
 import com.github.kkieffer.jzeld.ZCanvas;
 import static com.github.kkieffer.jzeld.ZCanvas.errorIcon;
+import com.github.kkieffer.jzeld.element.ZElement;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -26,6 +27,15 @@ public class CombineMenu extends JMenu {
             m.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    
+                    int clipCount = 0;
+                    for (ZElement e : canvas.getSelectedElementsArray()) {
+                        if (e.hasClip())
+                            clipCount++;
+                    }
+                    if (clipCount > 0) 
+                        JOptionPane.showMessageDialog(canvas, "Some selected elements are clipped. The clip will not be preserved.", "Warning", JOptionPane.ERROR_MESSAGE, errorIcon);
+
                     int numSel = canvas.getSelectedElementsArray().length;
                     int combined = canvas.combineSelectedElements(g);
                 

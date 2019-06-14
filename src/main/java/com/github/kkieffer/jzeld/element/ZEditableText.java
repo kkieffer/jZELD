@@ -256,6 +256,11 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     }
     
     @Override
+    public boolean hasClip() {
+        return false;
+    }
+    
+    @Override
     public void setPaintAttributes(PaintAttributes paint) {}  //not supported
    
     @Override

@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld.element;
 
 import com.github.kkieffer.jzeld.adapters.ShapeAdapter;
+import com.github.kkieffer.jzeld.attributes.Clippable;
 import com.github.kkieffer.jzeld.attributes.CustomStroke;
 import com.github.kkieffer.jzeld.attributes.ShadowAttributes;
 import com.github.kkieffer.jzeld.attributes.TextAttributes;
@@ -30,7 +31,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlRootElement(name = "ZGroupedElement")
 @XmlAccessorType(XmlAccessType.FIELD)
-public final class ZGroupedElement extends ZElement implements TextAttributes.TextInterface, ShadowAttributes.ShadowInterface {
+public final class ZGroupedElement extends ZElement implements TextAttributes.TextInterface, ShadowAttributes.ShadowInterface, Clippable {
 
     @XmlElement(name="ZElement")        
     private ArrayList<ZElement> elements;
@@ -121,12 +122,8 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
             e.move(-x, -y, Integer.MAX_VALUE, Integer.MAX_VALUE);
         }
         
-        
-        if (clippingShape != null) {  //scale this to the group origin (removing x, y as above)
-            AffineTransform a = AffineTransform.getTranslateInstance(-x, -y);
-            clippingShape = a.createTransformedShape(clippingShape);
-        }   
-        
+        setClippingShape(clippingShape);
+    
         setName("ZGroup (" + elements.size() + " elements)");
         
     }
@@ -397,6 +394,38 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
         return null;
     }
     
+    @Override
+    public boolean hasClip() {
+        return clippingShape != null;
+    }
+        
+    
+    /**
+     * Returns the clipping shape for this shape. The clipping shape has been offset to this shape's origin
+     * @return 
+     */
+    @Override
+    public Shape getClippingShape() {
+        return clippingShape;
+    }
+    
+    
+    /**
+     * Set the clipping shape for this shape. The clip shape must be in canvas units, but in absolute position on the canvas
+     * @param s the clip shape to apply, null to remove clip
+     */
+    @Override
+    public void setClippingShape(Shape s) {
+        if (s != null) {
+            Rectangle2D b = this.getBounds2D();
+            AffineTransform a = AffineTransform.getTranslateInstance(-b.getX(), -b.getY());  //translate to this shape's origin
+            clippingShape = a.createTransformedShape(s);
+        }
+        else
+            clippingShape = null;
+    }
+    
+  
     
     /**
      * When this group changes, send the change update to all the grouped elements
