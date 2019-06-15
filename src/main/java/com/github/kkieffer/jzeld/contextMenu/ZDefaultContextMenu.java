@@ -57,9 +57,10 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
     protected final JMenuItem clearShearMenuItem;
     protected final JMenu shearMenu;
     protected final ColorMenuItem removeFillMenuItem;
-    private final JMenuItem setHorizontalShearMenuItem;
-    private final JMenuItem setVerticalShearMenuItem;
-    private final JMenuItem clipMenuItem;   
+    protected final JMenuItem setHorizontalShearMenuItem;
+    protected final JMenuItem setVerticalShearMenuItem;
+    protected final JMenuItem clipMenuItem;   
+    
     private boolean clip = true;
     
     public ZDefaultContextMenu(ZCanvas canvas) {
