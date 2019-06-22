@@ -83,6 +83,7 @@ public abstract class ZElement implements Serializable {
   
     transient private boolean selected = false;
     
+    transient private UUID copySrcReference = null;  //references the element this is a copy of, or null if not a copy
   
     /**
      * Create an object with the initial position (in units) and bounds (in units)
@@ -139,14 +140,23 @@ public abstract class ZElement implements Serializable {
         this.flipVert = src.flipVert;
         this.className = src.className;
         
-        if (forNew)
-            this.uuid = UUID.randomUUID();  //new one 
-        else
+        //Creating a copy, create a new random UUID and the src reference is the UUID of the one we're copying
+        if (forNew) {
+            this.uuid = UUID.randomUUID();  
+            copySrcReference = src.getUUID();
+        }
+        else {  //Make identical to the src
             this.uuid = src.uuid;
+            this.copySrcReference = src.copySrcReference;
+        }
     } 
     
     public UUID getUUID() {
         return this.uuid;
+    }
+    
+    public UUID getCopySrcReferenceUUID() {
+        return this.copySrcReference;
     }
     
     public abstract String getHtmlHelp();
