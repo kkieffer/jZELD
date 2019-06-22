@@ -1348,7 +1348,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public void moveSelected(double x, double y) {
          
         for (ZElement e : getSelectedElements()) {
-           e.move(x, y, getMaxXPosition()/SCALE, getMaxYPosition()/SCALE);
+           e.move(x, y, getMaxXPosition(), getMaxYPosition());
         }
         repaint();
     }
@@ -1403,7 +1403,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return;
  
         undoStack.saveContext(fields.zElements);
-        
+                
         ZElement key = selectedElements.get(0);
         ZElement key2 = key;
         for (ZElement e : selectedElements) {  //loop through elements, looking for the key - closest to the edge
@@ -2119,7 +2119,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void paste(ZElement e) {
 
-        e.move(0.2, 0.2, getMaxXPosition()/SCALE, getMaxYPosition()/SCALE);  //move slighty down to distinguish from original
+        e.move(0.2, 0.2, getMaxXPosition(), getMaxYPosition());  //move slighty down to distinguish from original
         
         ZElement toPaste = e.copyOf(true);  //make a copy to paste, for multiple pastes
         
@@ -2428,7 +2428,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         g2d.translate(fields.origin.x, fields.origin.y);
         g2d.scale(fields.zoom, fields.zoom);
                
-        if (fields.backgroundColor != null) {
+        if (fields.backgroundColor != null && !printOn) {
             g2d.setBackground(fields.backgroundColor);
             if (fields.pageSize != null)
                 g2d.clearRect(0, 0, fields.pageSize.width, fields.pageSize.height);
@@ -2779,11 +2779,11 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         return (int)(getHeight() / fields.zoom);
     }
      
-    private int getMaxXPosition() {
-        return (int)((getWidth() - fields.origin.x - 10)/ fields.zoom);
+    public int getMaxXPosition() {
+        return (int)(((getWidth() - fields.origin.x - 10)/ fields.zoom)/SCALE);
     }
-    private int getMaxYPosition() {
-        return (int)((getHeight() - fields.origin.y - 10)/ fields.zoom);
+    public int getMaxYPosition() {
+        return (int)(((getHeight() - fields.origin.y - 10)/ fields.zoom)/SCALE);
     }
     
     @Override
@@ -2922,7 +2922,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (!selectedElementResizeOn) { //Reposition the object to the mouse, only when it won't take the object off the component
                 
                 if (lastSelectedElement.isMoveable()) {
-                    lastSelectedElement.reposition((mouseLoc.getX() - selectedObj_xOffset)/SCALE, (mouseLoc.getY() - selectedObj_yOffset)/SCALE, getMaxXPosition()/SCALE, getMaxYPosition()/SCALE);  
+                    lastSelectedElement.reposition((mouseLoc.getX() - selectedObj_xOffset)/SCALE, (mouseLoc.getY() - selectedObj_yOffset)/SCALE, getMaxXPosition(), getMaxYPosition());  
                     selectedMouseDrag = new Point2D.Double((mouseLoc.getX() - selectedObj_xOffset), (mouseLoc.getY() - selectedObj_yOffset));  
                 }
             } else if (selectedResizeElement != null) { //Resize the object
@@ -2952,7 +2952,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 double yMove = mouseLoc.getY() - lowerRightT.getY() + selectedObj_yOffset_toRightCorner;
 
                 //move the shape 
-                selectedResizeElement.move(xMove/SCALE, yMove/SCALE, getMaxXPosition()/SCALE, getMaxYPosition()/SCALE);
+                selectedResizeElement.move(xMove/SCALE, yMove/SCALE, getMaxXPosition(), getMaxYPosition());
 
             }
                         
