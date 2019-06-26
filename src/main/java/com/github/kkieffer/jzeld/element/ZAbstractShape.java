@@ -119,6 +119,11 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         return true;
     }
     
+     @Override
+    public boolean isGroupable() {
+        return true;
+    }
+    
     /**
      * For most subclasses, selecting on the canvas from within the shape outline is the typical case - the ZCanvas won't select an element when the mouse
      * is within the bounds but not within the shape. This behavior may be overridden by subclasses.

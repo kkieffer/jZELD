@@ -2,6 +2,7 @@
 package com.github.kkieffer.jzeld;
 
 import com.github.kkieffer.jzeld.element.ZElement;
+import java.awt.geom.Point2D;
 
 /**
  * Classes that implement this interface receive notifications when things happen on the canvas
@@ -41,5 +42,12 @@ public interface ZCanvasEventListener {
      * Called whenever the canvas has been zoomed in or out
      */
     public void canvasChangedZoom();
+
+    /**
+     * Called whenever the mouse is pressed in the canvas
+     * @param mouseLoc the coordinates, in units, where the mouse was pressed
+     * @param selected the element selected with the mouse press, or null if nothing was selected (or an element was deselected)
+     */
+    public void canvasMousePress(Point2D mouseLoc, ZElement selected);
     
 }

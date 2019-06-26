@@ -256,6 +256,11 @@ public class ZEditableText extends ZElement implements TextAttributes.TextInterf
     }
     
     @Override
+    public boolean isGroupable() {
+        return true;
+    }
+    
+    @Override
     public boolean hasClip() {
         return false;
     }

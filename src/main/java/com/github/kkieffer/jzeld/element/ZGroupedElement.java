@@ -1,6 +1,8 @@
 
 package com.github.kkieffer.jzeld.element;
 
+import com.github.kkieffer.jzeld.UnitMeasure;
+import com.github.kkieffer.jzeld.ZCanvas;
 import com.github.kkieffer.jzeld.adapters.ShapeAdapter;
 import com.github.kkieffer.jzeld.attributes.Clippable;
 import com.github.kkieffer.jzeld.attributes.CustomStroke;
@@ -45,8 +47,8 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
     
     private static ArrayList<ZElement> copyElements(ArrayList<ZElement> src) {
         ArrayList<ZElement> copy = new ArrayList<>(src.size());
-        for (int i=0; i<src.size(); i++) {
-            copy.add(src.get(i).copyOf(false));  //not for copy - for grouping
+        for (ZElement e : src) {
+            copy.add(e.copyOf(false));  //not for copy - for grouping
         }
         return copy;
     }
@@ -77,6 +79,9 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
             
             Rectangle2D b = getElementBounds(e);
             
+            if (b.isEmpty())
+                continue;
+            
             if (b.getX() < left)
                 left = b.getX();
             if (b.getY() < top)
@@ -101,7 +106,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
      * @return 
      */
     public static ZGroupedElement createGroup(ArrayList<ZElement> elements, Shape clippingShape) {
-        
+
         Rectangle2D b = getEnclosingBounds(elements);
         return new ZGroupedElement(b.getX(), b.getY(), b.getWidth(), b.getHeight(), elements, clippingShape);
     }
@@ -199,8 +204,6 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
             Rectangle2D eBounds = e.getBounds2D();
 
             Point2D centerE = new Point2D.Double(eBounds.getCenterX(), eBounds.getCenterY());
-
-            Point2D ePos = e.getPosition();
             
             Point2D relativeE = new Point2D.Double(centerE.getX() - center.getX(), centerE.getY() - center.getY());
            
@@ -398,8 +401,13 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
     public boolean hasClip() {
         return clippingShape != null;
     }
-        
     
+
+    @Override
+    public boolean isGroupable() {
+        return true;
+    }
+  
     /**
      * Returns the clipping shape for this shape. The clipping shape has been offset to this shape's origin
      * @return 
@@ -439,6 +447,17 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
         super.changed();
     }
     
+    /**
+     * Pass this on to all grouped elements
+     * @param canvas
+     * @param u 
+     */
+    @Override
+    public void unitChanged(ZCanvas canvas, UnitMeasure u) {
+        for (ZElement e : elements) {
+            e.unitChanged(canvas, u);
+        } 
+    }
     
     @Override
     public void flipHorizontal() {

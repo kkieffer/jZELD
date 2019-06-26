@@ -402,6 +402,12 @@ public abstract class ZElement implements Serializable {
     public abstract boolean isMutable();
    
     
+    /**
+     * True if the element supports being added to a ZGroupedElement
+     * @return 
+     */
+    public abstract boolean isGroupable();
+    
     public void setMoveable(boolean move) {
         canMove = move;
     }

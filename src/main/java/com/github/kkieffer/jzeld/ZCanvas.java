@@ -1509,8 +1509,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         ArrayList<ZElement> selectedElements = getSelectedElements();
         Iterator<ZElement> it = selectedElements.iterator();
-        while (it.hasNext()) {  //remove any unmutable objects
-            if (!it.next().isMutable())
+        while (it.hasNext()) {  //remove any unmutable and ungroupable objects
+            ZElement e = it.next();
+            if (!e.isMutable() || !e.isGroupable())
                 it.remove();
         }
 
@@ -2586,7 +2587,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     //Determine the selected object, if any, from the mouse pick. 
     private void selectElement(MouseEvent e) {
         
-        Point2D mouseLoc = getScaledMouse(e);
+        final Point2D mouseLoc = getScaledMouse(e);
         
         //Select the pointed object, if there is one
         //See if the mouse click was within the bounds of any component, checking upper objects before moving down the z stack
@@ -2656,8 +2657,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 if (contextMenu != null)
                     contextMenu.newSelections(lastSelectedElement, getSelectedElements());
                
-                for (ZCanvasEventListener l : canvasEventListeners)
+                for (ZCanvasEventListener l : canvasEventListeners) {
                     l.elementSelected(o);
+                    l.canvasMousePress(new Point2D.Double(mouseLoc.getX()/SCALE, mouseLoc.getY()/SCALE), o);
+                }
        
                 Point2D location = o.getPosition(SCALE);  //get the upper left, find the mouse offset from the upper left
                 
@@ -2687,6 +2690,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
 
         }
         selectNone();
+        
+        for (ZCanvasEventListener l : canvasEventListeners)
+            l.canvasMousePress(new Point2D.Double(mouseLoc.getX()/SCALE, mouseLoc.getY()/SCALE), null);
     }
     
     
@@ -3121,17 +3127,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      */
     public void paintToGraphicsContext(Graphics2D g, boolean hideBackground) {
         
-        //Hide margins, ruler, and grid
-        boolean marginsOn = areMarginsOn();
-        marginsOn(false);
-        ZGrid savedGrid = fields.grid; //save grid
-        hideRulers(true);
-        Color savedColor = fields.backgroundColor;
-        
-        setGrid(null);      
-        if (hideBackground)
-            setCanvasBackgroundColor(null);
-        
+
         drawOff();
         resetView();
         selectNone();  //prevents drawing any selections or client draw
@@ -3148,13 +3144,6 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         printOn = false;
         
-        
-        //Restore margins, ruler and grid
-        marginsOn(marginsOn);
-        setGrid(savedGrid);
-        hideRulers(false);
-        if (hideBackground)
-            setCanvasBackgroundColor(savedColor);
             
     }
     
@@ -3168,12 +3157,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (fields.pageSize == null || resolutionScale < 1)
             return null;
         
-        //Hide margins and grid
-        boolean marginsOn = areMarginsOn();
-        marginsOn(false);
-        ZGrid savedGrid = fields.grid; //save grid
-        setGrid(null);
-        
+   
         //Create Buffered Image
         BufferedImage bi = new BufferedImage(fields.pageSize.width*resolutionScale, fields.pageSize.height*resolutionScale, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = bi.createGraphics();
@@ -3186,10 +3170,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         print(g, null, 0);
         g.dispose();
         
-        //Restore margins and grid
-        marginsOn(marginsOn);
-        setGrid(savedGrid);
-        
+
         
         return bi;   
     }
@@ -3213,7 +3194,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         Collections.reverse(selectedElements); //the selected elements are ordered with top z plane first.  But the Grouped Element draws grouped elements in the order provided, so we need to reverse the list
         ZGroupedElement group = ZGroupedElement.createGroup(selectedElements, null);  //create the group of elements
         
-        group.reposition(0, 0, Double.MAX_VALUE, Double.MAX_VALUE); //no offset (not on canvas, painting to image
+        //group.reposition(0, 0, Double.MAX_VALUE, Double.MAX_VALUE); //no offset (not on canvas, painting to image
         
         //Find the shape that holds the element with its margins
         Rectangle2D margins = group.getMarginBounds(SCALE*fields.zoom); 
@@ -3235,15 +3216,19 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         g.scale(resolutionScale, resolutionScale);
         
         //Set the position to paint such that the margins will end up at the top left of the image
-        g.translate(-bounds.getX() - margins.getX(), -bounds.getY() - margins.getY());
+        Point2D position = group.getPosition(SCALE*fields.zoom);
+        g.translate(-position.getX() -bounds.getX() - margins.getX(), -position.getY() -bounds.getY() - margins.getY());
         g.scale(fields.zoom, fields.zoom);
         
         RepaintManager currentManager = RepaintManager.currentManager(this);
 
         currentManager.setDoubleBufferingEnabled(false);
-        this.paintElement(g, group, false);
+        for (ZElement e : selectedElements) {
+            if (e.isPrintable())
+                this.paintElement(g, e, false);
+        }
         currentManager.setDoubleBufferingEnabled(true);
-      
+
         g.dispose();
         return bi; 
     }
