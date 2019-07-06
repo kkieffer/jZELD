@@ -3153,6 +3153,16 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
      * @return the image of the canvas
      */
     public BufferedImage printToImage(int resolutionScale) {
+        return printToImage(resolutionScale, null);
+    }
+    
+    /**
+     * Grab an image of the canvas, the margins and grid are hidden
+     * @param resolutionScale the desired resolution multiplier. A value of 1 = 72dpi (screen resolution).  2 doubles this, and so on.
+     * @param clearColor clear the image with the specified color before painting image, if not null
+     * @return the image of the canvas
+     */
+    public BufferedImage printToImage(int resolutionScale, Color clearColor) {
         
         if (fields.pageSize == null || resolutionScale < 1)
             return null;
@@ -3165,6 +3175,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        if (clearColor != null) {
+            g.setBackground(clearColor);
+            g.clearRect(0, 0, bi.getWidth(), bi.getHeight());
+        }
 
         g.scale(resolutionScale, resolutionScale);
         print(g, null, 0);
