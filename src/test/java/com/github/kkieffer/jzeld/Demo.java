@@ -292,7 +292,7 @@ public class Demo extends javax.swing.JFrame {
         am.put("SaveElementImage", new AbstractAction(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                BufferedImage i = c.printSelectedElementsToImage(3);  //print at 216 dpi
+                BufferedImage i = c.printSelectedElementsToImage(3, null);  //print at 216 dpi
                 File f = new File("test.png");
                 try {
                     ImageIO.write(i, "png", f);

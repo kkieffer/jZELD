@@ -1523,7 +1523,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         undoStack.suspendSave();  //don't push all the remove and add changes to the undo stack
         
         Collections.reverse(selectedElements); //the selected elements are ordered with top z plane first.  But the Grouped Element draws grouped elements in the order provided, so we need to reverse the list
-        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements, null);  //create the group of elements
+        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements, null, true);  //create the group of elements
         
         for (ZElement e: selectedElements) //remove all selected
             removeElement(e);
@@ -3146,15 +3146,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
             
     }
-    
-    /**
-     * Grab an image of the canvas, the margins and grid are hidden
-     * @param resolutionScale the desired resolution multiplier. A value of 1 = 72dpi (screen resolution).  2 doubles this, and so on.
-     * @return the image of the canvas
-     */
-    public BufferedImage printToImage(int resolutionScale) {
-        return printToImage(resolutionScale, null);
-    }
+   
     
     /**
      * Grab an image of the canvas, the margins and grid are hidden
@@ -3193,9 +3185,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     /**
      * Print all selected elements by first creating a grouped element from them, and printing that element to an image
      * @param resolutionScale the desired resolution multiplier. A value of 1 = 72dpi (screen resolution).  2 doubles this, and so on.
+     * @param clearColor clear the image with the specified color before painting image, if not null
      * @return the image of the selected elements
      */
-    public BufferedImage printSelectedElementsToImage(int resolutionScale) {
+    public BufferedImage printSelectedElementsToImage(int resolutionScale, Color clearColor) {
         
         if (resolutionScale < 1)
             return null;
@@ -3206,7 +3199,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             return null;
         
         Collections.reverse(selectedElements); //the selected elements are ordered with top z plane first.  But the Grouped Element draws grouped elements in the order provided, so we need to reverse the list
-        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements, null);  //create the group of elements
+        ZGroupedElement group = ZGroupedElement.createGroup(selectedElements, null, false);  //create the group of elements
         
         //group.reposition(0, 0, Double.MAX_VALUE, Double.MAX_VALUE); //no offset (not on canvas, painting to image
         
@@ -3227,6 +3220,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        if (clearColor != null) {
+            g.setBackground(clearColor);
+            g.clearRect(0, 0, bi.getWidth(), bi.getHeight());
+        }
         g.scale(resolutionScale, resolutionScale);
         
         //Set the position to paint such that the margins will end up at the top left of the image

@@ -294,7 +294,7 @@ public class SVGImport {
             if (svgConvertedElements.isEmpty())
                 return;
                 
-            ZGroupedElement groupedSVG = ZGroupedElement.createGroup(svgConvertedElements, clipShape);  //create a new group with the elements
+            ZGroupedElement groupedSVG = ZGroupedElement.createGroup(svgConvertedElements, clipShape, true);  //create a new group with the elements
             
             String name = node.getClass().getSimpleName().replace("Node", "").replace("Graphics", "");
             

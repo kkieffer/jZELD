@@ -1,6 +1,7 @@
 
 package com.github.kkieffer.jzeld;
 
+import com.github.kkieffer.jzeld.adapters.DialogUtils;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -133,6 +134,10 @@ public class ZColorChooser {
         ColorTracker ok = new ColorTracker(chooser);
         JDialog dialog = JColorChooser.createDialog(null, title, true, chooser, ok, null);
 
+        DialogUtils.addShortcutAndIcon(chooser, "dispose");
+
+        
+        
         dialog.setVisible(true);
 
         Color c = ok.getColor();

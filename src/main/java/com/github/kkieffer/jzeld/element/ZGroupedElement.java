@@ -45,9 +45,11 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
     private double groupedWidth;
     private double groupedHeight;
     
-    private static ArrayList<ZElement> copyElements(ArrayList<ZElement> src) {
+    private static ArrayList<ZElement> copyElements(ArrayList<ZElement> src, boolean includeNonPrintable) {
         ArrayList<ZElement> copy = new ArrayList<>(src.size());
         for (ZElement e : src) {
+            if (!includeNonPrintable && !e.isPrintable())
+                continue;
             copy.add(e.copyOf(false));  //not for copy - for grouping
         }
         return copy;
@@ -68,7 +70,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
               
     }
     
-    protected static Rectangle2D getEnclosingBounds(ArrayList<ZElement> elements) {
+    protected static Rectangle2D getEnclosingBounds(ArrayList<ZElement> elements, boolean includeNonPrintable) {
         double left = Integer.MAX_VALUE;  //furthest left
         double top = Integer.MAX_VALUE;  //furthest top
         double right = 0;                 //furthest right
@@ -76,6 +78,8 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
         
         //Find furthest left and top
         for (ZElement e : elements) {
+            if (!includeNonPrintable && !e.isPrintable())
+                continue;
             
             Rectangle2D b = getElementBounds(e);
             
@@ -103,22 +107,23 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
      * position and size is set to bound all the sub-elements.
      * @param elements
      * @param clippingShape shape that clips the group, which can be null. The clipping shape is a shape in absolute position, scaled to canvas units
+     * @param includeNonPrintable include non-printable objects in the group
      * @return 
      */
-    public static ZGroupedElement createGroup(ArrayList<ZElement> elements, Shape clippingShape) {
+    public static ZGroupedElement createGroup(ArrayList<ZElement> elements, Shape clippingShape, boolean includeNonPrintable) {
 
-        Rectangle2D b = getEnclosingBounds(elements);
-        return new ZGroupedElement(b.getX(), b.getY(), b.getWidth(), b.getHeight(), elements, clippingShape);
+        Rectangle2D b = getEnclosingBounds(elements, includeNonPrintable);
+        return new ZGroupedElement(b.getX(), b.getY(), b.getWidth(), b.getHeight(), elements, clippingShape, includeNonPrintable);
     }
 
     
-    private ZGroupedElement(double x, double y, double w, double h, ArrayList<ZElement> srcElements, Shape clipping) {
+    private ZGroupedElement(double x, double y, double w, double h, ArrayList<ZElement> srcElements, Shape clipping, boolean includeNonPrintable) {
         super(x, y, w, h, 0.0, true, true, true);
         groupedWidth = w;  //maintain the original grouped size in case of resize
         groupedHeight = h;
         clippingShape = clipping;
         
-        elements = copyElements(srcElements);
+        elements = copyElements(srcElements, includeNonPrintable);
         
         //Remove the x,y offset from each element's position
         for (ZElement e : this.elements) {
@@ -137,7 +142,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
     
     private ZGroupedElement(ZGroupedElement src, boolean forNew) {
         super(src, forNew);
-        this.elements = copyElements(src.elements);
+        this.elements = copyElements(src.elements, true);
         this.groupedWidth = src.groupedWidth;
         this.groupedHeight = src.groupedHeight;
         
@@ -165,7 +170,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
     
     
     protected void regroup() {
-        Rectangle2D b = getEnclosingBounds(elements);
+        Rectangle2D b = getEnclosingBounds(elements, true);
         for (ZElement e : elements)
             e.move(-b.getX(), -b.getY(), Double.MAX_VALUE, Double.MAX_VALUE);
         super.setSize(b.getWidth(), b.getHeight(), 0, 1.0);
@@ -219,7 +224,7 @@ public final class ZGroupedElement extends ZElement implements TextAttributes.Te
             
         }
         
-        ArrayList<ZElement> copy = copyElements(elements);
+        ArrayList<ZElement> copy = copyElements(elements, true);
         this.elements.clear();  //invalidate 
         
         return copy;
