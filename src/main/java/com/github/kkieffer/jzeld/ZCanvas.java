@@ -271,6 +271,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     
     private ZElement passThruElement = null;
 
+    private Point2D selectedObj_dragPosition;
     private Point2D selectedObj_mousePoint;
     private double selectedObj_yOffset;
     private double selectedObj_xOffset;
@@ -384,7 +385,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         
         //Set up the standard hotkeys for the canvas, more can be added by custom implementations
-        InputMap im = getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
+        InputMap im = getInputMap(JPanel.WHEN_FOCUSED);
         ActionMap am = getActionMap();
 
        
@@ -747,6 +748,47 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         canvasModified = true;
         repaint();
     }
+    
+    /**
+     * Set the horizontal ruler's major value offset, fail silently if no ruler exists
+     * @param offset 
+     */
+    public void setHorizontalRulerOffset(int offset) {
+        if (fields.horizontalRuler != null)
+            fields.horizontalRuler.setMajorValOffset(offset);
+    }
+    
+     /**
+     * Set the vertical ruler's major value offset, fail silently if no ruler exists
+     * @param offset 
+     */
+    public void setVerticalRulerOffset(int offset) {
+        if (fields.verticalRuler != null)
+            fields.verticalRuler.setMajorValOffset(offset);
+    }
+    
+    /**
+     * Get the horizontal ruler's major value offset, return 0 if no ruler exists
+     * @return 
+     */
+    public int getHorizontalRulerOffset() {
+        if (fields.horizontalRuler != null)
+            return fields.horizontalRuler.getMajorValOffset();
+        else
+            return 0;
+    }
+    
+    /**
+     * Get the vertical ruler's major value offset, return 0 if no ruler exists
+     * @return 
+     */
+    public int getVerticalRulerOffset() {
+        if (fields.verticalRuler != null)
+            return fields.verticalRuler.getMajorValOffset();
+        else
+            return 0;
+    }
+    
     
     /**
      * Set the page size and orientation for printing.  The page is colored to the canvas background color
@@ -2665,6 +2707,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 Point2D location = o.getPosition(SCALE);  //get the upper left, find the mouse offset from the upper left
                 
                 selectedObj_mousePoint = mouseLoc;
+                selectedObj_dragPosition = mouseLoc;
                 
                 selectedObj_xOffset = mouseLoc.getX() - location.getX();
                 selectedObj_yOffset = mouseLoc.getY() - location.getY();
@@ -2925,13 +2968,21 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         if (lastSelectedElement != null && mouseLoc.getX() < getMaxWidth() && mouseLoc.getY() < getMaxHeight())  {      
                 
             
-            if (!selectedElementResizeOn) { //Reposition the object to the mouse, only when it won't take the object off the component
+            if (!selectedElementResizeOn) { //Reposition all selected based on the delta move of the last selected object
                 
                 if (lastSelectedElement.isMoveable()) {
-                    lastSelectedElement.reposition((mouseLoc.getX() - selectedObj_xOffset)/SCALE, (mouseLoc.getY() - selectedObj_yOffset)/SCALE, getMaxXPosition(), getMaxYPosition());  
+                    
+                                   
+                    double xDelta = (mouseLoc.getX() - selectedObj_dragPosition.getX())/SCALE;
+                    double yDelta = (mouseLoc.getY() - selectedObj_dragPosition.getY())/SCALE;
+                    moveSelected(xDelta, yDelta);
+                    
+                    selectedObj_dragPosition = mouseLoc;
+                    
                     selectedMouseDrag = new Point2D.Double((mouseLoc.getX() - selectedObj_xOffset), (mouseLoc.getY() - selectedObj_yOffset));  
                 }
-            } else if (selectedResizeElement != null) { //Resize the object
+                
+            } else if (selectedResizeElement != null) { //Resize the last selected object
                     
                 
                 //move mouse and originally selected point to base coordinates

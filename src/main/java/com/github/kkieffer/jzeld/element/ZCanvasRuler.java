@@ -35,6 +35,8 @@ public final class ZCanvasRuler extends ZRectangle {
     private int majorTickStep;
     private int minorTicks;
     
+    private int majorValOffset = 0;
+    
     protected ZCanvasRuler() {}
     
     /**
@@ -59,6 +61,14 @@ public final class ZCanvasRuler extends ZRectangle {
         this.minorTicks = minorTicks;
     }
     
+    public void setMajorValOffset(int offset) {
+        this.majorValOffset = offset;
+    }
+    
+    public int getMajorValOffset() {
+        return majorValOffset;
+    }
+    
     
     @Override
     public void paint(Graphics2D g, double unitSize, double width, double height) {
@@ -75,7 +85,7 @@ public final class ZCanvasRuler extends ZRectangle {
 
         double scale = majorTickStep * (double)unitSize / unit.getScale();
        
-        int majorVal = 0;
+        int majorVal = majorValOffset;
         if (isHoriz) {
             for (double i=0; i<width; i+=scale) {
                 
