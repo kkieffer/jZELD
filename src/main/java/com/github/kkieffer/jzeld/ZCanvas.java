@@ -5,6 +5,7 @@ import com.github.kkieffer.jzeld.contextMenu.ZCanvasContextMenu;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.ColorAdapter;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.DimensionAdapter;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.FontAdapter;
+import com.github.kkieffer.jzeld.adapters.JAXBAdapter.Point2DAdapter;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.PointAdapter;
 import com.github.kkieffer.jzeld.adapters.JAXBAdapter.Rectangle2DAdapter;
 import com.github.kkieffer.jzeld.attributes.CustomStroke;
@@ -244,6 +245,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
  
         @XmlElement(name="Zoom")
         private double zoom = 1.0;
+        
+        @XmlElement(name="ZeroOffset")
+        @XmlJavaTypeAdapter(Point2DAdapter.class)
+        private Point2D zeroOffset = new Point2D.Double(0, 0);   //in units
        
         static Class<?>[] getContextClasses() {
             return new Class<?>[] {UnitMeasure.class, Orientation.class, ZCanvasRuler.class, ZGrid.class};
@@ -975,6 +980,24 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public Point2D getOrigin() {
         return new Point2D.Double(fields.origin.getX()/SCALE, fields.origin.getY()/SCALE);
     }
+    
+    
+    /**
+     * Returns the zero offset in values of units
+     * @return 
+     */
+    public Point2D getZeroOffset() {
+        return new Point2D.Double(fields.zeroOffset.getX(), fields.zeroOffset.getY());
+    }
+    
+    
+ 
+    public void setZeroOffset(Point2D point) {
+        fields.zeroOffset = new Point2D.Double(point.getX(), point.getY());
+        canvasModified = true;
+        repaint();
+    }
+    
     
     /**
      * Provides the page drawing area of the canvas, in units 
@@ -2526,7 +2549,10 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             if (fields.mouseCoordFont != null) {
                 g2d.setColor(Color.BLACK);               
 
-                String mouseCoord = fields.unit.format(tMouse.getX()/SCALE, true) + ", " + fields.unit.format(tMouse.getY()/SCALE, true);                                       
+                double xPos = tMouse.getX() - fields.zeroOffset.getX()*SCALE;
+                double yPos = tMouse.getY() - fields.zeroOffset.getY()*SCALE;
+                
+                String mouseCoord = fields.unit.format(xPos/SCALE, true) + ", " + fields.unit.format(yPos/SCALE, true);                                       
                 int stringX = (int)tMouse.getX() - (int)Math.ceil(fontMetrics.stringWidth(mouseCoord) + 10.0 /fields.zoom);
                 int stringY = (int)tMouse.getY() - (int)Math.ceil(10/fields.zoom);
                 
@@ -2576,8 +2602,12 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
                 g2d.setColor(Color.BLACK);
                 String s;
                 String measString = null;
-                if (mouseDrag == null)
-                    s = fields.unit.format(mouseIn.getX()/SCALE, true) + ", " + fields.unit.format(mouseIn.getY()/SCALE, true);
+                if (mouseDrag == null) {
+                    double xPos = mouseIn.getX() - fields.zeroOffset.getX()*SCALE;
+                    double yPos = mouseIn.getY() - fields.zeroOffset.getY()*SCALE;
+                    
+                    s = fields.unit.format(xPos/SCALE, true) + ", " + fields.unit.format(yPos/SCALE, true);
+                }
                 else {
                     double area = (dragRect.getWidth()/SCALE) * (dragRect.getHeight()/SCALE);  //area is w*h in units
                     s = fields.unit.format(dragRect.getWidth()/SCALE, false) + " x " + fields.unit.format(dragRect.getHeight()/SCALE, true);
