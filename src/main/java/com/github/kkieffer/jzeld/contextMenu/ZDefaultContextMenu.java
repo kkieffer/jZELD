@@ -27,8 +27,12 @@ import javax.swing.UIManager;
 public class ZDefaultContextMenu implements ZCanvasContextMenu {
     
     public static final ImageIcon shearIcon = new ImageIcon(ZCanvas.class.getResource("/shear.png")); 
+    public static final ImageIcon horizMoveIcon = new ImageIcon(ZCanvas.class.getResource("/horiz.png")); 
+    public static final ImageIcon vertMoveIcon = new ImageIcon(ZCanvas.class.getResource("/vert.png")); 
 
-    
+    protected JMenu moveMenu;
+    protected JMenuItem moveHorizontallyMenuItem;
+    protected JMenuItem moveVerticallyMenuItem;
     protected JMenu rotateMenu;
     protected JMenuItem rotateCWMenuItem;
     protected JMenuItem rotateCCWMenuItem;
@@ -79,6 +83,12 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         editMenu.add(pasteMenuItem);
         editMenu.add(deleteMenuItem);
    
+        moveMenu = new JMenu("Move");
+        moveHorizontallyMenuItem = new JMenuItem("Horizontally");
+        moveVerticallyMenuItem = new JMenuItem("Vertically");
+        moveMenu.add(moveHorizontallyMenuItem);
+        moveMenu.add(moveVerticallyMenuItem);
+              
         rotateMenu = new JMenu("Rotate");
         rotateCWMenuItem = new JMenuItem("Snap Clockwise");
         rotateCCWMenuItem = new JMenuItem("Snap Counter CW");
@@ -148,6 +158,7 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
         attributesMenu.add(colorMenu);
         
         contextPopupMenu.add(editMenu);
+        contextPopupMenu.add(moveMenu);
         contextPopupMenu.add(rotateMenu);
         contextPopupMenu.add(shearMenu);
         contextPopupMenu.add(orderMenu);
@@ -245,6 +256,52 @@ public class ZDefaultContextMenu implements ZCanvasContextMenu {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 canvas.clearShear();
+            }
+        });
+        
+        moveHorizontallyMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                Component parent = SwingUtilities.getRoot(canvas);
+                
+                //Prompt for the offset
+                String rc = (String)JOptionPane.showInputDialog(parent, "Number of " + canvas.getUnit().getName() + " to move", "Move Horizontally", JOptionPane.QUESTION_MESSAGE, horizMoveIcon,
+                                                        (Object[])null, 0);
+                if (rc != null) {
+                    try {
+                        //Get the user entered coordinates
+                        double scale = 1.0/canvas.getUnit().getScale(); 
+                        double xShift = canvas.getUnit().parseFormat(rc) * scale;
+                        canvas.moveSelected(xShift, 0);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(canvas, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
+                    }
+                }
+
+            }
+        });
+        
+         moveVerticallyMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                Component parent = SwingUtilities.getRoot(canvas);
+                
+                //Prompt for the offset
+                String rc = (String)JOptionPane.showInputDialog(parent, "Number of " + canvas.getUnit().getName() + " to move", "Move Vertically", JOptionPane.QUESTION_MESSAGE, vertMoveIcon,
+                                                        (Object[])null, 0);
+                if (rc != null) {
+                    try {
+                        //Get the user entered coordinates
+                        double scale = 1.0/canvas.getUnit().getScale(); 
+                        double yShift = canvas.getUnit().parseFormat(rc) * scale;
+                        canvas.moveSelected(0, yShift);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(canvas, "Invalid value: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, errorIcon);
+                    }
+                }
+
             }
         });
        
