@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -70,6 +71,30 @@ public final class ZCanvasRuler extends ZRectangle {
     }
     
     
+    private void drawZeroMajorTick(Graphics2D g, double unitSize, int pos, int len, boolean isHoriz) {
+        
+        Stroke s = g.getStroke();
+        Color c = g.getColor();
+        
+        g.setStroke(createBasicStroke(unitSize, borderThickness*3, borderStyle, null));
+
+        if (isHoriz)
+            g.drawLine(pos, 0, pos, len);  //draw a vertical bar at pos for major tick
+        else
+            g.drawLine(0, pos, len, pos);  //draw a horizontal bar at pos for major tick
+
+        g.setStroke(s);  //back to original
+        
+        g.setColor(Color.WHITE);
+        
+        if (isHoriz)
+            g.drawLine(pos, 0, pos, len);  //draw a vertical bar at pos for major tick
+        else
+            g.drawLine(0, pos, len, pos);  //draw a horizontal bar at pos for major tick
+
+        g.setColor(c);  //back to original
+    }
+    
     @Override
     public void paint(Graphics2D g, double unitSize, double width, double height) {
         if (!isVisible())
@@ -91,13 +116,19 @@ public final class ZCanvasRuler extends ZRectangle {
                 
                 int inc = (int)Math.round(i);
                 
-                g.drawLine(inc, 0, inc, (int)(3*height/4));  //draw a vertical bar at i for major tick
-                
+                //Draw minors         
                 for (double j=i; j<width; j+=scale/minorTicks) {
                     int jnc = (int)Math.round(j);
                     g.drawLine(jnc, 0, jnc, (int)(height/4));  //draw a vertical bar at j for minor tick
                 }
                 
+                //Draw major
+                if (majorVal == 0 && majorValOffset != 0)
+                    drawZeroMajorTick(g, unitSize, inc, (int)height, true);
+                else           
+                    g.drawLine(inc, 0, inc, (int)(3*height/4));  //draw a vertical bar at i for major tick
+    
+                //draw label
                 if (i==0)
                     g.drawString(unit.getName(), 2, fontMetrics.getHeight());  //draw unit name instead of zero
                 else
@@ -111,14 +142,20 @@ public final class ZCanvasRuler extends ZRectangle {
              for (double i=0; i<height; i+=scale) {
                  
                 int inc = (int)Math.round(i);
-
-                g.drawLine(0, inc, (int)(3*width/4), inc);  //draw a horizontal bar at i for major tick
                 
-                 for (double j=i; j<height; j+=scale/minorTicks) {
-                        int jnc = (int)Math.round(j);
-                     g.drawLine(0, jnc, (int)(width/4), jnc);  //draw a horizontal bar at j for minor tick
-                 }
+                //draw minors
+                for (double j=i; j<height; j+=scale/minorTicks) {
+                    int jnc = (int)Math.round(j);
+                    g.drawLine(0, jnc, (int)(width/4), jnc);  //draw a horizontal bar at j for minor tick
+                }
                  
+                //draw major
+                if (majorVal == 0 && majorValOffset != 0)
+                    drawZeroMajorTick(g, unitSize, inc, (int)width, false);
+                else           
+                    g.drawLine(0, inc, (int)(3*width/4), inc);  //draw a horizontal bar at i for major tick
+      
+                //draw label
                 if (i==0)
                     g.drawString(unit.getName(), 0, fontMetrics.getHeight());  //draw unit name instead of zero
                 else
