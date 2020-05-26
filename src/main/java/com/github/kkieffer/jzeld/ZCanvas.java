@@ -2378,6 +2378,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         
         if (passThruElement != null ||  drawClient != null)
             return;
+        
+        if (fields.zElements.isEmpty())
+            return;
                     
         ZElement first = lastSelectedElement;
         ZElement next = first;
@@ -2402,6 +2405,9 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
     public void selectPrevElement() {
         
         if (passThruElement != null ||  drawClient != null)
+            return;
+        
+        if (fields.zElements.isEmpty())
             return;
                     
         ZElement first = lastSelectedElement;
