@@ -111,7 +111,7 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
         }
     }
     
-    public enum CombineOperation {Join, Subtract, Intersect, Exclusive_Join;
+    public enum CombineOperation {Join, Subtract, Intersect, Exclusive_Join, Append;
     
         @Override
         public String toString() {
@@ -126,13 +126,15 @@ public class ZCanvas extends JComponent implements Printable, MouseListener, Mou
             
             switch (this) {
                 case Join:
-                    return "Joins multiple shapes into a single shape.  All parts of the selected shapes are included, both overlapping and non-overlapping." + common;
+                    return "Joins multiple shapes into a single shape by merging their areas. All parts of the selected shapes are included, both overlapping and non-overlapping." + common;
                 case Subtract:
                     return "Subtracts from the first selected shape the overlapping areas from all the other selected shapes" + common;
                 case Intersect:
-                    return "Creates a shape from only the overlapping parts of the selected shapes." + common;
+                    return "Creates a shape from only the overlapping areas of the selected shapes." + common;
                 case Exclusive_Join:
-                    return "Joins multiple shapes into a single shape.  All parts of the selected shapes are included except the ones that overlap with each other." + common;
+                    return "Joins multiple shapes into a single shape. All areas of the selected shapes are included except the ones that overlap with each other." + common;
+                case Append:
+                    return "Similar to Join, except paths of the shapes are appended instead of the areas. Preserves borders as well as open and unclosed shapes.";
                 default:
                     throw new RuntimeException("Unhandled CombineOperation case");
             }

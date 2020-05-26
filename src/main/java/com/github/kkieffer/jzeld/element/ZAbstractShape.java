@@ -18,6 +18,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.FlatteningPathIterator;
+import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -498,6 +499,7 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
         
         Shape refShape = getShape();  //reference shape
         Area a = new Area(refShape);
+        Path2D path = new Path2D.Double(refShape);
         
         for (ZAbstractShape zShape : shapes) {
             
@@ -516,8 +518,15 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
                 case Exclusive_Join:
                     a.exclusiveOr(new Area(from));
                     break;
+                case Append:
+                    path.append(from, false);
+                    break;
             }
         }
+        
+        if (operation == CombineOperation.Append)
+            return path;
+        
         
         if (a.isEmpty())
             return null;
@@ -552,6 +561,11 @@ public abstract class ZAbstractShape extends ZElement implements ShadowAttribute
             case Exclusive_Join:
                 a.exclusiveOr(area);
                 break;
+            case Append:
+                Path2D path = new Path2D.Double(refShape);
+                path.append(area, false);
+                return ZShape.createFromReference(this, path);  //create a ZShape from the reference attributes and the merged shape
+               
         }
             
         if (a.isEmpty())
