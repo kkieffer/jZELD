@@ -42,11 +42,15 @@ public class JAXBAdapter {
 
         @Override
         public String marshal(final Color object) throws Exception {
+            if (object == null)
+                return "null";
            return Integer.toHexString(object.getRGB());
         }
 
         @Override
         public Color unmarshal(String v) throws Exception {
+            if (v.equals("null"))
+                return null;
             return new Color(Integer.parseUnsignedInt(v, 16), true);
         }
 
