@@ -6,6 +6,7 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.PixelGrabber;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,7 +15,6 @@ import java.io.Serializable;
 import javax.imageio.ImageIO;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import sun.awt.image.ToolkitImage;
 
 /**
  *
@@ -25,7 +25,7 @@ public class SerializableImage implements Serializable {
     
     /**
      * Make an exact copy of the BufferedImage
-     * @param i src
+     * @param i source image
      * @return copy
      */
     public static BufferedImage copyImage(BufferedImage i) {
@@ -64,13 +64,15 @@ public class SerializableImage implements Serializable {
     public static BufferedImage resizeImage(Image original, int newWidth, int newHeight, int newType, int x, int y, int w, int h) {
         
         if (newType == 0) {
-            boolean hasAlpha;
-            if (original instanceof ToolkitImage) 
-                hasAlpha = ((ToolkitImage)original).getColorModel().hasAlpha();
-            else if (original instanceof BufferedImage)
-                hasAlpha = ((BufferedImage)original).getColorModel().hasAlpha();
-            else
-                throw new RuntimeException("Unsupported image type to resize");
+            
+            PixelGrabber pg = new PixelGrabber(original, 0, 0, 1, 1, false);  //grab the first pixel
+            try { 
+                if (!pg.grabPixels())
+                throw new RuntimeException("Unable to get pixel from image");
+            } catch (InterruptedException ex) {
+                throw new RuntimeException("Interrupted while getting pixel from image");
+            }
+            boolean hasAlpha = pg.getColorModel().hasAlpha();  //see if the pixel has alpha channel
             
             newType = hasAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
         }
